@@ -1,0 +1,790 @@
+<html><head>
+
+<title>MaskTools v2</title><link rel="stylesheet" type="text/css" href="avisynth.css"><!--
+Automatically generated, don't change:
+$Id: masktools.htm,v 1.1.1.1 2004/02/18 20:54:58 warpenterprises Exp $ 
+--></head>
+<body>
+<h1>MaskTools v2</h1>
+<h2>Abstract</h2>
+<b>Authors : </b>Kurosu, Manao, mg262<br>
+<b>Version : </b>2.0 alpha 43<br>
+<b>Download : </b><a href="http://manao4.free.fr/">http://manao4.free.fr/</a><br>
+<b>Category : </b>Misc Plugins<br>
+<b>Requirements : </b>YV12 Colorspace
+<hr>
+<h2>Table of contents</h2>
+<ul>
+<li><a href="#masktools">Introduction</a></li>
+<li><a href="#common_parameters">Common parameters</a></li>
+<li><a href="#filters_list">Filters list</a></li>
+<li><a href="#filters_description">Filters description</a></li>
+<li><a href="#reverse_polish_notation">Reverse polish notation</a></li>
+<li><a href="#changelog">Changelog</a></li>
+</ul>
+
+<h2><a name="masktools"></a>I) Introduction</h2>
+
+<p>Masktool's dll contains a set of filters designed to create, manipulate and use masks. Masks,
+in video processing, are a way to give a relative importance to each pixels. You can, for example,
+create a mask that select only the green parts of the video, and then replace these parts with
+another video.</p>
+<p>
+To give the most control over the handling of masks, the filters will use the fact that each 
+luma and chroma planes can be uncorrelated. That mean that a single video will always be 
+considered by the filters as 3 independant planes. That applies for masks as well, which means
+that a mask clip will in fact contain 3 masks, one for each planes.</p>
+
+<p>The filters have a set of common parameters, that mainly concerns what processing to do on 
+each planes. They all work only in YV12 ( though with Avisynth 2.6, support for all planar format
+will be available ).</p>
+
+<p>There are four DLLs in this package : two win32 DLLS, and two win64 ones. There are two DLLs
+for avisynth 2.5, and two for avisynth 2.6</p>
+
+<h2><a name="common_parameters"></a>II) Common parameters</h2>
+
+As said previously, all the filters - except the helpers - share a common set of parameters. These parameters are used
+to tell what processing to do on each plane / channel, and what area of the video to process.
+
+<ul>
+<li><var>int "offx" (0), int "offy" (0)</var><br><br>
+
+"offx" and <var>offy</var> are the top left coordinates of the box where the actual processing shall occur.
+Everything outside that box will be garbage.<br>
+</li>
+
+<li><var>int "w" (-1), int "h" (-1)</var><br><br>
+
+<var>w</var> and <var>h</var> are the width and height of the processed box. -1 means that the box extends to the 
+lower right corner of the video. That also means that default settings are meant to process the
+whole picture.<br>
+</li>
+
+<li><var>int "y" (3), int "u" (1), int "v" (1)</var><br><br>
+
+These three values describe the actual processing mode that is to be used on each plane / channel.
+Here is how the modes are coded :
+<ul>
+<li>x=-255..0 : all the pixels of the plane will be set to -x.</li>
+<li>x=1 : the plane will not be processed. That means the content of the plane after the filter is pure garbage.</li>
+<li>x=2 : the plane of the first input clip will be copied.</li>
+<li>x=3 : the plane will be processed with the processing the filter is designed to do.</li>
+<li>x=4 (when applicable) : the plane of the second input clip will be copied.</li>
+<li>x=5 (when applicable) : the plane of the third input clip will be copied.</li>
+</ul>
+As you can see, defaults parameters are chosen to only process the luma, and not to care about the chroma. It's
+because most video processing doesn't touch the chroma when handling 4:2:0.<br>
+</li>
+<li><var>string "chroma" ("")</var><br><br>
+
+When defined, the value contained in this string will overwrite the <var>u</var> & <var>v</var> processing modes. This is a nice
+addition proposed by mg262 that makes the filter more user friendly. Allowed values for <var>chroma</var> are :
+<ul>
+<li>"process" : set <var>u</var> = <var>v</var> = 3.</li>
+<li>"copy" or "copy first" : set <var>u</var> = <var>v</var> = 2.</li>
+<li>"copy second" : set <var>u</var> = <var>v</var> = 4.</li>
+<li>"copy third" : set <var>u</var> = <var>v</var> = 5.</li>
+<li>"xxx", where xxx is a number : set <var>u</var> = <var>v</var> = -xxx.</li>
+</ul>
+</li>
+</ul>
+<h2><a name="filters_list"></a>III) Filters list</h2>
+Here is an exhaustive list of the filters contained in this dll :
+<ul>
+<li><b>Masks creation : </b><ul>
+<li><a href="#mt_edge">mt_edge :</a> creates edge masks.</li>
+<li><a href="#mt_motion">mt_motion :</a> creates motion masks.</li>
+</ul></li>
+<li><b>Masks operation : </b><ul>
+<li><a href="#mt_invert">mt_invert :</a> inverses masks.</li>
+<li><a href="#mt_binarize">mt_binarize :</a> transforms soft masks into hard masks.</li>
+<li><a href="#mt_logic">mt_logic :</a> combines masks using logic operators.</li>
+<li><a href="#mt_hysteresis">mt_hysteresis :</a> combines masks making the first one grows into the second.</li>
+</ul></li>
+<li><b>Mask merging : </b><ul>
+<li><a href="#mt_merge">mt_merge :</a> merges two clips according to a mask.</li>
+</ul></li>
+<li><b>Morphologic operator : </b><ul>
+<li><a href="#mt_expand_mt_inpand">mt_expand :</a> expands the mask / the video.</li>
+<li><a href="#mt_expand_mt_inpand">mt_inpand :</a> inpands the mask / the video.</li>
+<li><a href="#mt_inflate_mt_deflate">mt_inflate :</a> inflates the mask / the video.</li>
+<li><a href="#mt_inflate_mt_deflate">mt_deflate :</a> deflates the mask / the video.</li>
+</ul></li>
+<li><b>Lut operator : </b><ul>
+<li><a href="#mt_lut">mt_lut :</a> applies an expression to all the pixels of a mask / video.</li>
+<li><a href="#mt_lutxy">mt_lutxy :</a> applies an expression to all the pixels of two masks / videos.</li>
+<li><a href="#mt_lutxy">mt_lutxy :</a> applies an expression to all the pixels of two masks / videos.</li>
+<li><a href="#mt_lutxyz">mt_lutxyz :</a> applies an expression to all the pixels of three masks / videos.</li>
+<li><a href="#mt_lutf">mt_lutf :</a> creates a uniform picture from the collection of computation on pixels of two clips.</li>
+<li><a href="#mt_luts">mt_luts :</a> applies an expression taking neighbouring pixels into.</li>
+<li><a href="#mt_lutsx">mt_lutsx :</a> applies an expression taking neighbouring pixels into, in a different way.</li>
+<li><a href="#mt_lutspa">mt_lutspa :</a> computes the value of a pixel according to its spatial position.</li>
+</ul></li>
+<li><b>Support operator : </b><ul>
+<li><a href="#mt_makediff">mt_makediff :</a> substracts two clips.</li>
+<li><a href="#mt_adddiff">mt_adddiff :</a> adds back a difference of two clips.</li>
+<li><a href="#mt_clamp">mt_clamp :</a> clamps a clip between two other clips.</li>
+<li><a href="#mt_average">mt_average :</a> averages two clips.</li>
+</ul></li>
+<li><b>Convolutions : </b><ul>
+<li><a href="#mt_convolution">mt_convolution :</a> applies a separable convolution on the picture.</li>
+<li><a href="#mt_mappedblur">mt_mappedblur :</a> applies a special 3x3 convolution on the picture.</li>
+</ul></li>
+<li><b>Helpers : </b><ul>
+<li><a href="#mt_square_mt_circle_mt_diamond">mt_square :</a> creates a string describing a square.</li>
+<li><a href="#mt_rectangle_mt_ellipse_mt_losange">mt_rectange :</a> creates a string describing a rectangle.</li>
+<li><a href="#mt_freerectangle_mt_freeellipse_mt_freelosange">mt_freerectangle :</a> creates a string describing an rectangle.</li>
+<li><a href="#mt_square_mt_circle_mt_diamond">mt_diamond :</a> creates a string describing a diamond.</li>
+<li><a href="#mt_rectangle_mt_ellipse_mt_losange">mt_losange :</a> creates a string describing a lozenge.</li>
+<li><a href="#mt_freerectangle_mt_freeellipse_mt_freelosange">mt_freelosange :</a> creates a string describing an lozenge.</li>
+<li><a href="#mt_square_mt_circle_mt_diamond">mt_circle :</a> creates a string describing a circle.</li>
+<li><a href="#mt_rectangle_mt_ellipse_mt_losange">mt_ellipse :</a> creates a string describing an ellipse.</li>
+<li><a href="#mt_freerectangle_mt_freeellipse_mt_freelosange">mt_freeellipse :</a> creates a string describing an ellipse.</li>
+<li><a href="#mt_polish">mt_polish :</a> creates a reverse polish expression from an infix one.</li>
+<li><a href="#mt_infix">mt_infix :</a> creates an infix expression from a reverse polish one.</li>
+</ul></li>
+</ul>
+<h2><a name="filters_description"></a>IV) Filters description</h2>
+<h3><a name="mt_edge"></a>mt_edge</h3>
+<p>
+<code>mt_edge</code> : <var>string mode("sobel"), int thY1(10), int thY2(10), int thC1(10), int thC2(10)</var>
+</p>
+<p>
+<ul>
+<li><var>mode</var> choses the 3x3 convolution kernel used for the mask computing. There are three predefined kernel,
+"sobel", "roberts" and "laplace", and you can enter also a 3x3 custom kernel. "sobel" uses the
+kernel "0 -1 0 -1 0 1 0 1 0", "roberts": "0 0 0 0 2 -1 0 -1 0" and "laplace": "1 1 1 1 -8 1 1 1 1".
+The normalization factor of the kernel is automatically computed and ceiled to the closest power of 2,
+to allow faster processing. You can specify your own normalization factor by adding it to the list of 
+coefficients ( "1 1 1 1 -8 1 1 1 1 8" for example ).</li>
+<li><var>thX1</var> is the low threshold and <var>thX2</var> the high threshold. Under <var>thX1</var>, the pixel is set to zero, over <var>thX2</var>,
+to 255, and inbetween, left untouched.</li>
+<li>Four new kernels have been introduced lately : "hprewitt", "prewitt", "cartoon" and "min/max". "prewitt" is a more
+robust kernel, while "cartoon" behaves like "roberts", but takes only negative edges into account.
+Finally, "min/max" computes the local contrast ( local max - local min ).</li>
+<li>More precisely, "hprewitt" is equivalent to : mt_logic(mt_edge("1 2 1 0 0 0 -1 -2 -1 1"), mt_edge("1 0 -1 2 0 -2 1 0 -1 1"), mode = "max"), and
+"prewitt" is equivalent to mt_logic(mt_logic(mt_edge("1 1 0 1 0 -1 0 -1 -1 1"), mt_edge("1 1 1 0 0 0 -1 -1 -1 1"), mode = "max"), mt_logic(mt_edge("1 0 -1 1 0 -1 1 0 -1 1"), mt_edge("0 -1 -1 1 0 -1 1 1 0 1"), mode = "max"), mode = "max")
+</li>
+
+</ul>
+</p>
+<h3><a name="mt_motion"></a>mt_motion</h3>
+<p><code>mt_motion</code> : <var>int thY1(10), int thY2(10), int thC1(10), int thC2(10), int thT(10)</var></p>
+<p><ul>
+<li><var>thT</var> decides whether the frame is a scene change or not. The mask is made blank if a scene change
+is detected, else, the mask is computed.</li>
+<li><var>thX1</var>, <var>thX2</var> work as for mt_edge.</li>
+</ul></p>
+<h3><a name="mt_expand_mt_inpand"></a>mt_expand, mt_inpand</h3>
+<p><code>mt_xxpand</code> : <var>int thY(255), int thC(255), string mode("square")</var></p>
+<p><ul>
+<li>It replaces the pixel by the local maximum/minimum.</li>
+<li><var>thX</var> allows to limit the maximum change.</li>
+<li><var>mode</var> select the local neighbourhood. It can take the values :<ul>
+<li><b>"square"</b> : 3x3 square neighbourhood - isse optimized.</li>
+<li><b>"horizontal"</b> : 3x1 horizontal neighbourhood.</li>
+<li><b>"vertical"</b> : 1x3 horizontal neighbourhood.</li>
+<li><b>"both"</b> : a 3-long cross ( "horizontal" + "vertical" ) neighbourhood.</li>
+<li>a custom mode, where you give a list of coordinates. "0 0 -1 0 1 0" is for example
+equivalent to "horizontal".</li>
+</ul>
+</ul></p>
+<h3><a name="mt_inflate_mt_deflate"></a>mt_inflate, mt_deflate</h3>
+<p><code>mt_xxflate</code> : <var>int thY(255), int thC(255)</var></p>
+<p>
+<ul><li>It computes a local average by taking into account only the neighbourgh whose value is higher/lower than the pixel.</li></ul>
+</p>
+<h3><a name="mt_merge"></a>mt_merge</h3>
+<p><code>mt_merge</code> : <var>clip clip1, clip clip2, clip mask, bool "luma"(false)</var></p>
+<p>
+<ul>
+<li>It's the backbone of the framework. It merges two clips according to the mask. The bigger the mask value,
+the more the second clip will be taken into account ( the actual formula is y = ((256 - m) * x1 + m * x2 + 128) / 256 )</li>
+<li><var>luma</var> is a special mode, where only the luma plane of the mask is used to process all three channels.</li>
+<li><var>u</var> and <var>v</var> are defaulted to 2 (that way, the resulting clip contains the chroma of clip1, and looks right).</li>
+</ul></p>
+<h3><a name="mt_lut"></a>mt_lut</h3>
+<p><code>mt_lut</code> : <var>string expr("x"), string yexpr("x"), string uexpr("x"), string vexpr("x")</var></p>
+<p><ul>
+<li>It applies a function defined by expr to all the pixels. The function is written is reverse polish notation.</li>
+<li>If <var>yexpr</var>, <var>uexpr</var> or <var>vexpr</var> isn't defined, <var>expr</var> is used instead.</li>
+</ul></p>
+<h3><a name="mt_lutxy"></a>mt_lutxy</h3>
+<p><code>mt_lutxy</code> : <var>clip clip1, clip clip2, string expr("x"), string yexpr("x"), string uexpr("x"), string vexpr("x")</var></p>
+<p><ul>
+<li>It applies a two-parameters function defined by expr to all the pixels. The function is written is reverse polish notation.</li>
+<li>If <var>yexpr</var>, <var>uexpr</var> or <var>vexpr</var> isn't defined, <var>expr</var> is used instead.</li>
+</ul></p>
+<h3><a name="mt_lutxyz"></a>mt_lutxyz</h3>
+<p><code>mt_lutxyz</code> : <var>clip clip1, clip clip2, clip clip3, string expr("x"), string yexpr("x"), string uexpr("x"), string vexpr("x")</var></p>
+<p><ul>
+<li>It applies a three-parameters function defined by expr to all the pixels. The function is written is reverse polish notation.</li>
+<li>If <var>yexpr</var>, <var>uexpr</var> or <var>vexpr</var> isn't defined, <var>expr</var> is used instead.</li>
+</ul></p>
+<h3><a name="mt_lutf"></a>mt_lutf</h3>
+<p><code>mt_lutf</code> : <var>clip clip1, clip clip2, string mode("avg"), string expr("y"), string yexpr("y", string uexpr("y"), string vexpr("y")</var></p>
+<p><ul>
+<li>It computes a value by collecting the values of the pixels of <var>clip1</var>, according to <var>mode</var>. Then it applies the function
+defined by the expressions to all the pixels of <var>clip2</var> ( which are mapped to the y variable, while x is the collected value ).</li>
+<li><var>mode</var> can be :<ul>
+<li><b>"avg"</b> or <b>"average"</b> : computes the average of the values.</li>
+<li><b>"std"</b> or <b>"standard deviation"</b> : computes the standard deviation of the values.</li>
+<li><b>"min"</b> : computes the min of the values.</li>
+<li><b>"max"</b> : computes the max of the values.</li>
+<li><b>"range"</b> : computes "max" - "min".</li>
+<li><b>"med"</b> or <b>"median"</b> : computes the median of the values.</li>
+</ul></li>
+<li>A possible use is to allow increase the dynamic adaptively : <code>mt_lutf(c, c, mode = "range", expr = "y 128 - 256 * range / 128 +")</code></li>
+</ul></p>
+<h3><a name="mt_luts"></a>mt_luts</h3>
+<p><code>mt_luts</code> : <var>clip clip1, clip clip2, string mode("avg"), string pixels(""), string expr("x"), string yexpr("x"), string uexpr("x"), string vexpr("x")</var></p>
+<p><ul>
+<li>It computes the <var>mode</var> operation on the result of the function defined by <var>expr</var>, where x is the pixel from <var>clip1</var>, and y
+a pixel from the neighbourhood in <var>clip2</var>, defined by <var>pixels</var>.</li>
+<li><var>mode</var> can take the same values as for <code>mt_lutf</code>, but also supports a seventh mode, which will do a sum of the neighbouring, weighted by the serie of weights
+given as <var>mode</var>. The sum is normalized by the sum of weights.</li>
+<li><var>pixels</var> is a coordinates list, relative to the current pixels. It can be created by one of the form helpers.</li>
+<li>Let's see some uses :<ul>
+<li><code>mt_luts( c, c, mode = "avg", pixels = mt_square( 1 ), expr = "y" )</code> does a convolution
+by a 3x3 kernel filled with ones.</li>
+<li><code>mt_luts( c, c, mode = "min", pixels = mt_square( 1 ), expr = "y" )</code> does an inpand.</li>
+<li><code>mt_luts( c, c, mode = "range", pixels = mt_square( 1 ), expr = "y" )</code> does a <code>mt_edge( mode = "min/max" )</code>.</li>
+<li><code>mt_luts( c, c, mode = "std", pixels = mt_square( 1 ), expr = "y" )</code> gives the local standard deviation of the clip.</li>
+<li><code>mt_luts( c, c, mode = "max", pixels = mt_square( 1 ), expr = "x y - abs" )</code> gives
+the maximum difference between the surrounding pixels and the center.</li>
+<li><code>mt_luts( c, c, mode = "med", pixels = mt_square( 1 ), expr = "y" )</code> gives the median of the pixels of
+the surrounding.</li>
+<li><code>mt_luts( c, c, mode = "1 1 1 1 1 1 1 1 1", pixels = mt_square( 1 ), expr = "y" )</code> is equivalent to mode = "avg".</li>
+</ul></li>
+</ul></p>
+<h3><a name="mt_lutsx"></a>mt_lutsx</h3>
+<p><code>mt_lutsx</code> : <var>clip clip, clip clip1, clip clip2, string mode("avg"), string mode2("none"), string pixels(""), string expr("x"), string yexpr("x"), string uexpr("x"), string vexpr("x")</var></p>
+<p><ul>
+<li>It computes the <var>mode</var> on the neighbouring pixels in clip1, and <var>mode2</var> on the neighbouring pixels in clip2, 
+then it applies the function defines by <mode>expr</mode> with y = <var>mode</var> and z = <var>mode2</var>.</li>
+<li><var>mode</var> and <var>mode2</var> can take the same values as for <code>mt_luts</code>.</li>
+<li><var>pixels</var> works as in <code>mt_luts</code>.</li>
+<li>Let's see some examples :<ul>
+<li><code>mt_lutsx( c, c, c, mode = "min", mode2 = "max", pixels = mt_square( 1 ), expr = "z y -" )</code> computes the local max - min value.</li>	
+<li><code>mt_lutsx( c, c, c, mode = "min", mode2 = "max", pixels = mt_square( 1 ), expr = "x y - 256 * z y - /" )</code> change the local luminosity and constrast so that the local minimum is black and local maximum is white.</li>	
+</ul></li>
+</ul></p>
+<h3><a name="mt_lutspa"></a>mt_lutspa</h3>
+<p><code>mt_lutspa</code> : <var>clip clip, string mode("relative"), string expr("x"), string yexpr("x"), string uexpr("x"), string vexpr("x"), bool relative("true"), bool biased("true")</var></p>
+<p><ul>
+<li>It computes the value of each pixels according to its coordinates and the given lut. Variable x and y in the lut corresponds
+respectively to absciss and ordinate of the pixel. <var>mode</var> controls how the pixels coordinates are transformed into a value. It overrides the legacy parameters,
+<var>relative</var> and <var>biased</var>.</li>
+<li>Possible values for <var>mode</var> are :<ul><li>"absolute" : x and y go from 0 to width - 1 and height - 1. Equivalent to <var>relative</var> = false.</li>
+<li>"relative", or "relative opened", or "relative exclusive" : x and y go from 0 to 1 (excluded). Equivalent to <var>relative</var> = true, <var>biased</var> = true.</li>
+<li>"relative closed", or "relative inclusive" : x and y go from 0 to 1 (included). Equivalent to <var>relative</var> = true, <var>biased</var> = false.</li></ul></li>
+<li>Let's see an example :<ul>
+<li><code>mt_lutspa( c, mode = "relative", expr = "x y + 256 * 2 /", chroma = "128" )</code> creates a diagonal gradient.</li>	
+</ul></li>
+</ul></p>
+<h3><a name="mt_average"></a>mt_average</h3>
+<p><code>mt_average</code> : <var>clip clip1, clip clip2</var></p>
+<p><ul><li>Equivalent to <code>mt_lutxy("x y + 2 /")</code>, but faster.</li></ul></p>
+<h3><a name="mt_makediff"></a>mt_makediff</h3>
+<p><code>mt_makediff</code> : <var>clip clip1, clip clip2</var></p>
+<p><ul><li>Equivalent to <code>mt_lutxy("x y - 128 +")</code>, but faster.</li></ul></p>
+<h3><a name="mt_adddiff"></a>mt_adddiff</h3>
+<p><code>mt_adddiff</code> : <var>clip clip1, clip clip2</var></p>
+<p><ul><li>Equivalent to <code>mt_lutxy("x y + 128 -")</code>, but faster.</li></ul></p>
+<h3><a name="mt_clamp"></a>mt_clamp</h3>
+<p><code>mt_clamp</code> : <var>clip c, clip bright_limit, clip dark_limit, int overshoot(0), int undershoot(0)</var></p>
+<p><ul>
+<li>Forces the value of the first clip to be between bright_limit + overshoot and dark_limit - undershoot.</li>
+<li>Gives unwanted results if bright_limit + overshoot < dark_limit - undershoot.</li>
+</ul></p>
+<h3><a name="mt_invert"></a>mt_invert</h3>   
+<p><code>mt_invert</code> : <var>clip c</var></p>
+<p><ul>
+<li>Inverts the values of the pixels.</li>
+<li>Equivalent to <code>mt_lut("255 x -")</code>, but faster.</li>
+</ul></p>
+<h3><a name="mt_binarize"></a>mt_binarize</h3>
+<p><code>mt_binarize</code> : <var>clip c, int threshold(128), bool upper(false), string mode("lower")</var></p>
+<p><ul>
+<li>Does the quivalent of <code>mt_lut("x t > a b ?")</code>, where <b>"a b"</b> is derived from <var>mode</var>, and can be either <b>0</b>, <b>x</b>, <b>t</b> or <b>255</b> (<b>t</b> is replaced by <var>threshold</var>)</li>
+<li>Possible values for <var>mode</var> are :
+<ul>
+<li><b>"0 x"</b></li>
+<li><b>"x 0"</b></li>
+<li><b>"0 t"</b></li>
+<li><b>"t 0"</b></li>
+<li><b>"t x"</b></li>
+<li><b>"x t"</b></li>
+<li><b>"255 0"</b> or <b>"lower"</b></li>
+<li><b>"0 255"</b> or <b>"upper"</b></li>
+<li><b>"255 x"</b></li>
+<li><b>"x 255"</b></li>
+<li><b>"255 t"</b></li>
+<li><b>"t 255"</b></li>
+</ul>
+<li><var>upper</var> parameter is kept for compatibility purposes. When it is defined, it overrides <var>mode</var>.</li>
+</ul></p>
+<h3><a name="mt_logic"></a>mt_logic</h3>
+<p><code>mt_logic</code> : <var>clip clip1, clip clip2, string mode("and"), int th1(0), int th2(0)</var></p>
+<p><ul>
+<li>Applies the function defined by <var>mode</var> to <var>clip1</var> and <var>clip2</var>.</li>
+<li>Possible values for <var>mode</var> are :<ul>
+<li><b>"and"</b> : does a binary "and" on each pairs of pixels ( 11 & 5 is computed by converting them to binary, and to and all the bits : 11 = 1011, 5 = 101, 11 & 5 = 1 ).</li>
+<li><b>"or"</b> : does a binary "or" on each pairs of pixels ( 11 | 5 = 1011 | 101 = 1111 = 15 ).</li>
+<li><b>"xor"</b> : does a binary "xor" on each pairs of pixels ( 11 ^ 5 = 1011 ^ 101 = 1110 = 14 ).</li>
+<li><b>"andn"</b> : does a binary "and not" on each pairs of pixels ( 11 & ~5 = 1011 & ~101 = 1011 & 11111010 = 1010 = 10 ).</li>
+<li><b>"min"</b> : equivalent to <code>mt_lutxy("x th1 + y th2 + min")</code>.</li>
+<li><b>"max"</b> : equivalent to <code>mt_lutxy("x th1 + y th2 + max")</code>.</li>
+</ul></li>
+</ul></p>
+<h3><a name="mt_hysteresis"></a>mt_hysteresis</h3>
+<p><code>mt_hysteresis</code> : <var>clip small_mask, clip big_mask</var></p>
+<p><ul>
+<li>Grows the small mask into the big mask by connex components. That allows to build more robust edge masks.</li>
+</ul></p>
+<h3><a name="mt_convolution"></a>mt_convolution</h3>
+<p><code>mt_convolution</code> : <var>clip c, string horizontal("1 1 1"), string vertical("1 1 1"), bool saturate(true), float total(1.0f)</var></p>
+<p><ul>
+<li>Applies the convolution defined by the kernel <var>horizontal</var>T x <var>vertical</var> to the video.</li>
+<li>Both <var>horizontal</var> and <var>vertical</var> must have an odd length.</li>
+<li>The default normalization value is the sum of the absolute values of the coefficients of the kernel.</li>
+<li>If <var>saturate</var> is true, the result of the convolution is clipped to [0..255], else the absolute value of the result is clipped to [0..255].</li>
+<li>If <var>total</var> is defined, it overrides the default normalization value.</li>
+<li>Computations occurs in float as soon as one element of <var>horizontal</var> or <var>vertical</var> is a float.</li>
+</ul></p>
+<h3><a name="mt_mappedblur"></a>mt_mappedblur</h3>
+<p><code>mt_mappedblur</code> : <var>clip c, clip map, string kernel("1 1 1 1 1 1 1 1 1"), string mode("replace")</var></p>
+<p><ul>
+<li>Applies the convolution kernel to the clip, but in a special way, according to <var>mode</var> : <ul>
+<li><b>"replace"</b> : if a pixel differs by more than <var>map</var> from the center pixel of the convolution, it is replaced by the center value.</li>
+<li><b>"dump"</b> : if a pixel differs by more than <var>map</var> from the center pixel of the convolution, it is not taken into account.</li>
+</ul></li>
+</ul></p>
+<h3><a name="mt_square_mt_circle_mt_diamond"></a>mt_square, mt_circle, mt_diamond</h3>
+<p><code>mt_square</code> : <var>int radius(1), bool zero(true)</var><br>
+<code>mt_circle</code> : <var>int radius(1), bool zero(true)</var><br>
+<code>mt_diamond</code> : <var>int radius(1), bool zero(true)</var></p>
+<p><ul>
+<li>Creates a relative coordinates list that can be used in <code>luts</code>, <code>mt_expand</code> and <code>mt_inpand</code></li>
+<li><var>zero</var> decides whether the center of the form is included or not.</li>
+</ul></p>
+<h3><a name="mt_rectangle_mt_ellipse_mt_losange"></a>mt_rectangle, mt_ellipse, mt_losange</h3>
+<p><code>mt_rectangle</code> : <var>int hor_radius(1), int ver_radius(1), bool zero(true)</var><br>
+<code>mt_ellipse</code> : <var>int hor_radius(1), int ver_radius(1), bool zero(true)</var><br>
+<code>mt_losange</code> : <var>int hor_radius(1), int ver_radius(1), bool zero(true)</var></p>
+<p><ul>
+<li>Creates a relative coordinates list that can be used in <code>luts</code>, <code>mt_expand</code> and <code>mt_inpand</code></li>
+<li><var>zero</var> decides whether the center of the form is included or not.</li>
+</ul></p>
+<h3><a name="mt_freerectangle_mt_freeellipse_mt_freelosange"></a>mt_freerectangle, mt_freeellipse, mt_freelosange</h3>
+<p><code>mt_freerectangle</code> : <var>int top_x(-1), int top_y(-1), int bottom_x(1), int bottom_y(1), bool zero(true)</var><br>
+<code>mt_freeellipse</code> : <var>int top_x(-1), int top_y(-1), int bottom_x(1), int bottom_y(1), bool zero(true)</var><br>
+<code>mt_freelosange</code> : <var>int top_x(-1), int top_y(-1), int bottom_x(1), int bottom_y(1), bool zero(true)</var></p>
+<p><ul>
+<li>Creates a relative coordinates list that can be used in <code>luts</code>, <code>mt_expand</code> and <code>mt_inpand</code></li>
+<li><var>zero</var> decides whether the (0,0) pixel is included or not.</li>
+</ul></p>
+<h3><a name="mt_polish"></a>mt_polish</h3>
+<p><code>mt_polish</code> : <var>string expr("x")</var></p>
+<p><ul>
+<li>Creates a reverse polish expression from an infix one.</li>
+</ul></p>
+<h3><a name="mt_infix"></a>mt_infix</h3>
+<p><code>mt_infix</code> : <var>string expr("x")</var></p>
+<p><ul>
+<li>Creates an infix expression from a reverse polish one.</li>
+</ul></p>
+<h2><a name="reverse_polish_notation"></a>V) Reverse polish notation.</h2>
+A lot of filters accept custom functions defined by an expression written in reverse polish
+notation. You may not be accustomed to this notation, so here are a few pointers :
+<ul>
+<li>The basic concept behind the notation is to write the operator / function after the arguments.
+Hence, "x + y" in infix notation becomes in reverse polish "x y +". "(3 + 5) * x" would become
+"3 5 + x *". </li>
+<li>As you noticed in the last example, the great asset of the notation is that it
+doesn't need parenthesis. The expresion that would have been enclosed in parenthesis ( "3 + 5" )
+is correctly computed, because we read the expression from left to right, and because
+when the "+" is encountered, its two operands are unmistakenly known.</li>
+<li>The supported operators are : "+", "-", "*", "/", "%" ( modulo ) and "^" ( power )</li>
+<li>The supported functions are : "sin", "cos", "tan", "asin", "acos", "atan", "exp", "log",
+"abs", "round", "clip", "min", "max".</li>
+<li>Making the assumption that a positive float is "true", and a negative one is "false", 
+we can also define boolean operators : "&", "|", "&!" ( and not ), "&deg;" or "@"( xor ).</li>
+<li>Signed and unsigned unary and binary operators exists : "&u", "|u", "&deg;u" ("@u"), "~u", "&lt;&lt;u", "&gt;&gt;u" round and clip
+their operands to the nearest integer in [0..2^64-1], then do a "and", "or", "xor", "complement to 1", "left shift", or "right shift".
+Accordingly, "&s", "|s", "&deg;s" (@s), "~s", "&lt;&lt;s", "&gt;&gt;s"  do the same operations, but round and clip to the nearest
+integer in [-2^63..2^63-1] beforehand. "&lt;&lt;" and "&gt;&gt;" are equivalent to "&lt;&lt;u" and "&gt;&gt;u". The second operand of
+shifts is always considered signed : a left shift by a negative value is equivalent to a right shift by the opposite of the value.</li>
+<li>We can create boolean values with the following comparaison operators : "<", ">", "<=",
+">=", "!=", "==", "=".</li>
+<li>The variable "x", "y" and "z" ( when applicable ) contains the value of the pixel. It's an
+integer that ranges from 0 to 255.</li>
+<li>The constant "pi" can be used.</li>
+<li>Finally, there's a ternary operator : "?", which acts like a "if .. then .. else .."</li>
+<li>All the computation are made on floats, and the final results is rounded to the nearest integer,
+in the range [0..255].</li>
+<li>Throughout the whole documentation, you'll be able to found plenty of examples.</li>
+</ul>
+<h2><a name="changelog"></a>VI) Changelog</h2>
+
+<p>
+<b>Alpha 48 :</b>
+<ul>
+<li>added : signed and unsigned binary shifts to LUTs, ceil/floor/trunc float -> int conversions. @ is now equivalent to &deg;</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 47 :</b>
+<ul>
+<li>added : signed and unsigned binary operators to LUTs</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 46 :</b>
+<ul>
+<li>fixed : with mt_lutf, "std" mode wasn't working. Could also affect "std" with mt_luts and mt_lutsx</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 45 :</b>
+<ul>
+<li>fixed : mt_clamp on sse2 platforms with resolution not multiple of 64</li>
+<li>added : mode parameter to mt_lutspa, to clean up biased/relative mess</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 44 :</b>
+<ul>
+<li>added : new mode (weighted sum) for mt_luts and mt_lutsx</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 43 :</b>
+<ul>
+<li>fixed : optimized versions of small horizontal resolutions with mt_edge, mt_xxpand and mt_xxflate</li>
+<li>fixed : avisynth 2.6 support (likely broken since avisynth 2.6 alpha 2 at least)</li>
+<li>added : hprewitt mode to mt_edge</li>
+<li>added : "biased" option to mt_lutspa</li>
+<li>optimized : prewitt and hprewitt mode for mt_edge</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 42 :</b>
+<ul>
+<li>added : specialized modes for mt_binarize</li>
+<li>added : specialized modes for mt_logic</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 41 :</b>
+<ul>
+<li>(re)optimized : mt_edge with custom kernels and divisors that are a power of two</li>
+<li>fixed : mt_edge with custom kernels (has always been broken in C, which became obvious once asm was removed)</li>
+<li>fixed : no more crashes when an input clip isn't YUV planar</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 40 :</b>
+<ul>
+<li>optimized : mt_xxpand vertical/horizontal/both modes are asmized</li>
+<li>optimized : mt_xxflate are asmized</li>
+<li>optimized : mt_motion with sse2</li>
+<li>potential fix : mt_merge with mod8 width</li>
+<li>potential : 64 bits build included</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 39 :</b>
+<ul>
+<li>Failed attempt at 64 bits build</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 38 :</b>
+<ul>
+<li>Failed attempt at 64 bits build</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 37 :</b>
+<ul>
+<li>fixed : mt_polish wasn't handling "z", "min", "max", "clip" and "round"</li>
+<li>added : mt_infix, which convert from polish to infix notation</li>
+<li>changed : built with MSVC 2008</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 36 :</b>
+<ul>
+<li>fixed : "pi" wasn't properly defined for all luts</li>
+</ul>
+</p>
+
+<p>
+<b>Alpha 35 :</b>
+<ul>
+<li>added : mt_lutspa</li>
+</ul>
+</p>
+   
+<p>
+<b>Alpha 34 :</b>
+<ul>
+<li>added : support for interleaved2planar hack, enabling 422 support</li>
+<li>changed : both avisynth 2.5 and 2.6 version are built</li>
+</ul>
+</p>
+   
+<p>
+<b>Alpha 32 :</b>
+<ul>
+<li>added : mt_lutxyz</li>
+<li>added : mt_lutsx</li>
+<li>fixed : small memory leak in mt_luts</li>
+</ul>
+</p>
+<p>
+<b>Alpha 31 :</b>
+<ul>
+<li>fixed : mt_hysteresis was randomly crashing.</li>
+<li>fixed : mt_polish is back.</li>
+<li>added : round, clip, min, max and = for lut.</li>
+<li>adapted : to msvc8 / yasm.</li>
+</ul>
+</p>
+
+<p><b>Alpha 30 :</b>
+<ul>
+<li>fixed : luts was crashing if some pixels didn't have any neighbours in the pixels list.</li>
+<li>added : mt_freerectangle, mt_freeellipse and mt_freelosange helpers.</li>
+</ul>
+</p>
+
+
+<p><b>Alpha 29 :</b>
+<ul>
+<li>fixed : intern float to integer conversion that were badly rounding negative number. That resulted in -1.0 been rounded into 0 (!). Most notably affected was mt_convolution. Thanks redfordxx for pointing that out.</li>
+</ul>
+</p>
+
+<p><b>Alpha 28 :</b>
+<ul>
+<li>fixed : mt_expand / mt_inpand / mt_convolution / mt_edge optimizations ( were borked
+when width-16 was mod 64, and that could be noticed only with avs 2.5.7 )</li>
+</ul>
+</p>
+
+<p><b>Alpha 27 :</b>
+<ul>
+<li>fixed : mt_binarize asm optimizations that borked with some thresholds</li>
+</ul>
+</p>
+
+<p><b>Alpha 26 :</b>
+<ul>
+<li>fixed : avs closing issue.</li>
+</ul></p>
+
+<p><b>Alpha 25 :</b>
+<ul>
+<li>added : new html documentation.</li>
+<li>fixed : wrong frame issue.</li>
+<li>fixed : mt_merge with luma=true.</li>
+</ul></p>
+
+<p><b>Alpha 24 :</b>
+<ul>
+<li>fixed : issues with MT.dll ( thanks tsp, Boulder, vanessam and all those who suffered the bug ).</li>
+<li>fixed : check for YV12 colorspace, and report an error if it isn't ( thanks Boulder ).</li>
+<li>speed up : median mode for luts ( once again, thanks to tsp ).</li>
+</ul></p>
+
+<p><b>Alpha 23 :</b>
+<ul>
+<li>fix & speed up : median mode, thanks to tsp's insightfull remark. Note to self : think
+less like a mathematician, and more like a programmer. Simpler, faster & not bugged.</li>
+</ul></p>
+
+<p><b>Alpha 22 :</b>
+<ul>
+<li>added : "med"/"median" mode to luts/lutf.</li>
+<li>changed : luts doesn't necessarily consider the center pixel.</li>
+<li>changed back : forms helpers prepends (0, 0).</li>
+<li>changed : forms helpers now have a bool "zero" parameter, defaulted to true.</li>
+<li>added : bool "luma" parameter to mt_merge, which makes it use the luma mask for
+all three planes, and which forces chroma modes to "process" ( u=v=3 ).</li>
+</ul></p>
+
+<p><b>Alpha 21 :</b>
+<ul>
+<li>fixed : two & three input clips filters where requesting wrong frames
+leading to ghost artefacts.</li>
+</ul></p>
+
+<p><b>Alpha 20 :</b>
+<ul>
+<li>fixed : huge bug preventing most filters from working.</li>
+</ul></p>
+
+<p><b>Alpha 19 :</b>
+<ul>
+<li>code refactoring.</li>
+<li>fixed : bug with asm and width lower than 64.</li>
+<li>fixed : doesn't prepend (0, 0) pixel to the forms helpers.</li>
+<li>added : "min/max" mode to mt_edge. The edge value is local max - local min ( taken on a
+3x3 square ).</li>
+<li>added : mt_lutf : a frame lut, see the description above.</li>
+<li>added : mt_luts : a spatial lut, see the description above.</li>
+</ul></p>
+
+<p><b>Alpha 18 :</b>
+<ul>
+<li>added : mt_makediff, mt_adddiff, mt_average and mt_clamp, ported from mg262's
+limitedsupport plugin. The asm code is his, though it has been ported to nasm. They
+respectively amount to MakeDiff, AddDiff, SimpleAverage and Clamp.</li>
+<li>added : mt_edge : "prewitt" kernel, taken from mg262's Prewitt filter. Unlike mg262's filter,
+there's no multiplier ( it's always 1 ), but mt_edge's thresholds still apply. Results,
+and speed, are identical except for the borders, which are now filtered.</li>
+<li>added : "chroma" parameter, taken from mg262's excellent idea. It's a string that,
+if used, overrides U and V values. It can be either "process", "copy", "copy first",
+"copy second" or a number. "copy" and "copy second" work alike.</li>
+<li>added : vmToon-0.74, adapted to masktools 2.0.</li>
+<li>added : LimitedSharpenFaster, with LimitedSupport functions imported into the masktools.</li>
+</ul></p>
+
+<p><b>Alpha 17 :</b>
+<ul>
+<li>changed : behavior of mt_edge with a custom kernel : the automatic normalization factor
+is now the sum of the absolute value of the coefficients, ceiled to the next power of two 
+if that power is <= 128 ( else, it isn't ceiled ).</li>
+<li>added : cartoon mode for mt_edge.</li>
+<li>added : modified mfToon script, for masktools v2. mfToonLite's speed goes from 30 fps
+to 70 fps, mfToon from 4.5 to 6.5.</li>
+</ul></p>
+
+<p><b>Alpha 16 :</b>
+<ul>
+<li>fixed : some asm code used in invert, binarize and memset to a particular value.
+Bug made the first 8 pixels of the picture to be incorrect. Also, avoid another nasty issue
+that arise when cropping ( not my fault this time, though ).</li>
+</ul></p>
+
+<p><b>Alpha 15 :</b>
+<ul>
+<li>fixed : bugs from inflate & deflate ( thx you know you ).</li>
+<li>reversed : inflate and deflate now match their masktools' v1 counterparts' behavior.
+( if anybody used the new buggy one, let him speak quickly ).</li>
+</ul></p>
+
+<p><b>Alpha 14 :</b>
+<ul>
+<li>fixed : random crashes with some width and asm functions ( thx Didee ).</li>
+</ul></p>
+
+<p><b>Alpha 13 :</b>
+<ul>
+<li>fixed : mt_merge order swapped for mask operation ( no comment... ).</li>
+</ul></p>
+
+<p><b>Alpha 12 :</b>
+<ul>
+<li>fixed : bug with some width ( mod4 ) for the non processing mode ( != 1 or 3 ).</li>
+<li>changed : mt_merge order swapped for mask operation.</li>
+</ul></p>
+
+<p><b>Alpha 11 :</b>
+<ul>
+<li>fixed : mt_convolution's multiple instanciation bug.</li>
+</ul></p>
+
+<p><b>Alpha 10 :</b>
+<ul>
+<li>fixed : offY was always set to offX.</li>
+<li>fixed : offset quirk.</li>
+<li>fixed : mt_convolution was crashing with floats.</li>
+<li>changed : luts' equal operator is now equivalent to abs(x-y) < 0.000001.</li>
+<li>added : bool saturate(true) parameter to mt_convolution.</li>
+<li>added : float total(1.0) parameter to mt_convolution.</li>
+</ul></p>
+
+<p><b>Alpha 9 :</b>
+<ul>
+<li>fixed : mt_lut, mt_lutxy : even faster loading.</li>
+<li>fixed : mt_convolution : negative coefficients were offseted by 1.</li>
+<li>fixed : mt_convolution : division by zero if the sum of the coefficients was 0.</li>
+</ul></p>
+
+<p><b>Alpha 8 :</b>
+<ul>
+<li>fixed : mt_edge in custom mode wasn't working properly.</li>
+<li>fixed : mt_edge in custom mode, optimized wasn't working properly either.</li>
+<li>fixed : mt_lutxy was slow to load, it's better now.</li>
+</ul></p>
+
+<p><b>Alpha 7 :</b>
+<ul>
+<li>fixed : forgot to add functions to the parser. Thanks Didee for pointing that out.</li>
+</ul></p>
+
+<p><b>Alpha 6 :</b>
+<ul>
+<li>fixed : mt_polish was having some trouble with functions.</li>
+</ul></p>
+
+<p><b>Alpha 5 :</b>
+<ul>
+<li>added : helpers for creating string for inpand / expand custom modes :<ul>
+<li>mt_circle</li>
+<li>mt_square</li>
+<li>mt_diamond</li>
+<li>mt_ellipse</li>
+<li>mt_rectangle</li>
+<li>mt_losange</li>
+</ul></li>
+<li>added : helper for lut : consersion from infix to reverse polish notation : <ul>
+<li>mt_polish</li></ul></li>
+</ul></p>   
+
+<p><b>Alpha 4 :</b>
+<ul>
+<li>added : custom modes for inpand / expand.</li>
+</ul></p>
+
+<p><b>Alpha 3 :</b>
+<ul>
+<li>Fixed : mt_invert, mt_binarize, mt_lutxy, which weren't working properly anymore.</li>
+<li>Fixed : offset created by incorrect rounding in mt_convolution.</li>
+<li>Fixed : mmx version of edges filters ( soft thresholding, and roberts ).</li>
+<li>Fixed : mmx version of motion edge ( soft thresholding ).</li>
+<li>added : mt_mappedblur.</li>
+</ul></p>
+
+<p><b>Alpha 2 :</b>
+<ul>
+<li>added functions to luts : sin, abs, cos, tan, exp, log, acos, atan, asin.</li>
+<li>added "vertical", "horizontal" and "both" mode to mt_inpand / mt_expand.</li>
+<li>added mt_convolution.</li>
+<li>fixed mt_merge behavior for y, u, v = 2.</li>
+<li>added y, u, v = 4, for masked merge : copy the second clip channel. It's worth for any two clips input filters.</li>
+<li>internal changes ( code reorganization ).</li>
+ </ul></p> 
+
+<p><b>Alpha 1 :</b>
+<ul><li>Original release.</li></ul></p>
+</body>
+</html>
+
+
