@@ -3,7 +3,7 @@
 using namespace Filtering;
 
 typedef std::pair<int, int> Coordinates;
-typedef std::list<Coordinates> CoordinatesList;
+typedef std::vector<Coordinates> CoordinatesList;
 
 static void expandMask(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                        const Byte *pSrc2, ptrdiff_t nSrc2Pitch, Byte *pTemp, int x, int y, int nWidth, int nHeight)
@@ -16,7 +16,7 @@ static void expandMask(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdi
    pTemp[0] = 255;
    pDst[0]  = 255;
 
-   coordinates.push_back(Coordinates(0, 0));
+   coordinates.emplace_back(0, 0);
 
    while ( !coordinates.empty() )
    {
@@ -36,7 +36,7 @@ static void expandMask(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdi
          {
             if ( !pTemp[i + j * nWidth] && pSrc2[i + j * nSrc2Pitch] )
             {
-               coordinates.push_back(Coordinates(i, j));
+               coordinates.emplace_back(i, j);
                pTemp[i + j * nWidth] = 255;
                pDst[i + j * nDstPitch] = 255;
             }
