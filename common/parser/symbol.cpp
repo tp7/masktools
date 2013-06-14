@@ -38,14 +38,14 @@ static double sin             (double x, double y, double z) { UNUSED(y); UNUSED
 static double tan             (double x, double y, double z) { UNUSED(y); UNUSED(z); return tan(x); }
 static double exp             (double x, double y, double z) { UNUSED(y); UNUSED(z); return exp(x); }
 static double log             (double x, double y, double z) { UNUSED(y); UNUSED(z); return log(x); }
-static double abs             (double x, double y, double z) { UNUSED(y); UNUSED(z); return abs(x); }
+static double mabs             (double x, double y, double z) { UNUSED(y); UNUSED(z); return abs(x); }
 static double acos            (double x, double y, double z) { UNUSED(y); UNUSED(z); return acos(x); }
 static double asin            (double x, double y, double z) { UNUSED(y); UNUSED(z); return asin(x); }
 static double atan            (double x, double y, double z) { UNUSED(y); UNUSED(z); return atan(x); }
 static double round           (double x, double y, double z) { UNUSED(y); UNUSED(z); return double(convert<Int64, double>( x )); }
 static double clip            (double x, double y, double z) { return clip<double, double>( x, y, z ); }
-static double min             (double x, double y, double z) { UNUSED(z); return min<double>( x, y ); }
-static double max             (double x, double y, double z) { UNUSED(z); return max<double>( x, y ); }
+static double mmin             (double x, double y, double z) { UNUSED(z); return min<double>( x, y ); }
+static double mmax             (double x, double y, double z) { UNUSED(z); return max<double>( x, y ); }
 static double floor           (double x, double y, double z) { UNUSED(y); UNUSED(z); return floor(x); }
 static double ceil            (double x, double y, double z) { UNUSED(y); UNUSED(z); return ceil(x); }
 static double trunc           (double x, double y, double z) { UNUSED(y); UNUSED(z); return double(Int64(x)); }
@@ -89,14 +89,14 @@ Symbol Symbol::Sin            ("sin", FUNCTION, 1, sin);
 Symbol Symbol::Tan            ("tan", FUNCTION, 1, tan);
 Symbol Symbol::Log            ("log", FUNCTION, 1, log);
 Symbol Symbol::Exp            ("exp", FUNCTION, 1, exp);
-Symbol Symbol::Abs            ("abs", FUNCTION, 1, abs);
+Symbol Symbol::Abs            ("abs", FUNCTION, 1, mabs);
 Symbol Symbol::Atan           ("atan", FUNCTION, 1, atan);
 Symbol Symbol::Acos           ("acos", FUNCTION, 1, acos);
 Symbol Symbol::Asin           ("asin", FUNCTION, 1, asin);
 Symbol Symbol::Round          ("round", FUNCTION, 1, round);
 Symbol Symbol::Clip           ("clip", FUNCTION, 3, clip);
-Symbol Symbol::Min            ("min", FUNCTION, 2, min);
-Symbol Symbol::Max            ("max", FUNCTION, 2, max);
+Symbol Symbol::Min            ("min", FUNCTION, 2, mmin);
+Symbol Symbol::Max            ("max", FUNCTION, 2, mmax);
 Symbol Symbol::Ceil           ("ceil", FUNCTION, 1, ceil);
 Symbol Symbol::Floor          ("floor", FUNCTION, 1, floor);
 Symbol Symbol::Trunc          ("trunc", FUNCTION, 1, trunc);

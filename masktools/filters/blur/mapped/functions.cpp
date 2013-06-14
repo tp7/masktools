@@ -5,7 +5,7 @@ using namespace Filtering;
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Blur { namespace Mapped {
 
-static inline Byte convolution_all_c(Byte a11, Byte a21, Byte a31, Byte a12, Byte a22, Byte a32, Byte a13, Byte a23, Byte a33, const Short matrix[10], int nLowThreshold, int nHighThreshold)
+inline Byte convolution_all_c(Byte a11, Byte a21, Byte a31, Byte a12, Byte a22, Byte a32, Byte a13, Byte a23, Byte a33, const Short matrix[10], int nLowThreshold, int nHighThreshold)
 {
    int nSum = a22 * matrix[4];
 
@@ -23,7 +23,7 @@ static inline Byte convolution_all_c(Byte a11, Byte a21, Byte a31, Byte a12, Byt
    return clip<Byte, int>((nSum + matrix[9] / 2)/ matrix[9], 0, 255);
 }
 
-static inline Byte convolution_below_c(Byte a11, Byte a21, Byte a31, Byte a12, Byte a22, Byte a32, Byte a13, Byte a23, Byte a33, const Short matrix[10], int nLowThreshold, int nHighThreshold)
+inline Byte convolution_below_c(Byte a11, Byte a21, Byte a31, Byte a12, Byte a22, Byte a32, Byte a13, Byte a23, Byte a33, const Short matrix[10], int nLowThreshold, int nHighThreshold)
 {
    int nSum = a22 * matrix[4];
    int nSumCoeff = matrix[4];
