@@ -216,9 +216,6 @@
     <ClInclude Include="..\filters\gradient\filter.h">
       <Filter>filters\gradient</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\common.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\mt_resource.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -390,9 +387,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\documentation\mt_masktools.html">
-      <Filter>documentation</Filter>
-    </None>
-    <None Include="..\documentation\readme.txt">
       <Filter>documentation</Filter>
     </None>
   </ItemGroup>

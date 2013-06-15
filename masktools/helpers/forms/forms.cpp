@@ -3,17 +3,9 @@
 
 namespace Filtering { namespace MaskTools { namespace Helpers { namespace Forms {
 
-static String IntegerToString(int n)
-{
-   char buffer[10]; /* enough */
-   sprintf(buffer, "%i", n);
-   buffer[9] = 0;   /* just to be on the safe side */
-   return buffer;
-}
-
 static String &append_vector(String &str, int nX, int nY)
 {
-   return str.append(IntegerToString(nX)).append(" ").append(IntegerToString(nY)).append(" ");
+   return str.append(std::to_string(nX)).append(" ").append(std::to_string(nY)).append(" ");
 }
 
 #define ZERO ( zero || !i || !j )

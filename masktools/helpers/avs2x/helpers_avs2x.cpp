@@ -5,7 +5,7 @@
 #include <windows.h>
 #include "../../../avs2x/avisynth-2_6.h"
 #endif
-#include "../../common/common.h"
+#include "../../../common/utils/utils.h"
 #include "../../helpers/forms/forms.h"
 #include "../../helpers/parser/spirit.h"
 

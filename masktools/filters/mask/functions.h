@@ -1,7 +1,7 @@
 #ifndef __Mt_MaskFunctions_H__
 #define __Mt_MaskFunctions_H__
 
-#include "../../common/common.h"
+#include "../../../common/utils/utils.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Mask {
 

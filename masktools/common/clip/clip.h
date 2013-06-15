@@ -1,7 +1,7 @@
 #ifndef __Mt_Clip_H__
 #define __Mt_Clip_H__
 
-#include "../common.h"
+#include "../../../common/utils/utils.h"
 #include <vector>
 
 namespace Filtering { namespace MaskTools {

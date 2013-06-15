@@ -1,7 +1,7 @@
 #ifndef __Mt_SpiritParser_H__
 #define __Mt_SpiritParser_H__
 
-#include "../../common/common.h"
+#include "../../../common/utils/utils.h"
 
 namespace Filtering { namespace MaskTools { namespace Helpers { namespace PolishConverter {
 
