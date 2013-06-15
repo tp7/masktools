@@ -17,6 +17,14 @@
       <Configuration>debug-avs26</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="profile-avs26|Win32">
+      <Configuration>profile-avs26</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile-avs26|x64">
+      <Configuration>profile-avs26</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="release-avs25|Win32">
       <Configuration>release-avs25</Configuration>
       <Platform>Win32</Platform>
@@ -62,6 +70,14 @@
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v110</PlatformToolset>
@@ -85,6 +101,14 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v110</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
@@ -116,6 +140,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
@@ -129,6 +157,10 @@
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
@@ -155,7 +187,17 @@
     <IntDir>$(Platform)\Temp\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">
+    <OutDir>$(Platform)\Build\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\Temp\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
@@ -295,6 +337,49 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">
+    <YASM>
+      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
+    </YASM>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>C:\Soft\Boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MASKTOOLS_EXPORTS;_CRT_SECURE_NO_WARNINGS;FILTER_AVS_26;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>16Bytes</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>..\..\bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>odbc32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>
+      </OptimizeReferences>
+      <EnableCOMDATFolding>
+      </EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)masktools.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">
     <YASM>
       <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
@@ -331,6 +416,51 @@
       <EnableCOMDATFolding />
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)masktools.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">
+    <YASM>
+      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
+    </YASM>
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>N:\work\boost_1_42_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN64;_AMD64_;NDEBUG;_WINDOWS;_USRDLL;MASKTOOLS_EXPORTS;_CRT_SECURE_NO_WARNINGS;FILTER_AVS_26;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>16Bytes</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <OutputFile>C:\Program Files (x86)\AviSynth 2.5\plugins64\mt_masktools.dll</OutputFile>
+      <Version>2.0a45</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>..\..\bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>odbc32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>
+      </OptimizeReferences>
+      <EnableCOMDATFolding>
+      </EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
       <ImportLibrary>$(OutDir)masktools.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
@@ -515,12 +645,14 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\binarize\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\morphologic\expand\functions.asm">
       <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">
@@ -531,30 +663,35 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\morphologic\inpand\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\morphologic\inflate\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\morphologic\deflate\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\merge\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\logic\functions.asm">
       <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">
@@ -565,6 +702,7 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\support\makediff\functions.asm">
       <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">e:\list.txt</ListFileName>
@@ -574,30 +712,35 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\support\average\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\support\adddiff\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\support\clamp\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\mask\motion\functions.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\filters\mask\edge\functions.asm">
       <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">e:\list.txt</ListFileName>
@@ -607,6 +750,7 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\common\asm\morphologic.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">true</ExcludedFromBuild>
@@ -618,7 +762,9 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
     <YASM Include="..\common\asm\support.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">true</ExcludedFromBuild>
@@ -634,9 +780,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">true</ExcludedFromBuild>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">true</ExcludedFromBuild>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">..\..\common\asm</IncludePaths>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">true</ExcludedFromBuild>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
+      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
   </ItemGroup>
   <ItemGroup>
@@ -649,7 +799,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\morphologic\expand\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)2.obj</ObjectFileName>
@@ -659,7 +811,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)2.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)2.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)2.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)2.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\morphologic\inpand\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)3.obj</ObjectFileName>
@@ -669,7 +823,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)3.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)3.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)3.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)3.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)3.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)3.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\morphologic\inflate\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)4.obj</ObjectFileName>
@@ -679,7 +835,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)4.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)4.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)4.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)4.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)4.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)4.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\morphologic\deflate\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)5.obj</ObjectFileName>
@@ -689,7 +847,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)5.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)5.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)5.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)5.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)5.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)5.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\lut\lut\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)7.obj</ObjectFileName>
@@ -699,7 +859,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)7.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)7.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)7.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)7.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)7.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)7.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\lut\lutxy\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)6.obj</ObjectFileName>
@@ -709,7 +871,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)6.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)6.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)6.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)6.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)6.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)6.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\lut\luts\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)19.obj</ObjectFileName>
@@ -719,7 +883,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)19.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)19.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)19.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)19.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)19.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)19.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\lut\lutf\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)20.obj</ObjectFileName>
@@ -729,7 +895,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)20.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)20.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)20.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)20.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)20.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)20.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\lut\lutxyz\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)21.obj</ObjectFileName>
@@ -739,7 +907,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)21.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)21.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)21.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)21.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)21.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)21.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\lut\lutsx\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)22.obj</ObjectFileName>
@@ -749,7 +919,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)22.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)22.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)22.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)22.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)22.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)22.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\lut\lutspa\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)24.obj</ObjectFileName>
@@ -759,7 +931,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)24.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)24.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)24.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)24.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)24.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)24.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\merge\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)8.obj</ObjectFileName>
@@ -769,7 +943,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)8.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)8.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)8.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)8.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)8.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)8.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\logic\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)18.obj</ObjectFileName>
@@ -779,7 +955,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)18.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)18.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)18.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)18.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)18.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)18.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\convolution\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)9.obj</ObjectFileName>
@@ -789,7 +967,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)9.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)9.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)9.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)9.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)9.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)9.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\blur\mapped\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)10.obj</ObjectFileName>
@@ -799,7 +979,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)10.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)10.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)10.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)10.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)10.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)10.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\support\makediff\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)11.obj</ObjectFileName>
@@ -809,7 +991,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)11.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)11.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)11.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)11.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)11.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)11.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\support\average\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)12.obj</ObjectFileName>
@@ -819,7 +1003,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)12.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)12.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)12.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)12.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)12.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)12.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\support\adddiff\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)13.obj</ObjectFileName>
@@ -829,7 +1015,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)13.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)13.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)13.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)13.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)13.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)13.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\support\clamp\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)14.obj</ObjectFileName>
@@ -839,7 +1027,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)14.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)14.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)14.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)14.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)14.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)14.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\mask\motion\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)15.obj</ObjectFileName>
@@ -849,7 +1039,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)15.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)15.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)15.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)15.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)15.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)15.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\mask\edge\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)16.obj</ObjectFileName>
@@ -859,7 +1051,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)16.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)16.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)16.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)16.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)16.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)16.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\mask\hysteresis\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)17.obj</ObjectFileName>
@@ -869,7 +1063,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)17.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)17.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)17.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)17.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)17.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)17.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\filters\gradient\functions.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">$(IntDir)%(Filename)23.obj</ObjectFileName>
@@ -879,7 +1075,9 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">$(IntDir)%(Filename)23.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">$(IntDir)%(Filename)23.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">$(IntDir)%(Filename)23.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">$(IntDir)%(Filename)23.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)23.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)23.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\common\clip\clip.cpp" />
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -890,7 +1088,9 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">Level3</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">Level3</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">Level3</WarningLevel>
     </ClCompile>
     <ClCompile Include="..\helpers\avs2x\helpers_avs2x.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">Level3</WarningLevel>
@@ -900,7 +1100,9 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">Level3</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">Level3</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">Level3</WarningLevel>
     </ClCompile>
     <ClCompile Include="..\helpers\forms\forms.cpp" />
     <ClCompile Include="..\helpers\parser\spirit.cpp" />
@@ -912,7 +1114,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
