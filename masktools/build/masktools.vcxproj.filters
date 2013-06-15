@@ -127,9 +127,6 @@
     <Filter Include="helpers\parser">
       <UniqueIdentifier>{c622ffc9-36b4-4cbc-a381-9e9782d5a271}</UniqueIdentifier>
     </Filter>
-    <Filter Include="softwire">
-      <UniqueIdentifier>{9930178a-8d8e-4424-9519-6490d7072f6c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\filters\invert\filter.h">
@@ -242,9 +239,6 @@
     </ClInclude>
     <ClInclude Include="..\helpers\parser\spirit.h">
       <Filter>helpers\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\softwire\softwire.h">
-      <Filter>softwire</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -387,9 +381,6 @@
     </ClCompile>
     <ClCompile Include="..\helpers\parser\spirit.cpp">
       <Filter>helpers\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\softwire\softwire.cpp">
-      <Filter>softwire</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

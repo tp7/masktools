@@ -633,7 +633,6 @@
     <ClInclude Include="..\helpers\avs2x\helpers_avs2x.h" />
     <ClInclude Include="..\helpers\forms\forms.h" />
     <ClInclude Include="..\helpers\parser\spirit.h" />
-    <ClInclude Include="..\softwire\softwire.h" />
   </ItemGroup>
   <ItemGroup>
     <YASM Include="..\filters\invert\functions.asm">
@@ -1106,18 +1105,6 @@
     </ClCompile>
     <ClCompile Include="..\helpers\forms\forms.cpp" />
     <ClCompile Include="..\helpers\parser\spirit.cpp" />
-    <ClCompile Include="..\softwire\softwire.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs26|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">true</ExcludedFromBuild>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\common\mt_resource.rc" />
