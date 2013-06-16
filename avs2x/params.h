@@ -2,6 +2,7 @@
 #define __Common_Avs2x_Params_H__
 
 #include "clip.h"
+#include "../common/params/params.h"
 
 namespace Filtering { namespace Avisynth2x {
 

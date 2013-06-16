@@ -2,6 +2,7 @@
 #define __Common_Avs2x_Clip_H__
 
 #include "../common/common.h"
+#include "../common/utils/utils.h"
 
 #if defined(FILTER_AVS_25)
 #include "avisynth-2_5.h"
