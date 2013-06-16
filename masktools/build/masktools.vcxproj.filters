@@ -225,9 +225,6 @@
     <ClInclude Include="..\common\params\params.h">
       <Filter>common\params</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\clip\clip.h">
-      <Filter>common\clip</Filter>
-    </ClInclude>
     <ClInclude Include="..\helpers\avs2x\helpers_avs2x.h">
       <Filter>helpers\avs2x</Filter>
     </ClInclude>
@@ -236,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="..\helpers\parser\spirit.h">
       <Filter>helpers\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\clip\inputconfig.h">
+      <Filter>common\clip</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -364,9 +364,6 @@
     <ClCompile Include="..\filters\gradient\functions.cpp">
       <Filter>filters\gradient</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\clip\clip.cpp">
-      <Filter>common\clip</Filter>
-    </ClCompile>
     <ClCompile Include="..\avs2x\wrapper.cpp">
       <Filter>avs2x</Filter>
     </ClCompile>
@@ -378,6 +375,9 @@
     </ClCompile>
     <ClCompile Include="..\helpers\parser\spirit.cpp">
       <Filter>helpers\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\clip\inputconfig.cpp">
+      <Filter>common\clip</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -613,7 +613,7 @@
     <ClInclude Include="..\common\mt_resource.h" />
     <ClInclude Include="..\common\base\filter.h" />
     <ClInclude Include="..\common\params\params.h" />
-    <ClInclude Include="..\common\clip\clip.h" />
+    <ClInclude Include="..\common\clip\inputconfig.h" />
     <ClInclude Include="..\helpers\avs2x\helpers_avs2x.h" />
     <ClInclude Include="..\helpers\forms\forms.h" />
     <ClInclude Include="..\helpers\parser\spirit.h" />
@@ -1062,7 +1062,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">$(IntDir)%(Filename)23.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">$(IntDir)%(Filename)23.obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="..\common\clip\clip.cpp" />
+    <ClCompile Include="..\common\clip\inputconfig.cpp" />
     <ClCompile Include="..\avs2x\wrapper.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">Level3</WarningLevel>

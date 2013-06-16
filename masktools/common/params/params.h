@@ -19,18 +19,6 @@ class Operator {
 
    Mode mode;
    int nValue;      /* only for mode == memset */
-   static Operator IntToOperator(int nValue)
-   {
-      switch ( nValue )
-      {
-      case 5 : return Operator(COPY_THIRD);
-      case 4 : return Operator(COPY_SECOND);
-      case 3 : return Operator(PROCESS);
-      case 2 : return Operator(COPY);
-      case 1 : return Operator(NONE);
-      default: return Operator(MEMSET, -nValue);
-      }
-   }
 
 public:
 
@@ -52,7 +40,7 @@ public:
 
    bool operator==(const Operator &operation) const { return mode == operation.mode; }
    bool operator==(Mode mode) const { return mode == this->mode; }
-   operator Mode() const { return mode; }
+   Mode getMode() { return mode; }
    int value() const { return nValue; }
 };
 

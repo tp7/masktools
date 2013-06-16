@@ -84,7 +84,7 @@ public:
    Processor(P *processor, const Constraint &constraint, int nSpeed) : processor(processor), constraint(constraint), nSpeed(nSpeed) { }
    bool respect( const Constraint &constraint) const { return this->constraint.respect(constraint); }
    int speed() const { return nSpeed; }
-   operator P*() const { return processor; }
+   P* getFunction() const { return processor; }
    void print() const { constraint.print(); }
 
 };
@@ -99,16 +99,15 @@ public:
    {
       int nBestSpeed = -1;
       Processor<P> best_proc;
-      for ( ProcessorList<P>::const_iterator it = begin(); it != end(); it++ )
-      {
-         if ( it->speed() > nBestSpeed && it->respect(constraint) )
-         {
-            nBestSpeed = it->speed();
-            best_proc = *it;
-         }
+
+      for(const auto &processor: *this) {
+          if (processor.speed() > nBestSpeed && processor.respect(constraint)) {
+              nBestSpeed = processor.speed();
+              best_proc = processor;
+          }
       }
 
-      return best_proc;
+      return best_proc.getFunction();
    }
 };
 

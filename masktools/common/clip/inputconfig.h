@@ -8,8 +8,8 @@ namespace Filtering { namespace MaskTools {
 
 class Input {
 
-   int nOffset;
    int nIndex;
+   int nOffset;
 
 public:
 

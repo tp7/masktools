@@ -6,7 +6,7 @@
 #include "../../../common/parser/parser.h"
 #include "../../../common/utils/utils.h"
 #include "../../common/params/params.h"
-#include "../../common/clip/clip.h"
+#include "../../common/clip/inputconfig.h"
 
 namespace Filtering { namespace MaskTools { 
 
@@ -111,7 +111,7 @@ public:
          /* in place filters copy differently */
          for ( int i = 0; i < 3; i++ )
          {
-            switch ( operators[i] )
+            switch ( operators[i].getMode() )
             {
             case COPY: operators[i] = NONE; break;
             case COPY_SECOND: operators[i] = COPY; break;
@@ -121,7 +121,7 @@ public:
       }
 
       /* effective modes */
-      print( LOG_DEBUG, "modes : %i %i %i\n", Mode(operators[0]), Mode(operators[1]), Mode(operators[2]) );
+      print( LOG_DEBUG, "modes : %i %i %i\n", operators[0].getMode(), operators[1].getMode(), operators[2].getMode() );
 
       /* cpu flags */
       if ( !parameters["mmx"].toBool() ) flags &= ~CPU_MMX;
@@ -170,7 +170,7 @@ public:
       /* need multiple constraints */
       Constraint constraint = constraints[nPlane];
 
-      switch ( Mode( operators[nPlane] ) )
+      switch (operators[nPlane].getMode())
       {
       case COPY: copies.best_processor(constraint)( output_plane, output_plane.pitch(),
                                                     frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(),
