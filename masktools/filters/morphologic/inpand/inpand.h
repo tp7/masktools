@@ -1,7 +1,7 @@
 #ifndef __Mt_Inpand_H__
 #define __Mt_Inpand_H__
 
-#include "../../../filters/morphologic/filter.h"
+#include "../morphologic.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Inpand {
 

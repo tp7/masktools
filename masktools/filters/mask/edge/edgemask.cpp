@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "edgemask.h"
 #include "../../../filters/mask/functions.h"
 
 using namespace Filtering;

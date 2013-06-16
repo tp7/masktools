@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "average.h"
 
 using namespace Filtering;
 

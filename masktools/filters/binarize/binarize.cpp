@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "binarize.h"
 
 using namespace Filtering;
 

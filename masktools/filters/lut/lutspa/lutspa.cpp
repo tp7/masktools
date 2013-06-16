@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "lutspa.h"
 
 using namespace Filtering;
 

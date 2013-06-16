@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "lutsx.h"
 #include "../functions.h"
 
 using namespace Filtering;

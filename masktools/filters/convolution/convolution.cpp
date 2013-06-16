@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "convolution.h"
 
 using namespace Filtering;
 

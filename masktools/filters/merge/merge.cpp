@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "merge.h"
 
 using namespace Filtering;
 

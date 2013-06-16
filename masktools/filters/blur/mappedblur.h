@@ -1,9 +1,9 @@
 #ifndef __Mt_Blur_H__
 #define __Mt_Blur_H__
 
-#include "../../../common/base/filter.h"
+#include "../../common/base/filter.h"
 
-namespace Filtering { namespace MaskTools { namespace Filters { namespace Blur { namespace Mapped {
+namespace Filtering { namespace MaskTools { namespace Filters { namespace Blur { 
 
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch,
                         const Byte *pMask, ptrdiff_t nMaskPitch, const Short *matrix, int nWidth, int nHeight);
@@ -73,6 +73,6 @@ public:
    }
 };
 
-} } } } }
+} } } }
 
 #endif

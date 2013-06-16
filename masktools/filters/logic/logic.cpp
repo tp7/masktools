@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "logic.h"
 
 using namespace Filtering;
 

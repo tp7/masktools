@@ -61,9 +61,6 @@
     <Filter Include="filters\blur">
       <UniqueIdentifier>{4ad6fa24-0166-4018-ab15-d834e5795e6b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="filters\blur\mapped">
-      <UniqueIdentifier>{507f7563-a53f-4582-bd67-b532fcf8ed3e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="filters\support">
       <UniqueIdentifier>{96c6aebc-4c57-4c2a-9da7-0ec9dc33012e}</UniqueIdentifier>
     </Filter>
@@ -129,92 +126,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\filters\invert\filter.h">
-      <Filter>filters\invert</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\binarize\filter.h">
-      <Filter>filters\binarize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\morphologic\filter.h">
-      <Filter>filters\morphologic</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\morphologic\functions.h">
       <Filter>filters\morphologic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\morphologic\expand\filter.h">
-      <Filter>filters\morphologic\expand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\morphologic\inpand\filter.h">
-      <Filter>filters\morphologic\inpand</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\morphologic\inflate\filter.h">
-      <Filter>filters\morphologic\inflate</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\morphologic\deflate\filter.h">
-      <Filter>filters\morphologic\deflate</Filter>
     </ClInclude>
     <ClInclude Include="..\filters\lut\functions.h">
       <Filter>filters\lut</Filter>
     </ClInclude>
-    <ClInclude Include="..\filters\lut\lut\filter.h">
-      <Filter>filters\lut\lut</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\lut\lutxy\filter.h">
-      <Filter>filters\lut\lutxy</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\lut\luts\filter.h">
-      <Filter>filters\lut\luts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\lut\lutf\filter.h">
-      <Filter>filters\lut\lutf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\lut\lutxyz\filter.h">
-      <Filter>filters\lut\lutxyz</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\lut\lutsx\filter.h">
-      <Filter>filters\lut\lutsx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\lut\lutspa\filter.h">
-      <Filter>filters\lut\lutspa</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\merge\filter.h">
-      <Filter>filters\merge</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\logic\filter.h">
-      <Filter>filters\logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\convolution\filter.h">
-      <Filter>filters\convolution</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\blur\mapped\filter.h">
-      <Filter>filters\blur\mapped</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\support\makediff\filter.h">
-      <Filter>filters\support\makediff</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\support\average\filter.h">
-      <Filter>filters\support\average</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\support\adddiff\filter.h">
-      <Filter>filters\support\adddiff</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\support\clamp\filter.h">
-      <Filter>filters\support\clamp</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\mask\functions.h">
       <Filter>filters\mask</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\mask\motion\filter.h">
-      <Filter>filters\mask\motion</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\mask\edge\filter.h">
-      <Filter>filters\mask\edge</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\mask\hysteresis\filter.h">
-      <Filter>filters\mask\hysteresis</Filter>
-    </ClInclude>
-    <ClInclude Include="..\filters\gradient\filter.h">
-      <Filter>filters\gradient</Filter>
     </ClInclude>
     <ClInclude Include="..\common\mt_resource.h">
       <Filter>common</Filter>
@@ -237,133 +156,136 @@
     <ClInclude Include="..\common\clip\inputconfig.h">
       <Filter>common\clip</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\binarize\binarize.h">
+      <Filter>filters\binarize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\convolution\convolution.h">
+      <Filter>filters\convolution</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\gradient\gradient.h">
+      <Filter>filters\gradient</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\invert\invert.h">
+      <Filter>filters\invert</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\logic\logic.h">
+      <Filter>filters\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\support\adddiff\adddiff.h">
+      <Filter>filters\support\adddiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\support\average\average.h">
+      <Filter>filters\support\average</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\support\clamp\clamp.h">
+      <Filter>filters\support\clamp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\support\makediff\makediff.h">
+      <Filter>filters\support\makediff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\morphologic.h">
+      <Filter>filters\morphologic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\inpand\inpand.h">
+      <Filter>filters\morphologic\inpand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\inflate\inflate.h">
+      <Filter>filters\morphologic\inflate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\expand\expand.h">
+      <Filter>filters\morphologic\expand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\deflate\deflate.h">
+      <Filter>filters\morphologic\deflate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\merge\merge.h">
+      <Filter>filters\merge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\mask\motion\motionmask.h">
+      <Filter>filters\mask\motion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\mask\hysteresis\hysteresis.h">
+      <Filter>filters\mask\hysteresis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\mask\edge\edgemask.h">
+      <Filter>filters\mask\edge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\lut\lutxyz\lutxyz.h">
+      <Filter>filters\lut\lutxyz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\lut\lutxy\lutxy.h">
+      <Filter>filters\lut\lutxy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\lut\lutsx\lutsx.h">
+      <Filter>filters\lut\lutsx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\lut\lutspa\lutspa.h">
+      <Filter>filters\lut\lutspa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\lut\luts\luts.h">
+      <Filter>filters\lut\luts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\lut\lutf\lutf.h">
+      <Filter>filters\lut\lutf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\lut\lut\lut.h">
+      <Filter>filters\lut\lut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\blur\mappedblur.h">
+      <Filter>filters\blur</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="..\filters\invert\functions.asm">
-      <Filter>filters\invert</Filter>
-    </YASM>
-    <YASM Include="..\filters\binarize\functions.asm">
-      <Filter>filters\binarize</Filter>
-    </YASM>
-    <YASM Include="..\filters\morphologic\expand\functions.asm">
-      <Filter>filters\morphologic\expand</Filter>
-    </YASM>
-    <YASM Include="..\filters\morphologic\inpand\functions.asm">
-      <Filter>filters\morphologic\inpand</Filter>
-    </YASM>
-    <YASM Include="..\filters\morphologic\inflate\functions.asm">
-      <Filter>filters\morphologic\inflate</Filter>
-    </YASM>
-    <YASM Include="..\filters\morphologic\deflate\functions.asm">
-      <Filter>filters\morphologic\deflate</Filter>
-    </YASM>
-    <YASM Include="..\filters\merge\functions.asm">
-      <Filter>filters\merge</Filter>
-    </YASM>
-    <YASM Include="..\filters\logic\functions.asm">
-      <Filter>filters\logic</Filter>
-    </YASM>
-    <YASM Include="..\filters\support\makediff\functions.asm">
-      <Filter>filters\support\makediff</Filter>
-    </YASM>
-    <YASM Include="..\filters\support\average\functions.asm">
-      <Filter>filters\support\average</Filter>
-    </YASM>
-    <YASM Include="..\filters\support\adddiff\functions.asm">
-      <Filter>filters\support\adddiff</Filter>
-    </YASM>
-    <YASM Include="..\filters\support\clamp\functions.asm">
-      <Filter>filters\support\clamp</Filter>
-    </YASM>
-    <YASM Include="..\filters\mask\motion\functions.asm">
-      <Filter>filters\mask\motion</Filter>
-    </YASM>
-    <YASM Include="..\filters\mask\edge\functions.asm">
-      <Filter>filters\mask\edge</Filter>
-    </YASM>
     <YASM Include="..\common\asm\morphologic.asm">
       <Filter>common\asm</Filter>
     </YASM>
     <YASM Include="..\common\asm\support.asm">
       <Filter>common\asm</Filter>
     </YASM>
+    <YASM Include="..\filters\binarize\binarize.asm">
+      <Filter>filters\binarize</Filter>
+    </YASM>
+    <YASM Include="..\filters\invert\invert.asm">
+      <Filter>filters\invert</Filter>
+    </YASM>
+    <YASM Include="..\filters\logic\logic.asm">
+      <Filter>filters\logic</Filter>
+    </YASM>
+    <YASM Include="..\filters\support\adddiff\addiff.asm">
+      <Filter>filters\support\adddiff</Filter>
+    </YASM>
+    <YASM Include="..\filters\support\average\average.asm">
+      <Filter>filters\support\average</Filter>
+    </YASM>
+    <YASM Include="..\filters\support\clamp\clamp.asm">
+      <Filter>filters\support\clamp</Filter>
+    </YASM>
+    <YASM Include="..\filters\support\makediff\makediff.asm">
+      <Filter>filters\support\makediff</Filter>
+    </YASM>
+    <YASM Include="..\filters\morphologic\inpand\inpand.asm">
+      <Filter>filters\morphologic\inpand</Filter>
+    </YASM>
+    <YASM Include="..\filters\morphologic\inflate\inflate.asm">
+      <Filter>filters\morphologic\inflate</Filter>
+    </YASM>
+    <YASM Include="..\filters\morphologic\expand\expand.asm">
+      <Filter>filters\morphologic\expand</Filter>
+    </YASM>
+    <YASM Include="..\filters\morphologic\deflate\deflate.asm">
+      <Filter>filters\morphologic\deflate</Filter>
+    </YASM>
+    <YASM Include="..\filters\merge\merge.asm">
+      <Filter>filters\merge</Filter>
+    </YASM>
+    <YASM Include="..\filters\mask\motion\motionmask.asm">
+      <Filter>filters\mask\motion</Filter>
+    </YASM>
+    <YASM Include="..\filters\mask\edge\edgemask.asm">
+      <Filter>filters\mask\edge</Filter>
+    </YASM>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\filters\invert\functions.cpp">
-      <Filter>filters\invert</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\binarize\functions.cpp">
-      <Filter>filters\binarize</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\morphologic\expand\functions.cpp">
-      <Filter>filters\morphologic\expand</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\morphologic\inpand\functions.cpp">
-      <Filter>filters\morphologic\inpand</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\morphologic\inflate\functions.cpp">
-      <Filter>filters\morphologic\inflate</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\morphologic\deflate\functions.cpp">
-      <Filter>filters\morphologic\deflate</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\lut\lut\functions.cpp">
-      <Filter>filters\lut\lut</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\lut\lutxy\functions.cpp">
-      <Filter>filters\lut\lutxy</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\lut\luts\functions.cpp">
-      <Filter>filters\lut\luts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\lut\lutf\functions.cpp">
-      <Filter>filters\lut\lutf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\lut\lutxyz\functions.cpp">
-      <Filter>filters\lut\lutxyz</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\lut\lutsx\functions.cpp">
-      <Filter>filters\lut\lutsx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\lut\lutspa\functions.cpp">
-      <Filter>filters\lut\lutspa</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\merge\functions.cpp">
-      <Filter>filters\merge</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\logic\functions.cpp">
-      <Filter>filters\logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\convolution\functions.cpp">
-      <Filter>filters\convolution</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\blur\mapped\functions.cpp">
-      <Filter>filters\blur\mapped</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\support\makediff\functions.cpp">
-      <Filter>filters\support\makediff</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\support\average\functions.cpp">
-      <Filter>filters\support\average</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\support\adddiff\functions.cpp">
-      <Filter>filters\support\adddiff</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\support\clamp\functions.cpp">
-      <Filter>filters\support\clamp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\mask\motion\functions.cpp">
-      <Filter>filters\mask\motion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\mask\edge\functions.cpp">
-      <Filter>filters\mask\edge</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\mask\hysteresis\functions.cpp">
-      <Filter>filters\mask\hysteresis</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\gradient\functions.cpp">
-      <Filter>filters\gradient</Filter>
-    </ClCompile>
     <ClCompile Include="..\avs2x\wrapper.cpp">
       <Filter>avs2x</Filter>
     </ClCompile>
@@ -378,6 +300,81 @@
     </ClCompile>
     <ClCompile Include="..\common\clip\inputconfig.cpp">
       <Filter>common\clip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\binarize\binarize.cpp">
+      <Filter>filters\binarize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\convolution\convolution.cpp">
+      <Filter>filters\convolution</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\gradient\gradient.cpp">
+      <Filter>filters\gradient</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\invert\invert.cpp">
+      <Filter>filters\invert</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\logic\logic.cpp">
+      <Filter>filters\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\adddiff\addiff.cpp">
+      <Filter>filters\support\adddiff</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\average\average.cpp">
+      <Filter>filters\support\average</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\clamp\clamp.cpp">
+      <Filter>filters\support\clamp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\makediff\makediff.cpp">
+      <Filter>filters\support\makediff</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\inpand\inpand.cpp">
+      <Filter>filters\morphologic\inpand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\inflate\inflate.cpp">
+      <Filter>filters\morphologic\inflate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\expand\expand.cpp">
+      <Filter>filters\morphologic\expand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\deflate\deflate.cpp">
+      <Filter>filters\morphologic\deflate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\merge\merge.cpp">
+      <Filter>filters\merge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\mask\motion\motionmask.cpp">
+      <Filter>filters\mask\motion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\mask\hysteresis\hysteresis.cpp">
+      <Filter>filters\mask\hysteresis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\mask\edge\edgemask.cpp">
+      <Filter>filters\mask\edge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\lutxyz\lutxyz.cpp">
+      <Filter>filters\lut\lutxyz</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\lutxy\lutxy.cpp">
+      <Filter>filters\lut\lutxy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\lutsx\lutsx.cpp">
+      <Filter>filters\lut\lutsx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\lutspa\lutspa.cpp">
+      <Filter>filters\lut\lutspa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\luts\luts.cpp">
+      <Filter>filters\lut\luts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\lutf\lutf.cpp">
+      <Filter>filters\lut\lutf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\lut\lut.cpp">
+      <Filter>filters\lut\lut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\blur\mappedblur.cpp">
+      <Filter>filters\blur</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

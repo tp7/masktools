@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "hysteresis.h"
 
 using namespace Filtering;
 

@@ -1,9 +1,9 @@
-#include "filter.h"
-#include "../../../filters/mask/functions.h"
+#include "mappedblur.h"
+#include "../../filters/mask/functions.h"
 
 using namespace Filtering;
 
-namespace Filtering { namespace MaskTools { namespace Filters { namespace Blur { namespace Mapped {
+namespace Filtering { namespace MaskTools { namespace Filters { namespace Blur {
 
 inline Byte convolution_all_c(Byte a11, Byte a21, Byte a31, Byte a12, Byte a22, Byte a32, Byte a13, Byte a23, Byte a33, const Short matrix[10], int nLowThreshold, int nHighThreshold)
 {
@@ -69,4 +69,4 @@ void mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
 Processor *mapped_below_c = &mask_t<convolution_below_c>;
 Processor *mapped_all_c = &mask_t<convolution_all_c>;
 
-} } } } }
+} } } }

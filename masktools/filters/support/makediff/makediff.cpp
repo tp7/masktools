@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "makediff.h"
 
 using namespace Filtering;
 

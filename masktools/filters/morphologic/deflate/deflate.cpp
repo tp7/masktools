@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "deflate.h"
 #include "../../../filters/morphologic/functions.h"
 
 using namespace Filtering;

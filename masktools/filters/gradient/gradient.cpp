@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "gradient.h"
 
 using namespace Filtering;
 

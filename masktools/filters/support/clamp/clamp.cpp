@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "clamp.h"
 
 using namespace Filtering;
 

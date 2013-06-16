@@ -1,31 +1,31 @@
 //#include "wrapper.h"
 
-#include "../filters/binarize/filter.h"
-#include "../filters/invert/filter.h"
-#include "../filters/logic/filter.h"
-#include "../filters/merge/filter.h"
-#include "../filters/convolution/filter.h"
-#include "../filters/lut/lut/filter.h"
-#include "../filters/lut/luts/filter.h"
-#include "../filters/lut/lutf/filter.h"
-#include "../filters/lut/lutxy/filter.h"
-#include "../filters/lut/lutxyz/filter.h"
-#include "../filters/lut/lutsx/filter.h"
-#include "../filters/lut/lutspa/filter.h"
-#include "../filters/mask/edge/filter.h"
-#include "../filters/mask/motion/filter.h"
-#include "../filters/mask/hysteresis/filter.h"
-#include "../filters/morphologic/expand/filter.h"
-#include "../filters/morphologic/inpand/filter.h"
-#include "../filters/morphologic/inflate/filter.h"
-#include "../filters/morphologic/deflate/filter.h"
-#include "../filters/blur/mapped/filter.h"
-#include "../filters/gradient/filter.h"
+#include "../filters/binarize/binarize.h"
+#include "../filters/invert/invert.h"
+#include "../filters/logic/logic.h"
+#include "../filters/merge/merge.h"
+#include "../filters/convolution/convolution.h"
+#include "../filters/lut/lut/lut.h"
+#include "../filters/lut/luts/luts.h"
+#include "../filters/lut/lutf/lutf.h"
+#include "../filters/lut/lutxy/lutxy.h"
+#include "../filters/lut/lutxyz/lutxyz.h"
+#include "../filters/lut/lutsx/lutsx.h"
+#include "../filters/lut/lutspa/lutspa.h"
+#include "../filters/mask/edge/edgemask.h"
+#include "../filters/mask/motion/motionmask.h"
+#include "../filters/mask/hysteresis/hysteresis.h"
+#include "../filters/morphologic/expand/expand.h"
+#include "../filters/morphologic/inpand/inpand.h"
+#include "../filters/morphologic/inflate/inflate.h"
+#include "../filters/morphologic/deflate/deflate.h"
+#include "../filters/blur/mappedblur.h"
+#include "../filters/gradient/gradient.h"
 //
-#include "../filters/support/adddiff/filter.h"
-#include "../filters/support/makediff/filter.h"
-#include "../filters/support/average/filter.h"
-#include "../filters/support/clamp/filter.h"
+#include "../filters/support/adddiff/adddiff.h"
+#include "../filters/support/makediff/makediff.h"
+#include "../filters/support/average/average.h"
+#include "../filters/support/clamp/clamp.h"
 
 #include "../../avs2x/avs2x.h"
 #include "../helpers/avs2x/helpers_avs2x.h"
@@ -51,7 +51,7 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit2(IScri
    Avisynth2x::Filter<Merge::Merge>::create( env );
    Avisynth2x::Filter<Logic::Logic>::create( env );
    Avisynth2x::Filter<Convolution::Convolution>::create( env );
-   Avisynth2x::Filter<Blur::Mapped::MappedBlur>::create( env );
+   Avisynth2x::Filter<Blur::MappedBlur>::create( env );
    Avisynth2x::Filter<Gradient::Gradient>::create( env );
    Avisynth2x::Filter<Support::MakeDiff::MakeDiff>::create( env );
    Avisynth2x::Filter<Support::Average::Average>::create( env );

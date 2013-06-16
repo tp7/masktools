@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "motionmask.h"
 #include "../../../../common/functions/functions.h"
 
 using namespace Filtering;

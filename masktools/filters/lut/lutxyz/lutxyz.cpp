@@ -1,4 +1,4 @@
-#include "filter.h"
+#include "lutxyz.h"
 
 using namespace Filtering;
 
