@@ -73,30 +73,6 @@ typedef enum {
 #define MAX_LOG_LEVEL LOG_ERROR
 #endif
 
-static inline void init_random(int seed)
-{
-   srand( seed );
-}
-
-static inline Double uniform_random(Double min, Double max)
-{
-   return min + rand() * (max - min) / (RAND_MAX + 1);
-}
-
-static inline Double gaussian_random(Double mean, Double std)
-{
-   Double x1, x2, w;
-   do {
-      x1 = 2.0 * uniform_random(0, 1) - 1.0;
-      x2 = 2.0 * uniform_random(0, 1) - 1.0;
-      w = x1 * x1 + x2 * x2;
-   } while ( w >= 1.0 );
-
-   w = sqrt( (-2.0 * log( w ) ) / w );
-   return x1 * w * std + mean;
-}
-
-
 /* debug print function */
 static inline void print(LogLevel level, const char *format, ...)
 {
@@ -197,105 +173,6 @@ static const int pixel_sizes[3][COLORSPACE_COUNT] =
 };
 
 template<Colorspace C> int pixel_size(int nPlane) { return pixel_sizes[C][nPlane]; }
-
-/* matrix operations */
-template<typename T>
-class Vector : public std::vector<T> {
-public:
-   Vector() : std::vector<T>() {}
-   Vector(T v1) : std::vector<T>() { push_back( v1 ); }
-   Vector(T v1, T v2) : std::vector<T>() { push_back( v1 ); push_back( v2 ); }
-};
-
-template<typename T>
-class Matrix : public Vector<Vector<T> >{
-
-public:
-
-   Matrix() : Vector<Vector<T> >() { }
-   Matrix(Vector<T> v1, Vector<T> v2) : Vector<Vector<T> >( v1, v2 ) { }
-
-   static int trigonalize(Matrix<T> &matrix, Vector<T> &v, std::list<int> &rrows, std::list<int> &rcolumns, std::vector<int> &nrows, std::vector<int> &ncolumns)
-   {
-      T max = -1;
-      std::list<int>::iterator itr_max, itc_max; 
-
-      if ( rrows.empty() )
-         return 0;
-
-      /* find the highest non trigonalized coefficient in the matrix */
-      for ( std::list<int>::iterator itr = rrows.begin(); itr != rrows.end(); itr++ )
-      {
-         for ( std::list<int>::iterator itc = rcolumns.begin(); itc != rcolumns.end(); itc++ )
-         {
-            if ( max < abs<T>( matrix[*itr][*itc] ) )
-            {
-               itr_max = itr;
-               itc_max = itc;
-               max = abs<T>( matrix[*itr][*itc] );
-            }
-         }
-      }
-
-      T pivot = matrix[*itr_max][*itc_max];
-
-      if ( abs<T>( pivot ) < zero_threshold<T>() )
-         return -1;
-
-      /* pivotize the remaining lines & columns */
-      for ( std::list<int>::iterator itr = rrows.begin(); itr != rrows.end(); itr++ )
-      {
-         if ( itr == itr_max )
-            continue;
-
-         T factor = matrix[*itr][*itc_max];
-
-         for ( std::list<int>::iterator itc = rcolumns.begin(); itc != rcolumns.end(); itc++ )
-            matrix[*itr][*itc] -= matrix[*itr_max][*itc] * factor / pivot;
-
-         matrix[*itr][*itc_max] = 0;
-         v[*itr] -= v[*itr_max] * factor / pivot;
-      }
-      nrows.insert(nrows.begin(), *itr_max);
-      ncolumns.insert(ncolumns.begin(), *itc_max);
-      rrows.erase(itr_max);
-      rcolumns.erase(itc_max);
-
-      return trigonalize( matrix, v, rrows, rcolumns, nrows, ncolumns );
-   }
-
-   Vector<T> solve(const Vector<T> &v)
-   {
-      Vector<T> vv = v;
-
-      std::list<int> rr, rc;
-      std::vector<int> nr, nc;
-      for (int i = 0; i < int(size()); i++ )
-      {
-         rr.push_back(i);
-         rc.push_back(i);
-      }
-      Matrix<T> mat = *this;
-      if ( trigonalize( mat, vv, rr, rc, nr, nc ) < 0 )
-         return v;
-
-      /* compute the result */
-      Vector<T> result = v;
-
-      for (int i = 0; i < int(v.size()); i++)
-      {
-         T precomputed = 0;
-         for (int j = 0; j < i; j++)
-            precomputed += result[nc[j]] * mat[nr[i]][nc[j]];
-
-         result[nc[i]] = (vv[nr[i]] - precomputed) / mat[nr[i]][nc[i]];
-      }
-
-      /* */
-      return result;
-   }
-
-};
 
 /* ref counted class */
 class RefCounted {

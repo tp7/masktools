@@ -18,8 +18,7 @@ public:
 public:
    Parser &addSymbol(const Symbol &symbol);
 private:
-   Symbol findSymbol(const String &value) const;
-   bool isSymbol(const String &value) const { return findSymbol(value).type != Symbol::UNDEFINED; }
+   const Symbol *findSymbol(const String &value) const;
    Symbol stringToSymbol(const String &value) const;
 public:
    Parser &parse(const String &parsed_string, const String &separators);

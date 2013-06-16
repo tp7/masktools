@@ -20,28 +20,27 @@ protected:
 
 public:
 
-   Filter(const Parameters &parameters) : parameters(parameters), flags(Functions::get_cpu_flags())
-   {
-      for ( int i = 0; i < int(parameters.size()); i++ )
-         if ( parameters[i].get_type() == TYPE_CLIP )
-            childs.push_back( Value( parameters[i] ) );
+    Filter(const Parameters &parameters) : parameters(parameters), flags(Functions::get_cpu_flags())
+    {
+        for(auto &param: parameters) {
+            if (param.getType() == TYPE_CLIP) {
+                childs.push_back(param.getValue());
+            }
+        }
 
-      assert( childs.size() );
+        assert( !childs.empty() );
 
-      nWidth = childs[0]->width();
-      nHeight = childs[0]->height();
-      C = childs[0]->colorspace();
-   }
-   ~Filter()
-   {
-   }
+        nWidth = childs[0]->width();
+        nHeight = childs[0]->height();
+        C = childs[0]->colorspace();
+    }
 
-   ClipArray &get_childs() { return childs; }
+    ClipArray &get_childs() { return childs; }
 
-   virtual Frame<Byte> get_frame(int n, const Frame<Byte> &output_frame) = 0;
+    virtual Frame<Byte> get_frame(int n, const Frame<Byte> &output_frame) = 0;
 
-   String get_error() const { return error; }
-   bool is_error() const { return !error.empty(); }
+    String get_error() const { return error; }
+    bool is_error() const { return !error.empty(); }
 
 };
 

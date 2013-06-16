@@ -18,21 +18,23 @@ Parser::Parser &Parser::Parser::addSymbol(const Symbol &symbol)
    return *this;
 }
 
-Parser::Symbol Parser::Parser::findSymbol(const String &value) const
+const Parser::Symbol *Parser::Parser::findSymbol(const String &value) const
 {
-   for ( std::list<Symbol>::const_iterator it = symbols.begin(); it != symbols.end(); it++ )
-      if ( it->value == value || it->value2 == value )
-         return *it;
+    for (auto &symbol: symbols) {
+        if (symbol.value == value || symbol.value2 == value) {
+            return &symbol;
+        }
+    }
 
-   return Symbol();
+   return nullptr;
 }
 
 Parser::Symbol Parser::Parser::stringToSymbol(const String &value) const
 { 
-   if ( isSymbol(value) )
-      return findSymbol(value);
-   else
-      return Symbol(value, Symbol::NUMBER, 0, NULL);
+    auto found = findSymbol(value);
+    return found == nullptr
+        ? Symbol(value, Symbol::NUMBER, 0, NULL)
+        : *found;
 }
 
 Parser::Parser &Parser::Parser::parse(const String &parsed_string, const String &separators)
