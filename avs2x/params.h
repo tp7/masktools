@@ -8,7 +8,7 @@ namespace Filtering { namespace Avisynth2x {
 
 Value AVSValueToValue(const AVSValue& value, const Parameter &param)
 {
-   switch ( Type( Value( param ) ) )
+   switch ( param.getType() )
    {
    case TYPE_INT: return Value( value.AsInt() );
    case TYPE_STRING: return Value( String( value.AsString() ) );
@@ -23,10 +23,10 @@ String ParameterToString(const Parameter &parameter)
 {
    String str = "";
 
-   if ( String( parameter ).length() )
-      str.append( "[" ).append( parameter ).append( "]" );
+   if ( parameter.isNamed() )
+      str.append( "[" ).append( parameter.getName() ).append( "]" );
 
-   switch ( Type(parameter) )
+   switch ( parameter.getType() )
    {
    case TYPE_INT      : return str.append("i");
    case TYPE_FLOAT    : return str.append("f");
@@ -50,7 +50,7 @@ String SignatureToString(const Signature &signature)
 Parameter GetParameter(const AVSValue &value, const Parameter &default_param)
 {
    if ( value.Defined() )
-      return Parameter( AVSValueToValue( value, default_param ), String( default_param ) );
+      return Parameter( AVSValueToValue( value, default_param ), default_param.getName() );
 
    Parameter parameter = default_param;
    parameter.set_defined(false);

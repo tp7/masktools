@@ -49,7 +49,8 @@ public:
    operator bool() const { return val_bool; }
    operator String() const { return val_string; }
    operator PClip() const { return val_clip; }
-   operator Type() const { return type; }
+
+   Type get_type() const { return type; }
 
    int toInt() const { return val_int; }
    double toFloat() const { return val_float; }
@@ -77,10 +78,10 @@ public:
    Parameter(const Value &value, const String &name) : value(value), name(name) { }
 
    void set_defined(bool d) { value.set_defined( d ); }
-   operator String() const { return name; }
-   operator Value() const { return value; }
-   operator Type() const { return value; }   
-
+   bool isNamed() const { return !name.empty(); }
+   Type getType() const { return value.get_type(); }
+   String getName() const { return name; }
+   Value getValue() const { return value; }
 };
 
 /* list of parameters */
@@ -88,38 +89,38 @@ class Parameters : public std::vector<Parameter> {
 
 public:
 
-   /* handy accessor */
-   Value operator[](const String &name) const
-   {
-      for ( const_iterator it = begin(); it != end(); it++ )
-         if ( name == String(*it) )
-            return *it;
+    /* handy accessor */
+    Value operator[](const String &name) const
+    {
+        for(auto &p :*this) {
+            if (name == p.getName()) {
+                return p.getValue();
+            }
+        }
+        return Value();
+    }
 
-      return Value();
-   }
-   Value operator[](int n) const
-   {
-      return std::vector<Parameter>::operator [](n);
-   }
-
+    Value operator[](int n) const
+    {
+        return std::vector<Parameter>::operator [](n).getValue();
+    }
 };
 
 /* signature of the filter */
 class Signature {
 
-   Parameters              parameters;
-   String                  name;
+    Parameters              parameters;
+    String                  name;
 
 public:
 
-   Signature(const String &name) : name(name) { }
-   void add(const Parameter &parameter) { parameters.push_back(parameter); }
+    Signature(const String &name) : name(name) { }
+    void add(const Parameter &parameter) { parameters.push_back(parameter); }
 
-   String toString() const { return name; }
-   operator String() const { return name; }
-   Value operator[](const String &name) const { return parameters[name]; }
-   Parameter operator[](int index) const { return parameters.at(index); }
-   int count() const { return int(parameters.size()); }
+    String getName() const { return name; }
+    Value operator[](const String &name) const { return parameters[name]; }
+    Parameter operator[](int index) const { return parameters.at(index); }
+    int count() const { return int(parameters.size()); }
 
 };
 

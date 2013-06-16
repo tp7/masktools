@@ -3,3 +3,4 @@ Test
 *.*sdf
 *.suo
 *.user
+/bin

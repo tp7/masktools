@@ -160,10 +160,6 @@ public:
       copies.push_back(Processor<Functions::Copy>(&copy8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 2));
       copies.push_back(Processor<Functions::Copy>(&copy8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 3));
 
-      /* prefetches */
-      //prefetches.push_back(Processor<Prefetch>(&prefetch_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-      //prefetches.push_back(Processor<Prefetch>(&prefetch_isse, Constraint(CPU_ISSE, 1, 1, 1, 1), 1));
-
       /* check the colorspace */
       if ( C == COLORSPACE_NONE )
          error = "unsupported colorspace. masktools only support planar YUV colorspaces (YV12, YV16, YV24)";

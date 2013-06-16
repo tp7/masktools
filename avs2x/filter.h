@@ -22,7 +22,7 @@ public:
    {
       if ( _filter.is_error() )
       {
-         env->ThrowError( ( String( signature ) + " : " + _filter.get_error() ).c_str() );
+         env->ThrowError( ( signature.getName() + " : " + _filter.get_error() ).c_str() );
       }
    }
    ~Filter()
@@ -49,7 +49,7 @@ public:
    }
    static void create(IScriptEnvironment *env)
    {
-      env->AddFunction(T::filter_signature().toString().c_str(), SignatureToString( T::filter_signature() ).c_str(), _create, NULL );
+      env->AddFunction(T::filter_signature().getName().c_str(), SignatureToString( T::filter_signature() ).c_str(), _create, NULL );
    }
 };
 

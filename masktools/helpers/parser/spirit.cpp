@@ -62,16 +62,9 @@ public:
    template<typename IteratorT>
    void operator()( IteratorT a ) const
    {
-      rpn.append(IToS(a)).append(" ");
+      rpn.append(std::to_string(a)).append(" ");
    }
 private:
-   String IToS(int v) const
-   {
-      char buffer[20];
-      sprintf(buffer, "%i", v);
-      buffer[19] = 0; /* safety */
-      return buffer;
-   }
    String &rpn;
 };
 

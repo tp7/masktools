@@ -15,12 +15,6 @@ void Functions::copy_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdif
       memcpy(pDst, pSrc, nWidth);
 }
 
-void Functions::prefetch_nothing_c(const Byte *pDst, int nWidth)
-{
-   UNUSED(pDst);
-   UNUSED(nWidth);
-}
-
 extern "C" void start_asm(Byte *pbBytes);
 extern "C" void stop_asm(const Byte *pbBytes);
 

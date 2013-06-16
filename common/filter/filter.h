@@ -23,7 +23,7 @@ public:
    Filter(const Parameters &parameters) : parameters(parameters), flags(Functions::get_cpu_flags())
    {
       for ( int i = 0; i < int(parameters.size()); i++ )
-         if ( Type( parameters[i] ) == TYPE_CLIP )
+         if ( parameters[i].get_type() == TYPE_CLIP )
             childs.push_back( Value( parameters[i] ) );
 
       assert( childs.size() );
