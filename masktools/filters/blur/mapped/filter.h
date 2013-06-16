@@ -11,7 +11,7 @@ typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdi
 extern Processor *mapped_below_c;
 extern Processor *mapped_all_c;
 
-class Filter : public MaskTools::Filter<ChildFilter>
+class MappedBlur : public MaskTools::Filter<ChildFilter>
 {
    Short matrix[10];
 
@@ -24,7 +24,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters )
+   MappedBlur(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters )
    {
       std::list<Parser::Symbol> coeffs = Parser::getDefaultParser().parse(parameters["kernel"].toString(), " ").getExpression();
       memset(matrix, 0, sizeof(matrix));

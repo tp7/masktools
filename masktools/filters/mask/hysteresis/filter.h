@@ -10,7 +10,7 @@ typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrd
 
 Processor hysteresis_c;
 
-class Filter : public MaskTools::Filter<ChildFilter>
+class Hysteresis : public MaskTools::Filter<ChildFilter>
 {
 
    Byte *pbStack;
@@ -32,8 +32,8 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters ), pbStack(NULL) { }
-   ~Filter()
+   Hysteresis(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters ), pbStack(NULL) { }
+   ~Hysteresis()
    {
       if ( pbStack )
          delete pbStack;

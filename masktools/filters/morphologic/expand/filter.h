@@ -31,10 +31,10 @@ extern Processor *expand_both_c;
 
 extern Processor *expand_custom_c;
 
-class Filter : public Morphologic::Filter
+class Expand : public Morphologic::MorphologicFilter
 {
 public:
-   Filter(const Parameters&parameters) : Morphologic::Filter( parameters )
+   Expand(const Parameters&parameters) : Morphologic::MorphologicFilter( parameters )
    {
       /* add the processors */
       if ( parameters["mode"].toString() == "square" )
@@ -76,7 +76,7 @@ public:
       }
    }
 
-   static Signature Filter::filter_signature()
+   static Signature Expand::filter_signature()
    {
       Signature signature = "mt_expand";
 

@@ -8,12 +8,12 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Morpho
 
 typedef void (Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight);
 
-class Filter : public MaskTools::Filter<ChildFilter>
+class MorphologicFilter : public MaskTools::Filter<ChildFilter>
 {
    int nMaxDeviations[3];
    int *pCoordinates, nCoordinates;
 
-   Filter(const Filter &filter);
+   MorphologicFilter(const MorphologicFilter &filter);
 
 protected:
 
@@ -40,14 +40,14 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters ), pCoordinates( NULL ), nCoordinates( 0 )
+   MorphologicFilter(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters ), pCoordinates( NULL ), nCoordinates( 0 )
    {
       nMaxDeviations[0] = clip<int, int>( parameters["thY"].toInt(), 0, 255 );
       nMaxDeviations[1] = clip<int, int>( parameters["thC"].toInt(), 0, 255 );
       nMaxDeviations[2] = clip<int, int>( parameters["thC"].toInt(), 0, 255 );
    }
 
-   ~Filter()
+   ~MorphologicFilter()
    {
       if ( pCoordinates )
          delete[] pCoordinates;

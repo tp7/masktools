@@ -14,7 +14,7 @@ extern "C" Processor Invert_invert8_3dnow;
 extern "C" Processor Invert_invert8_sse2;
 extern "C" Processor Invert_invert8_asse2;
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class Invert : public MaskTools::Filter<InPlaceFilter>
 {
    ProcessorList<Processor> processors;
 
@@ -26,7 +26,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   Invert(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
       /* add the processors */
       processors.push_back( Filtering::Processor<Processor>( invert_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );

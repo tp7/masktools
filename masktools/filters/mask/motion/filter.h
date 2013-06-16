@@ -13,7 +13,7 @@ extern Processor *mask8_isse;
 extern Processor *mask8_sse2;
 extern Processor *mask8_asse2;
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class MotionMask : public MaskTools::Filter<InPlaceFilter>
 {
    int nLowThresholds[3];
    int nHighThresholds[3];
@@ -36,7 +36,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   MotionMask(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
       nLowThresholds[0] = clip<int, int>( parameters["thY1"].toInt(), 0, 255 );
       nLowThresholds[1] = nLowThresholds[2] = clip<int, int>( parameters["thC1"].toInt(), 0, 255 );

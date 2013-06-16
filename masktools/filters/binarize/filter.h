@@ -35,7 +35,7 @@ DEFINE_PROCESSOR(binarize_255_t);
 #undef DEFINE_PROCESSOR_NO_MMX
 #undef DEFINE_PROCESSOR
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class Binarize : public MaskTools::Filter<InPlaceFilter>
 {
    Byte nThreshold;
    ProcessorList<Processor> processors;
@@ -48,7 +48,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>(parameters)
+   Binarize(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>(parameters)
    {
       nThreshold = convert<Byte, int>( parameters["threshold"].toInt() );
 

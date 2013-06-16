@@ -44,7 +44,7 @@ DEFINE_NINE(max);
 #undef DEFINE_PROCESSOR_NO_MMX
 #undef DEFINE_PROCESSOR
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class Logic : public MaskTools::Filter<InPlaceFilter>
 {
 
    ProcessorList<Processor> processors;
@@ -59,7 +59,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   Logic(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
 
 #define SET_MODE_NO_MMX(mode) \

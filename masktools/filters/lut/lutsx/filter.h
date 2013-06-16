@@ -12,7 +12,7 @@ typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrd
 
 extern Processor *processors_array[NUM_MODES][NUM_MODES];
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class Lutsx : public MaskTools::Filter<InPlaceFilter>
 {
    Byte *luts[3];
 
@@ -44,7 +44,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   Lutsx(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
       static const char *expr_strs[] = { "yExpr", "uExpr", "vExpr" };
 

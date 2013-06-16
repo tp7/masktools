@@ -32,10 +32,10 @@ extern Processor *inpand_both_c;
 
 extern Processor *inpand_custom_c;
 
-class Filter : public Morphologic::Filter
+class Inpand : public Morphologic::MorphologicFilter
 {
 public:
-   Filter(const Parameters&parameters) : Morphologic::Filter( parameters )
+   Inpand(const Parameters&parameters) : Morphologic::MorphologicFilter( parameters )
    {
       /* add the processors */
       if ( parameters["mode"].toString() == "square" )
@@ -77,7 +77,7 @@ public:
       }
    }
 
-   static Signature Filter::filter_signature()
+   static Signature Inpand::filter_signature()
    {
       Signature signature = "mt_inpand";
 

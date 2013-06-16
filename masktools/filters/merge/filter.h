@@ -22,7 +22,7 @@ extern "C" Processor Merge_merge_luma_4208_isse;
 extern "C" Processor Merge_merge_luma_4208_3dnow;
 extern "C" Processor Merge_merge_luma_4208_sse2;
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class Merge : public MaskTools::Filter<InPlaceFilter>
 {
 
    bool use_luma;
@@ -41,7 +41,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   Merge(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
       use_luma = parameters["luma"].toBool();
 

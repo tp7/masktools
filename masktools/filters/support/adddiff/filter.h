@@ -14,7 +14,7 @@ extern "C" Processor AddDiff_adddiff8_3dnow;
 extern "C" Processor AddDiff_adddiff8_sse2;
 extern "C" Processor AddDiff_adddiff8_asse2;
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class AddDiff : public MaskTools::Filter<InPlaceFilter>
 {
 
    ProcessorList<Processor> processors;
@@ -28,7 +28,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   AddDiff(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(&adddiff_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));

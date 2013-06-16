@@ -11,10 +11,10 @@ extern "C" Processor Inflate_inflate8_3dnow;
 extern "C" Processor Inflate_inflate8_sse2;
 extern "C" Processor Inflate_inflate8_asse2;
 
-class Filter : public Morphologic::Filter
+class Inflate : public Morphologic::MorphologicFilter
 {
 public:
-   Filter(const Parameters &parameters) : Morphologic::Filter(parameters)
+   Inflate(const Parameters &parameters) : Morphologic::MorphologicFilter(parameters)
    {
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(inflate_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
@@ -24,7 +24,7 @@ public:
       processors.push_back(Filtering::Processor<Processor>(Inflate_inflate8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
    }
 
-   static Signature Filter::filter_signature()
+   static Signature Inflate::filter_signature()
    {
       Signature signature = "mt_inflate";
 

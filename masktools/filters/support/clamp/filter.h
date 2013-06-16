@@ -13,7 +13,7 @@ extern "C" Processor Clamp_clamp8_3dnow;
 extern "C" Processor Clamp_clamp8_sse2;
 extern "C" Processor Clamp_clamp8_asse2;
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class Clamp : public MaskTools::Filter<InPlaceFilter>
 {
 
    int nOvershoot, nUndershoot;
@@ -28,7 +28,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   Clamp(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
       nUndershoot = parameters["undershoot"];
       nOvershoot = parameters["overshoot"];

@@ -10,7 +10,7 @@ typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, int nWidth, int nHeight
 
 Processor lut_c;
 
-class Filter : public MaskTools::Filter<InPlaceFilter>
+class Lutspa : public MaskTools::Filter<InPlaceFilter>
 {
    Byte *luts[3];
 
@@ -22,7 +22,7 @@ protected:
    }
 
 public:
-   Filter(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   Lutspa(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
    {
       static const char *expr_strs[] = { "yExpr", "uExpr", "vExpr" };
       bool is_relative = parameters["relative"].toBool();
@@ -66,7 +66,7 @@ public:
       }
    }
 
-   ~Filter()
+   ~Lutspa()
    {
       for ( int i = 0; i < 3; i++ )
          delete[] luts[i];
