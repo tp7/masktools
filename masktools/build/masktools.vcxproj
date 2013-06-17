@@ -704,7 +704,7 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
-    <YASM Include="..\filters\support\adddiff\addiff.asm">
+    <YASM Include="..\filters\support\adddiff\adddiff.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
@@ -792,7 +792,7 @@
     <ClCompile Include="..\filters\convolution\convolution.cpp" />
     <ClCompile Include="..\filters\support\makediff\makediff.cpp" />
     <ClCompile Include="..\filters\support\average\average.cpp" />
-    <ClCompile Include="..\filters\support\adddiff\addiff.cpp" />
+    <ClCompile Include="..\filters\support\adddiff\adddiff.cpp" />
     <ClCompile Include="..\filters\support\clamp\clamp.cpp" />
     <ClCompile Include="..\filters\mask\motion\motionmask.cpp" />
     <ClCompile Include="..\filters\mask\edge\edgemask.cpp" />

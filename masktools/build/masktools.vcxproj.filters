@@ -251,9 +251,6 @@
     <YASM Include="..\filters\logic\logic.asm">
       <Filter>filters\logic</Filter>
     </YASM>
-    <YASM Include="..\filters\support\adddiff\addiff.asm">
-      <Filter>filters\support\adddiff</Filter>
-    </YASM>
     <YASM Include="..\filters\support\average\average.asm">
       <Filter>filters\support\average</Filter>
     </YASM>
@@ -283,6 +280,9 @@
     </YASM>
     <YASM Include="..\filters\mask\edge\edgemask.asm">
       <Filter>filters\mask\edge</Filter>
+    </YASM>
+    <YASM Include="..\filters\support\adddiff\adddiff.asm">
+      <Filter>filters\support\adddiff</Filter>
     </YASM>
   </ItemGroup>
   <ItemGroup>
@@ -315,9 +315,6 @@
     </ClCompile>
     <ClCompile Include="..\filters\logic\logic.cpp">
       <Filter>filters\logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\support\adddiff\addiff.cpp">
-      <Filter>filters\support\adddiff</Filter>
     </ClCompile>
     <ClCompile Include="..\filters\support\average\average.cpp">
       <Filter>filters\support\average</Filter>
@@ -375,6 +372,9 @@
     </ClCompile>
     <ClCompile Include="..\filters\blur\mappedblur.cpp">
       <Filter>filters\blur</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\adddiff\adddiff.cpp">
+      <Filter>filters\support\adddiff</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
