@@ -30,9 +30,9 @@ public:
    }
    PVideoFrame __stdcall GetFrame(int n, IScriptEnvironment *env)
    {
-      PVideoFrame dst = T::is_in_place() ? child->GetFrame(n, env) : env->NewVideoFrame(vi);
+      PVideoFrame dst = _filter.is_in_place() ? child->GetFrame(n, env) : env->NewVideoFrame(vi);
 
-      if ( T::is_in_place() )
+      if ( _filter.is_in_place() )
          env->MakeWritable( &dst );
 
       for ( int i = 0; i < int(_filter.get_childs().size()); i++ )
@@ -54,12 +54,5 @@ public:
 };
 
 } } // namespace Avisynth2x, Filtering
-
-#define AVS2X_DEFINE_FILTER(filter, blabla) \
-extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit2(IScriptEnvironment* env) \
-{ \
-   Filtering::Avisynth2x::Filter<filter>::create( env ); \
-   return ( blabla ); \
-}
 
 #endif

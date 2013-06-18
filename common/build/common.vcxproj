@@ -445,7 +445,6 @@
     <ClInclude Include="..\utils\utils.h" />
     <ClInclude Include="..\parser\parser.h" />
     <ClInclude Include="..\parser\symbol.h" />
-    <ClInclude Include="..\filter\filter.h" />
     <ClInclude Include="..\functions\functions.h" />
     <ClInclude Include="..\clip\clip.h" />
     <ClInclude Include="..\params\params.h" />

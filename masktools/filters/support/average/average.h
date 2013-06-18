@@ -13,7 +13,7 @@ extern "C" Processor Average_average8_3dnow;
 extern "C" Processor Average_average8_sse2;
 extern "C" Processor Average_average8_asse2;
 
-class Average : public MaskTools::Filter<InPlaceFilter>
+class Average : public MaskTools::Filter
 {
 
    ProcessorList<Processor> processors;
@@ -27,7 +27,7 @@ protected:
    }
 
 public:
-   Average(const Parameters &parameters) : MaskTools::Filter<InPlaceFilter>( parameters )
+   Average(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )
    {
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(&average_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));

@@ -9,7 +9,7 @@ typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdi
 
 extern Processor *sad_c;
 
-class Gradient : public MaskTools::Filter<ChildFilter>
+class Gradient : public MaskTools::Filter
 {
 
    ProcessorList<Processor> processors;
@@ -28,7 +28,7 @@ protected:
    }
 
 public:
-   Gradient(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters )
+   Gradient(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD )
    {
       /* add the processors */
       if ( parameters["distorsion"].toString() == "sad" )

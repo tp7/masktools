@@ -39,7 +39,7 @@ extern Processor *morpho_c;
 extern Processor *morpho8_isse;
 extern Processor *morpho8_sse2;
 
-class EdgeMask : public MaskTools::Filter<ChildFilter>
+class EdgeMask : public MaskTools::Filter
 {
    int nLowThresholds[3];
    int nHighThresholds[3];
@@ -56,7 +56,7 @@ protected:
    }
 
 public:
-   EdgeMask(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters )
+   EdgeMask(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD )
    {
       nLowThresholds[0] = clip<int, int>( parameters["thY1"].toInt(), 0, 255 );
       nLowThresholds[1] = nLowThresholds[2] = clip<int, int>( parameters["thC1"].toInt(), 0, 255 );

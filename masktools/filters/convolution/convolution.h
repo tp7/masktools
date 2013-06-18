@@ -12,7 +12,7 @@ extern Processor *convolution_i_s_c;
 extern Processor *convolution_f_m_c;
 extern Processor *convolution_i_m_c;
 
-class Convolution : public MaskTools::Filter<ChildFilter>
+class Convolution : public MaskTools::Filter
 {
    int *i_horizontal, *i_vertical;
    float *f_horizontal, *f_vertical;
@@ -34,7 +34,7 @@ protected:
    }
 
 public:
-   Convolution(const Parameters &parameters) : MaskTools::Filter<ChildFilter>( parameters )
+   Convolution(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD )
    {
       i_vertical = i_horizontal = NULL;
       f_vertical = f_horizontal = NULL;
