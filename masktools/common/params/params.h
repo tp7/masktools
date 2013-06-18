@@ -39,7 +39,9 @@ public:
    }
 
    bool operator==(const Operator &operation) const { return mode == operation.mode; }
+   bool operator!=(const Operator &operation) const { return mode != operation.mode; }
    bool operator==(Mode mode) const { return mode == this->mode; }
+   bool operator!=(Mode mode) const { return mode != this->mode; }
    Mode getMode() { return mode; }
    int value() const { return nValue; }
 };

@@ -95,7 +95,7 @@ public:
    static Symbol Trunc;
 };
 
-class Context : private std::list<double> {
+class Context {
 
    Symbol *pSymbols;
    int nSymbols;
