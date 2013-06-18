@@ -3,6 +3,7 @@
 
 #include "../../../common/base/filter.h"
 #include "../../../../common/parser/parser.h"
+#include "../helpers.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace Trial {
 
@@ -51,6 +52,11 @@ public:
       for ( int i = 0; i < 3; i++ )
       {
           if (operators[i] != PROCESS) {
+              continue;
+          }
+
+          if (stringValueEmpty(parameters[expr_strs[i]]) && stringValueEmpty(parameters["expr"])) {
+              operators[i] = COPY_SECOND; //inplace
               continue;
           }
 

@@ -3,6 +3,7 @@
 
 #include "../../../common/base/filter.h"
 #include "../../../../common/parser/parser.h"
+#include "../helpers.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace Coordinate {
 
@@ -43,6 +44,17 @@ public:
       /* compute the luts */
       for ( int i = 0; i < 3; i++ )
       {
+          luts[i] = nullptr;
+
+          if (operators[i] != PROCESS) {
+              continue;
+          }
+
+          if (stringValueEmpty(parameters[expr_strs[i]]) && stringValueEmpty(parameters["expr"])) {
+              operators[i] = Operator(MEMSET, 0); //for no real reason
+              continue;
+          }
+
          const int w = i ? nCoreWidthUV : nCoreWidth;
          const int h = i ? nCoreHeightUV : nCoreHeight;
          if ( parameters[expr_strs[i]].is_defined() ) 

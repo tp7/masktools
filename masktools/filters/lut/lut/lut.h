@@ -3,6 +3,7 @@
 
 #include "../../../common/base/filter.h"
 #include "../../../../common/parser/parser.h"
+#include "../helpers.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace Single {
 
@@ -31,21 +32,30 @@ public:
       /* compute the luts */
       for ( int i = 0; i < 3; i++ )
       {
-         if ( parameters[expr_strs[i]].is_defined() ) 
-            parser.parse(parameters[expr_strs[i]].toString(), " ");
-         else
-            parser.parse(parameters["expr"].toString(), " ");
+          if (operators[i] != PROCESS) {
+              continue;
+          }
 
-         Parser::Context ctx(parser.getExpression());
+          if (stringValueEmpty(parameters[expr_strs[i]]) && stringValueEmpty(parameters["expr"])) {
+              operators[i] = NONE; //inplace
+              continue;
+          }
 
-         if ( !ctx.check() )
-         {
-            error = "invalid expression in the lut";
-            return;
-         }
+          if ( parameters[expr_strs[i]].is_defined() ) 
+              parser.parse(parameters[expr_strs[i]].toString(), " ");
+          else
+              parser.parse(parameters["expr"].toString(), " ");
 
-         for ( int x = 0; x < 256; x++ )
-            luts[i][x] = ctx.compute_byte(x, 0.0f);
+          Parser::Context ctx(parser.getExpression());
+
+          if ( !ctx.check() )
+          {
+              error = "invalid expression in the lut";
+              return;
+          }
+
+          for ( int x = 0; x < 256; x++ )
+              luts[i][x] = ctx.compute_byte(x, 0.0f);
       }
    }
 

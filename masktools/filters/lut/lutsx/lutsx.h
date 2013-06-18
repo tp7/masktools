@@ -5,6 +5,7 @@
 #include "../../../../common/parser/parser.h"
 
 #include "../functions.h"
+#include "../helpers.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace SpatialExtended {
 
@@ -73,6 +74,11 @@ public:
       for ( int i = 0; i < 3; i++ )
       {
           if (operators[i] != PROCESS) {
+              continue;
+          }
+
+          if (stringValueEmpty(parameters[expr_strs[i]]) && stringValueEmpty(parameters["expr"])) {
+              operators[i] = NONE; //inplace
               continue;
           }
 

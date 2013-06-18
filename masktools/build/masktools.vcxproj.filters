@@ -234,6 +234,9 @@
     <ClInclude Include="..\filters\blur\mappedblur.h">
       <Filter>filters\blur</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\lut\helpers.h">
+      <Filter>filters\lut</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <YASM Include="..\common\asm\morphologic.asm">

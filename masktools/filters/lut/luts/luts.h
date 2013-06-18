@@ -5,6 +5,7 @@
 #include "../../../../common/parser/parser.h"
 
 #include "../functions.h"
+#include "../helpers.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace Spatial {
 
@@ -51,37 +52,46 @@ public:
 
    Luts(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )
    {
-      static const char *expr_strs[] = { "yExpr", "uExpr", "vExpr" };
+       static const char *expr_strs[] = { "yExpr", "uExpr", "vExpr" };
 
-      Parser::Parser parser = Parser::getDefaultParser().addSymbol(Parser::Symbol::X).addSymbol(Parser::Symbol::Y);
+       Parser::Parser parser = Parser::getDefaultParser().addSymbol(Parser::Symbol::X).addSymbol(Parser::Symbol::Y);
 
-      /* compute the luts */
-      for ( int i = 0; i < 3; i++ )
-      {
-         if ( parameters[expr_strs[i]].is_defined() ) 
-            parser.parse(parameters[expr_strs[i]].toString(), " ");
-         else
-            parser.parse(parameters["expr"].toString(), " ");
+       /* compute the luts */
+       for ( int i = 0; i < 3; i++ )
+       {
+           if (operators[i] != PROCESS) {
+               continue;
+           }
 
-         Parser::Context ctx(parser.getExpression());
+           if (stringValueEmpty(parameters[expr_strs[i]]) && stringValueEmpty(parameters["expr"])) {
+               operators[i] = NONE; //inplace
+               continue;
+           }
 
-         if ( !ctx.check() )
-         {
-            error = "invalid expression in the lut";
-            return;
-         }
+           if ( parameters[expr_strs[i]].is_defined() ) 
+               parser.parse(parameters[expr_strs[i]].toString(), " ");
+           else
+               parser.parse(parameters["expr"].toString(), " ");
 
-         for ( int x = 0; x < 256; x++ )
-            for ( int y = 0; y < 256; y++ )
-               luts[i][(x<<8)+y] = ctx.compute_byte(x, y);
-      }
+           Parser::Context ctx(parser.getExpression());
 
-      /* get the pixels list */
-      FillCoordinates( parameters["pixels"].toString() );
+           if ( !ctx.check() )
+           {
+               error = "invalid expression in the lut";
+               return;
+           }
 
-      /* choose the mode */
-      mode = parameters["mode"].toString();
-      processors.push_back( processors_array[ ModeToInt( mode ) ] );
+           for ( int x = 0; x < 256; x++ )
+               for ( int y = 0; y < 256; y++ )
+                   luts[i][(x<<8)+y] = ctx.compute_byte(x, y);
+       }
+
+       /* get the pixels list */
+       FillCoordinates( parameters["pixels"].toString() );
+
+       /* choose the mode */
+       mode = parameters["mode"].toString();
+       processors.push_back( processors_array[ ModeToInt( mode ) ] );
    }
 
    InputConfiguration &input_configuration() const { return InPlaceTwoFrame(); }

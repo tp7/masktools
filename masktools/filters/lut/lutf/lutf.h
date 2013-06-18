@@ -5,6 +5,7 @@
 #include "../../../../common/parser/parser.h"
 
 #include "../functions.h"
+#include "../helpers.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace Frame {
 
@@ -35,22 +36,31 @@ public:
       /* compute the luts */
       for ( int i = 0; i < 3; i++ )
       {
-         if ( parameters[expr_strs[i]].is_defined() ) 
-            parser.parse(parameters[expr_strs[i]].toString(), " ");
-         else
-            parser.parse(parameters["expr"].toString(), " ");
+          if (operators[i] != PROCESS) {
+              continue;
+          }
 
-         Parser::Context ctx(parser.getExpression());
+          if (stringValueEmpty(parameters[expr_strs[i]]) && stringValueEmpty(parameters["expr"])) {
+              operators[i] = NONE; //inplace
+              continue;
+          }
 
-         if ( !ctx.check() )
-         {
-            error = "invalid expression in the lut";
-            return;
-         }
+          if ( parameters[expr_strs[i]].is_defined() ) 
+              parser.parse(parameters[expr_strs[i]].toString(), " ");
+          else
+              parser.parse(parameters["expr"].toString(), " ");
 
-         for ( int x = 0; x < 256; x++ )
-            for ( int y = 0; y < 256; y++ )
-               luts[i][(x<<8)+y] = ctx.compute_byte(x, y);
+          Parser::Context ctx(parser.getExpression());
+
+          if ( !ctx.check() )
+          {
+              error = "invalid expression in the lut";
+              return;
+          }
+
+          for ( int x = 0; x < 256; x++ )
+              for ( int y = 0; y < 256; y++ )
+                  luts[i][(x<<8)+y] = ctx.compute_byte(x, y);
       }
 
       processors.push_back( processors_array[ ModeToInt( parameters["mode"].toString() ) ] );
