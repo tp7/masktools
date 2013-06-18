@@ -111,15 +111,13 @@ public:
 
    virtual Frame<Byte> get_frame(int n)
    {
-      PVideoFrame frame;
-      frame = pclip->GetFrame( n ,env );
+      PVideoFrame frame = pclip->GetFrame( n ,env );
       frames.push_back( frame );
       return ConvertTo<Byte>( frame );
    }
    virtual Frame<const Byte> get_const_frame(int n)
    {
-      PVideoFrame frame;
-      frame = pclip->GetFrame( clip<int>(n, 0, nFrames - 1), env );
+      PVideoFrame frame = pclip->GetFrame( clip<int>(n, 0, nFrames - 1), env );
       frames.push_back( frame );
       return ConvertTo<const Byte>( frame );
    }

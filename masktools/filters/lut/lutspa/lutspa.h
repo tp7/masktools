@@ -22,12 +22,12 @@ protected:
    }
 
 public:
-   Lutspa(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )
+   Lutspa(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD )
    {
       static const char *expr_strs[] = { "yExpr", "uExpr", "vExpr" };
       bool is_relative = parameters["relative"].toBool();
       bool is_biased = parameters["biased"].toBool();
-
+      
       if (parameters["mode"].is_defined())
       {
          if (parameters["mode"].toString() == "absolute") is_relative = false, is_biased = false;
@@ -72,7 +72,14 @@ public:
          delete[] luts[i];
    }
 
-   InputConfiguration &input_configuration() const { return InPlaceOneFrame(); }
+   InputConfiguration &input_configuration() const { 
+       for (int i = 0; i < 3; i++) {
+           if (operators[i] == COPY) {
+               return OneFrame();
+           }
+       }
+       return InPlaceOneFrame();
+   }
 
    static Signature filter_signature()
    {

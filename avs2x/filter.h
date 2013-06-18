@@ -25,9 +25,7 @@ public:
          env->ThrowError( ( signature.getName() + " : " + _filter.get_error() ).c_str() );
       }
    }
-   ~Filter()
-   {
-   }
+
    PVideoFrame __stdcall GetFrame(int n, IScriptEnvironment *env)
    {
       PVideoFrame dst = _filter.is_in_place() ? child->GetFrame(n, env) : env->NewVideoFrame(vi);
@@ -47,6 +45,7 @@ public:
 
       return dst;
    }
+
    static void create(IScriptEnvironment *env)
    {
       env->AddFunction(T::filter_signature().getName().c_str(), SignatureToString( T::filter_signature() ).c_str(), _create, NULL );
