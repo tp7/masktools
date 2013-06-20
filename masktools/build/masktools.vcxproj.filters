@@ -237,6 +237,9 @@
     <ClInclude Include="..\filters\lut\helpers.h">
       <Filter>filters\lut</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\simd.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <YASM Include="..\common\asm\morphologic.asm">

@@ -581,6 +581,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\simd.h" />
     <ClInclude Include="..\filters\blur\mappedblur.h" />
     <ClInclude Include="..\filters\invert\invert.h" />
     <ClInclude Include="..\filters\binarize\binarize.h" />
