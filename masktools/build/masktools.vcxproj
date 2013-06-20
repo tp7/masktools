@@ -620,17 +620,6 @@
     <ClInclude Include="..\helpers\parser\spirit.h" />
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="..\filters\invert\invert.asm">
-      <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">
-      </ListFileName>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
-      <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">
-      </ListFileName>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
-    </YASM>
     <YASM Include="..\filters\binarize\binarize.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>

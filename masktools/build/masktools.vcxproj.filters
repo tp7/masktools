@@ -248,9 +248,6 @@
     <YASM Include="..\filters\binarize\binarize.asm">
       <Filter>filters\binarize</Filter>
     </YASM>
-    <YASM Include="..\filters\invert\invert.asm">
-      <Filter>filters\invert</Filter>
-    </YASM>
     <YASM Include="..\filters\logic\logic.asm">
       <Filter>filters\logic</Filter>
     </YASM>
