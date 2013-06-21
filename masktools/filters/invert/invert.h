@@ -9,8 +9,7 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Invert
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, int nWidth, int nHeight);
 
 Processor invert_c;
-extern Processor* invert_asse2;
-extern Processor* invert_sse2;
+Processor invert_sse2;
 
 class Invert : public MaskTools::Filter
 {
@@ -28,8 +27,7 @@ public:
    {
       /* add the processors */
       processors.push_back( Filtering::Processor<Processor>( invert_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-      processors.push_back( Filtering::Processor<Processor>( invert_sse2, Constraint( CPU_SSE2, 16, 1, 1, 1 ), 4 ) );
-      processors.push_back( Filtering::Processor<Processor>( invert_asse2, Constraint( CPU_SSE2, 16, 1, 16, 16 ), 5 ) );
+      processors.push_back( Filtering::Processor<Processor>( invert_sse2, Constraint( CPU_SSE2, 16, 1, 16, 16 ), 1 ) );
    }
 
    InputConfiguration &input_configuration() const { return InPlaceOneFrame(); }
