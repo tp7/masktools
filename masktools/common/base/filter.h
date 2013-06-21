@@ -75,7 +75,9 @@ public:
         nXOffset( parameters["offx"] ),
         nYOffset( parameters["offy"] ),
         nCoreWidth( parameters["w"] ),
-        nCoreHeight( parameters["h"] )
+        nCoreHeight( parameters["h"] ),
+        parameters(parameters), 
+        flags(Functions::get_cpu_flags())
     {
         for(auto &param: parameters) {
             if (param.getType() == TYPE_CLIP) {
