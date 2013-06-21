@@ -5,21 +5,21 @@ using namespace Filtering;
 
 typedef Byte (Operator)(Byte, Byte);
 
-static inline Byte upper(Byte x, Byte t) { return x > t ? 0 : 255; }
-static inline Byte lower(Byte x, Byte t) { return x > t ? 255 : 0; }
+inline Byte upper(Byte x, Byte t) { return x > t ? 0 : 255; }
+inline Byte lower(Byte x, Byte t) { return x > t ? 255 : 0; }
 
-static inline Byte binarize_0_x(Byte x, Byte t) { return x > t ? 0 : x; }
-static inline Byte binarize_t_x(Byte x, Byte t) { return x > t ? t : x; }
-static inline Byte binarize_x_0(Byte x, Byte t) { return x > t ? x : 0; }
-static inline Byte binarize_x_t(Byte x, Byte t) { return x > t ? x : t; }
+inline Byte binarize_0_x(Byte x, Byte t) { return x > t ? 0 : x; }
+inline Byte binarize_t_x(Byte x, Byte t) { return x > t ? t : x; }
+inline Byte binarize_x_0(Byte x, Byte t) { return x > t ? x : 0; }
+inline Byte binarize_x_t(Byte x, Byte t) { return x > t ? x : t; }
 
-static inline Byte binarize_t_0(Byte x, Byte t) { return x > t ? t : 0; }
-static inline Byte binarize_0_t(Byte x, Byte t) { return x > t ? 0 : t; }
+inline Byte binarize_t_0(Byte x, Byte t) { return x > t ? t : 0; }
+inline Byte binarize_0_t(Byte x, Byte t) { return x > t ? 0 : t; }
 
-static inline Byte binarize_x_255(Byte x, Byte t) { return x > t ? x : 255; }
-static inline Byte binarize_t_255(Byte x, Byte t) { return x > t ? t : 255; }
-static inline Byte binarize_255_x(Byte x, Byte t) { return x > t ? 255 : x; }
-static inline Byte binarize_255_t(Byte x, Byte t) { return x > t ? 255 : t; }
+inline Byte binarize_x_255(Byte x, Byte t) { return x > t ? x : 255; }
+inline Byte binarize_t_255(Byte x, Byte t) { return x > t ? t : 255; }
+inline Byte binarize_255_x(Byte x, Byte t) { return x > t ? 255 : x; }
+inline Byte binarize_255_t(Byte x, Byte t) { return x > t ? 255 : t; }
 
 
 template <Operator op>
@@ -95,20 +95,24 @@ void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidt
 {
     auto t = _mm_set1_epi32((nThreshold << 24) | (nThreshold << 16) | (nThreshold << 8) | nThreshold);
     auto t128 = _mm_add_epi8(t, _mm_set1_epi32(0x80808080));
-    int wMod16 = (nWidth * 16) / 16;
+    int wMod32 = (nWidth * 32) / 32;
     auto pDst2 = pDst;
 
     for ( int j = 0; j < nHeight; ++j ) {
-        for ( int i = 0; i < wMod16; i+=16 ) {
+        for ( int i = 0; i < wMod32; i+=32 ) {
+            _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+320, _MM_HINT_T0);
             auto src = load(reinterpret_cast<const __m128i*>(pDst+i));
+            auto src2 = load(reinterpret_cast<const __m128i*>(pDst+i+16));
             auto result = op(src, t, t128);
+            auto result2 = op(src2, t, t128);
             store(reinterpret_cast<__m128i*>(pDst+i), result);
+            store(reinterpret_cast<__m128i*>(pDst+i+16), result2);
         }
         pDst += nDstPitch;
     }
 
-    if (nWidth > wMod16) {
-        binarize_t<op_c>(pDst2 + (nWidth - wMod16), nDstPitch, nThreshold, nWidth - wMod16, nHeight);
+    if (nWidth > wMod32) {
+        binarize_t<op_c>(pDst2 + (nWidth - wMod32), nDstPitch, nThreshold, nWidth - wMod32, nHeight);
     }
 }
 
