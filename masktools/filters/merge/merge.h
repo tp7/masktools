@@ -14,6 +14,7 @@ Processor merge_luma_420_c;
 extern Processor *merge_sse2;
 extern Processor *merge_asse2;
 extern Processor *merge_luma_420_sse2;
+extern Processor *merge_luma_420_asse2;
 
 
 class Merge : public MaskTools::Filter
@@ -59,7 +60,8 @@ public:
 
       /* add the chroma processors */
       chroma_processors.push_back( Filtering::Processor<Processor>( merge_luma_420_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-      chroma_processors.push_back( Filtering::Processor<Processor>( merge_luma_420_sse2, Constraint( CPU_SSE2, 8, 1, 1, 1 ), 1 ) );
+      chroma_processors.push_back( Filtering::Processor<Processor>( merge_luma_420_sse2, Constraint( CPU_SSE2, 1, 1, 1, 1 ), 1 ) );
+      chroma_processors.push_back( Filtering::Processor<Processor>( merge_luma_420_asse2, Constraint( CPU_SSE2, 1, 1, 1, 1 ), 2) );
    }
 
    InputConfiguration &input_configuration() const { return InPlaceThreeFrame(); }

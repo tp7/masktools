@@ -653,13 +653,6 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
-    <YASM Include="..\filters\merge\merge.asm">
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
-    </YASM>
     <YASM Include="..\filters\mask\edge\edgemask.asm">
       <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">e:\list.txt</ListFileName>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>

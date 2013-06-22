@@ -33,6 +33,8 @@ void merge_luma_420_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdif
 }
 
 
+
+
 template <decltype(simd_store_epi128) store>
 void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                                                    const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
@@ -48,8 +50,8 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
         for ( int i = 0; i < wMod16; i+=16 ) {
             auto src2_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc2+i));
             auto src2_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc2+8+i));
-            auto unpacked_src2_t1 = _mm_unpacklo_epi8(src2_t1, zero);
-            auto unpacked_src2_t2 = _mm_unpacklo_epi8(src2_t2, zero);
+            auto mask_t1 = _mm_unpacklo_epi8(src2_t1, zero);
+            auto mask_t2 = _mm_unpacklo_epi8(src2_t2, zero);
 
             auto dst_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+i));
             auto dst_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+8+i));
@@ -61,11 +63,11 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
             auto unpacked_src1_t1 = _mm_unpacklo_epi8(src1_t1, zero);
             auto unpacked_src1_t2 = _mm_unpacklo_epi8(src1_t2, zero);
 
-            auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, unpacked_src2_t1), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
-            auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, unpacked_src2_t2), unpacked_dst_t2);
+            auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t1), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
+            auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t2), unpacked_dst_t2);
 
-            auto temp2_t1 = _mm_mullo_epi16(unpacked_src2_t1, unpacked_src1_t1); // pSrc2[x] * pSrc1[x]
-            auto temp2_t2 = _mm_mullo_epi16(unpacked_src2_t2, unpacked_src1_t2);
+            auto temp2_t1 = _mm_mullo_epi16(mask_t1, unpacked_src1_t1); // pSrc2[x] * pSrc1[x]
+            auto temp2_t2 = _mm_mullo_epi16(mask_t2, unpacked_src1_t2);
 
             temp1_t1 = _mm_add_epi16(temp1_t1, temp2_t1);
             temp1_t2 = _mm_add_epi16(temp1_t2, temp2_t2);
@@ -89,8 +91,76 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
     }
 }
 
+template <decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
+                  const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
+{
+    int wMod16 = (nWidth / 16) * 16;
+    auto pDst_s = pDst;
+    auto pSrc1_s = pSrc1;
+    auto pSrc2_s = pSrc2;
+    auto v256 = _mm_set1_epi16(0x0100);
+    auto v255 = _mm_set1_epi16(0x00FF);
+    auto v128 = _mm_set1_epi16(0x0080);
+    auto zero = _mm_setzero_si128();
+    for ( int j = 0; j < nHeight; ++j ) {
+        for ( int i = 0; i < wMod16; i+=16 ) {
+            // preparing mask
+            auto src2_row1_t1 = load(reinterpret_cast<const __m128i*>(pSrc2 + i*2));
+            auto src2_row1_t2 = load(reinterpret_cast<const __m128i*>(pSrc2 + i*2 + 16));
+            auto src2_row2_t1 = load(reinterpret_cast<const __m128i*>(pSrc2 + nSrc2Pitch + i*2));
+            auto src2_row2_t2 = load(reinterpret_cast<const __m128i*>(pSrc2 + nSrc2Pitch + i*2 + 16));
+            auto avg_t1 = _mm_avg_epu8(src2_row1_t1,src2_row2_t1);
+            auto avg_t2 = _mm_avg_epu8(src2_row1_t2,src2_row2_t2);
+            auto shifted_t1 = _mm_srli_si128(avg_t1, 1);
+            auto shifted_t2 = _mm_srli_si128(avg_t2, 1);
+            avg_t1 = _mm_avg_epu8(avg_t1, shifted_t1);
+            avg_t2 = _mm_avg_epu8(avg_t2, shifted_t2);
+            auto mask_t1 = _mm_and_si128(avg_t1, v255);
+            auto mask_t2 = _mm_and_si128(avg_t2, v255);
+
+            // merging 
+            auto dst_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+i));
+            auto dst_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+8+i));
+            auto unpacked_dst_t1 = _mm_unpacklo_epi8(dst_t1, zero);
+            auto unpacked_dst_t2 = _mm_unpacklo_epi8(dst_t2, zero);
+
+            auto src1_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+i));
+            auto src1_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+8+i));
+            auto unpacked_src1_t1 = _mm_unpacklo_epi8(src1_t1, zero);
+            auto unpacked_src1_t2 = _mm_unpacklo_epi8(src1_t2, zero);
+
+            auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t1), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
+            auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t2), unpacked_dst_t2);
+
+            auto temp2_t1 = _mm_mullo_epi16(mask_t1, unpacked_src1_t1); // pSrc2[x] * pSrc1[x]
+            auto temp2_t2 = _mm_mullo_epi16(mask_t2, unpacked_src1_t2);
+
+            temp1_t1 = _mm_add_epi16(temp1_t1, temp2_t1);
+            temp1_t2 = _mm_add_epi16(temp1_t2, temp2_t2);
+
+            temp1_t1 = _mm_add_epi16(temp1_t1, v128);
+            temp1_t2 = _mm_add_epi16(temp1_t2, v128);
+
+            auto result1 = _mm_srli_epi16(temp1_t1, 8);
+            auto result2 = _mm_srli_epi16(temp1_t2, 8);
+
+            auto result = _mm_packus_epi16(result1, result2);
+            store(reinterpret_cast<__m128i*>(pDst+i), result);
+        }
+        pDst += nDstPitch;
+        pSrc1 += nSrc1Pitch;
+        pSrc2 += nSrc2Pitch * 2;
+    }
+
+    if (nWidth > wMod16) {
+        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pSrc2_s + wMod16, nSrc2Pitch, nWidth, nHeight);
+    }
+}
+
 Processor *merge_sse2 = merge_sse2_t<simd_storeu_epi128>;
 Processor *merge_asse2 = merge_sse2_t<simd_store_epi128>;
-Processor *merge_luma_420_sse2 = merge_luma_420_c;
+Processor *merge_luma_420_sse2 = merge_luma_420_sse2_t<simd_loadu_epi128, simd_storeu_epi128>;
+Processor *merge_luma_420_asse2 = merge_luma_420_sse2_t<simd_load_epi128, simd_store_epi128>;
 
 } } } }
