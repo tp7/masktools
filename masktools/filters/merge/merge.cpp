@@ -1,13 +1,14 @@
 #include "merge.h"
+#include "../../common/simd.h"
 
-using namespace Filtering;
+namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge {
 
-void Filtering::MaskTools::Filters::Merge::merge_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
+void merge_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                                                    const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
 {
-   for ( int y = 0; y < nHeight; y++ )
+   for ( int y = 0; y < nHeight; ++y )
    {
-      for ( int x = 0; x < nWidth; x++ )
+      for ( int x = 0; x < nWidth; ++x )
          pDst[x] = ((256 - int(pSrc2[x])) * pDst[x] + int(pSrc2[x]) * pSrc1[x] + 128) >> 8;
       pDst += nDstPitch;
       pSrc1 += nSrc1Pitch;
@@ -15,12 +16,12 @@ void Filtering::MaskTools::Filters::Merge::merge_c(Byte *pDst, ptrdiff_t nDstPit
    }
 }
 
-void Filtering::MaskTools::Filters::Merge::merge_luma_420_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
+void merge_luma_420_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                                                         const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
 {
-   for ( int y = 0; y < nHeight; y++ )
+   for ( int y = 0; y < nHeight; ++y )
    {
-      for ( int x = 0; x < nWidth; x++ )
+      for ( int x = 0; x < nWidth; ++x )
       {
          const int nMask = (((pSrc2[x*2] + pSrc2[x*2+nSrc2Pitch] + 1) >> 1) + ((pSrc2[x*2+1] + pSrc2[x*2+nSrc2Pitch+1] + 1) >> 1) + 1) >> 1;
          pDst[x] = static_cast<Byte>(((256 - int(nMask)) * pDst[x] + int(nMask) * pSrc1[x] + 128) >> 8);
@@ -30,3 +31,66 @@ void Filtering::MaskTools::Filters::Merge::merge_luma_420_c(Byte *pDst, ptrdiff_
       pSrc2 += nSrc2Pitch * 2;
    }
 }
+
+
+template <decltype(simd_store_epi128) store>
+void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
+                                                   const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
+{
+    int wMod16 = (nWidth / 16) * 16;
+    auto pDst_s = pDst;
+    auto pSrc1_s = pSrc1;
+    auto pSrc2_s = pSrc2;
+    auto v256 = _mm_set1_epi16(0x0100);
+    auto v128 = _mm_set1_epi16(0x0080);
+    auto zero = _mm_setzero_si128();
+    for ( int j = 0; j < nHeight; ++j ) {
+        for ( int i = 0; i < wMod16; i+=16 ) {
+            auto src2_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc2+i));
+            auto src2_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc2+8+i));
+            auto unpacked_src2_t1 = _mm_unpacklo_epi8(src2_t1, zero);
+            auto unpacked_src2_t2 = _mm_unpacklo_epi8(src2_t2, zero);
+
+            auto dst_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+i));
+            auto dst_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+8+i));
+            auto unpacked_dst_t1 = _mm_unpacklo_epi8(dst_t1, zero);
+            auto unpacked_dst_t2 = _mm_unpacklo_epi8(dst_t2, zero);
+
+            auto src1_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+i));
+            auto src1_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+8+i));
+            auto unpacked_src1_t1 = _mm_unpacklo_epi8(src1_t1, zero);
+            auto unpacked_src1_t2 = _mm_unpacklo_epi8(src1_t2, zero);
+
+            auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, unpacked_src2_t1), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
+            auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, unpacked_src2_t2), unpacked_dst_t2);
+
+            auto temp2_t1 = _mm_mullo_epi16(unpacked_src2_t1, unpacked_src1_t1); // pSrc2[x] * pSrc1[x]
+            auto temp2_t2 = _mm_mullo_epi16(unpacked_src2_t2, unpacked_src1_t2);
+
+            temp1_t1 = _mm_add_epi16(temp1_t1, temp2_t1);
+            temp1_t2 = _mm_add_epi16(temp1_t2, temp2_t2);
+
+            temp1_t1 = _mm_add_epi16(temp1_t1, v128);
+            temp1_t2 = _mm_add_epi16(temp1_t2, v128);
+
+            auto result1 = _mm_srli_epi16(temp1_t1, 8);
+            auto result2 = _mm_srli_epi16(temp1_t2, 8);
+
+            auto result = _mm_packus_epi16(result1, result2);
+            store(reinterpret_cast<__m128i*>(pDst+i), result);
+        }
+        pDst += nDstPitch;
+        pSrc1 += nSrc1Pitch;
+        pSrc2 += nSrc2Pitch;
+    }
+
+    if (nWidth > wMod16) {
+        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pSrc2_s + wMod16, nSrc2Pitch, nWidth, nHeight);
+    }
+}
+
+Processor *merge_sse2 = merge_sse2_t<simd_storeu_epi128>;
+Processor *merge_asse2 = merge_sse2_t<simd_store_epi128>;
+Processor *merge_luma_420_sse2 = merge_luma_420_c;
+
+} } } }

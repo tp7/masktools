@@ -11,16 +11,10 @@ typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrd
 Processor merge_c;
 Processor merge_luma_420_c;
 
-extern "C" Processor Merge_merge8_mmx;
-extern "C" Processor Merge_merge8_isse;
-extern "C" Processor Merge_merge8_3dnow;
-extern "C" Processor Merge_merge8_sse2;
-extern "C" Processor Merge_merge8_asse2;
+extern Processor *merge_sse2;
+extern Processor *merge_asse2;
+extern Processor *merge_luma_420_sse2;
 
-extern "C" Processor Merge_merge_luma_4208_mmx;
-extern "C" Processor Merge_merge_luma_4208_isse;
-extern "C" Processor Merge_merge_luma_4208_3dnow;
-extern "C" Processor Merge_merge_luma_4208_sse2;
 
 class Merge : public MaskTools::Filter
 {
@@ -60,18 +54,12 @@ public:
 
       /* add the processors */
       processors.push_back( Filtering::Processor<Processor>( merge_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-      processors.push_back( Filtering::Processor<Processor>( Merge_merge8_mmx, Constraint( CPU_MMX, 8, 1, 1, 1 ), 2 ) );
-      processors.push_back( Filtering::Processor<Processor>( Merge_merge8_isse, Constraint( CPU_ISSE, 8, 1, 1, 1 ), 3 ) );
-      processors.push_back( Filtering::Processor<Processor>( Merge_merge8_3dnow, Constraint( CPU_3DNOW, 8, 1, 1, 1 ), 4 ) );
-      processors.push_back( Filtering::Processor<Processor>( Merge_merge8_sse2, Constraint( CPU_SSE2, 8, 1, 1, 1 ), 5 ) );
-      processors.push_back( Filtering::Processor<Processor>( Merge_merge8_asse2, Constraint( CPU_SSE2, 8, 1, 16, 16 ), 6 ) );
+      processors.push_back( Filtering::Processor<Processor>( merge_sse2, Constraint( CPU_SSE2, 1, 1, 1, 1 ), 1 ) );
+      processors.push_back( Filtering::Processor<Processor>( merge_asse2, Constraint( CPU_SSE2, 1, 1, 16, 16 ), 2 ) );
 
       /* add the chroma processors */
       chroma_processors.push_back( Filtering::Processor<Processor>( merge_luma_420_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-      chroma_processors.push_back( Filtering::Processor<Processor>( Merge_merge_luma_4208_mmx, Constraint( CPU_MMX, 8, 1, 1, 1 ), 1 ) );
-      chroma_processors.push_back( Filtering::Processor<Processor>( Merge_merge_luma_4208_isse, Constraint( CPU_ISSE, 8, 1, 1, 1 ), 2 ) );
-      chroma_processors.push_back( Filtering::Processor<Processor>( Merge_merge_luma_4208_3dnow, Constraint( CPU_3DNOW, 8, 1, 1, 1 ), 3 ) );
-      chroma_processors.push_back( Filtering::Processor<Processor>( Merge_merge_luma_4208_sse2, Constraint( CPU_SSE2, 8, 1, 1, 1 ), 4 ) );
+      chroma_processors.push_back( Filtering::Processor<Processor>( merge_luma_420_sse2, Constraint( CPU_SSE2, 8, 1, 1, 1 ), 1 ) );
    }
 
    InputConfiguration &input_configuration() const { return InPlaceThreeFrame(); }
