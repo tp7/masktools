@@ -95,7 +95,7 @@ void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidt
 {
     auto t = _mm_set1_epi32((nThreshold << 24) | (nThreshold << 16) | (nThreshold << 8) | nThreshold);
     auto t128 = _mm_add_epi8(t, _mm_set1_epi32(0x80808080));
-    int wMod32 = (nWidth * 32) / 32;
+    int wMod32 = (nWidth / 32) * 32;
     auto pDst2 = pDst;
 
     for ( int j = 0; j < nHeight; ++j ) {
@@ -112,7 +112,7 @@ void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidt
     }
 
     if (nWidth > wMod32) {
-        binarize_t<op_c>(pDst2 + (nWidth - wMod32), nDstPitch, nThreshold, nWidth - wMod32, nHeight);
+        binarize_t<op_c>(pDst2 + wMod32, nDstPitch, nThreshold, nWidth - wMod32, nHeight);
     }
 }
 

@@ -14,7 +14,7 @@ void adddiff_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrc
 template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static void adddiff_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nWidth, int nHeight)
 {
-    int wMod32 = (nWidth * 32) / 32;
+    int wMod32 = (nWidth / 32) * 32;
     auto pDst2 = pDst;
     auto pSrc2 = pSrc;
     auto v128 = _mm_set1_epi32(0x80808080);
@@ -49,7 +49,7 @@ static void adddiff_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, pt
     }
 
     if (nWidth > wMod32) {
-        adddiff_c(pDst2 + (nWidth - wMod32), nDstPitch, pSrc2 + (nWidth - wMod32), nSrcPitch, nWidth - wMod32, nHeight);
+        adddiff_c(pDst2 + wMod32, nDstPitch, pSrc2 + wMod32, nSrcPitch, nWidth - wMod32, nHeight);
     }
 }
 

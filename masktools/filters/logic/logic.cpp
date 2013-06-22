@@ -71,7 +71,7 @@ template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store,
     decltype(and_sse2_op) op, decltype(and) op_c>
     void logic_t_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nWidth, int nHeight, Byte nThresholdDestination, Byte nThresholdSource)
 {
-    int wMod32 = (nWidth * 32) / 32;
+    int wMod32 = (nWidth / 32) * 32;
     auto pDst2 = pDst;
     auto pSrc2 = pSrc;
     auto tDest = _mm_set1_epi32((nThresholdDestination << 24) | (nThresholdDestination << 16) | (nThresholdDestination << 8) | nThresholdDestination);
@@ -98,7 +98,7 @@ template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store,
     }
 
     if (nWidth > wMod32) {
-        logic_t<op_c>(pDst2 + (nWidth - wMod32), nDstPitch, pSrc2 + (nWidth - wMod32), nSrcPitch, nWidth - wMod32, nHeight, nThresholdDestination, nThresholdSource);
+        logic_t<op_c>(pDst2 + wMod32, nDstPitch, pSrc2 + wMod32, nSrcPitch, nWidth - wMod32, nHeight, nThresholdDestination, nThresholdSource);
     }
 }
 
