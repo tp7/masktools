@@ -118,45 +118,37 @@ void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidt
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Binarize {
 
-Processor *upper_c = &binarize_t<upper>;
-Processor *lower_c = &binarize_t<lower>;
-Processor *binarize_0_x_c = &binarize_t<binarize_0_x>;
-Processor *binarize_t_x_c = &binarize_t<binarize_t_x>;
-Processor *binarize_x_0_c = &binarize_t<binarize_x_0>;
-Processor *binarize_x_t_c = &binarize_t<binarize_x_t>;
-Processor *binarize_t_0_c = &binarize_t<binarize_t_0>;
-Processor *binarize_0_t_c = &binarize_t<binarize_0_t>;
+Processor *upper_c          = &binarize_t<upper>;
+Processor *lower_c          = &binarize_t<lower>;
+Processor *binarize_0_x_c   = &binarize_t<binarize_0_x>;
+Processor *binarize_t_x_c   = &binarize_t<binarize_t_x>;
+Processor *binarize_x_0_c   = &binarize_t<binarize_x_0>;
+Processor *binarize_x_t_c   = &binarize_t<binarize_x_t>;
+Processor *binarize_t_0_c   = &binarize_t<binarize_t_0>;
+Processor *binarize_0_t_c   = &binarize_t<binarize_0_t>;
 Processor *binarize_x_255_c = &binarize_t<binarize_x_255>;
 Processor *binarize_t_255_c = &binarize_t<binarize_t_255>;
 Processor *binarize_255_x_c = &binarize_t<binarize_255_x>;
 Processor *binarize_255_t_c = &binarize_t<binarize_255_t>;
 
+#define DEFINE_SSE2_VERSIONS(name, load, store) \
+Processor *upper_##name          = &binarize_sse2_t<load, store, upper_sse2_op, upper>; \
+Processor *lower_##name          = &binarize_sse2_t<load, store, lower_sse2_op, lower>; \
+Processor *binarize_0_x_##name   = &binarize_sse2_t<load, store, binarize_0_x_sse2_op, binarize_0_x>; \
+Processor *binarize_t_x_##name   = &binarize_sse2_t<load, store, binarize_t_x_sse2_op, binarize_t_x>; \
+Processor *binarize_x_0_##name   = &binarize_sse2_t<load, store, binarize_x_0_sse2_op, binarize_x_0>; \
+Processor *binarize_x_t_##name   = &binarize_sse2_t<load, store, binarize_x_t_sse2_op, binarize_x_t>; \
+Processor *binarize_t_0_##name   = &binarize_sse2_t<load, store, binarize_t_0_sse2_op, binarize_t_0>; \
+Processor *binarize_0_t_##name   = &binarize_sse2_t<load, store, binarize_0_t_sse2_op, binarize_0_t>; \
+Processor *binarize_x_255_##name = &binarize_sse2_t<load, store, binarize_x_255_sse2_op, binarize_x_255>; \
+Processor *binarize_t_255_##name = &binarize_sse2_t<load, store, binarize_t_255_sse2_op, binarize_t_255>; \
+Processor *binarize_255_x_##name = &binarize_sse2_t<load, store, binarize_255_x_sse2_op, binarize_255_x>; \
+Processor *binarize_255_t_##name = &binarize_sse2_t<load, store, binarize_255_t_sse2_op, binarize_255_t>;
 
-Processor *upper_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, upper_sse2_op, upper>;
-Processor *lower_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, lower_sse2_op, lower>;
-Processor *binarize_0_x_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_0_x_sse2_op, binarize_0_x>;
-Processor *binarize_t_x_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_t_x_sse2_op, binarize_t_x>;
-Processor *binarize_x_0_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_x_0_sse2_op, binarize_x_0>;
-Processor *binarize_x_t_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_x_t_sse2_op, binarize_x_t>;
-Processor *binarize_t_0_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_t_0_sse2_op, binarize_t_0>;
-Processor *binarize_0_t_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_0_t_sse2_op, binarize_0_t>;
-Processor *binarize_x_255_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_x_255_sse2_op, binarize_x_255>;
-Processor *binarize_t_255_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_t_255_sse2_op, binarize_t_255>;
-Processor *binarize_255_x_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_255_x_sse2_op, binarize_255_x>;
-Processor *binarize_255_t_sse2 = &binarize_sse2_t<simd_loadu_epi128, simd_storeu_epi128, binarize_255_t_sse2_op, binarize_255_t>;
 
-Processor *upper_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, upper_sse2_op, upper>;
-Processor *lower_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, lower_sse2_op, lower>;
-Processor *binarize_0_x_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_0_x_sse2_op, binarize_0_x>;
-Processor *binarize_t_x_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_t_x_sse2_op, binarize_t_x>;
-Processor *binarize_x_0_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_x_0_sse2_op, binarize_x_0>;
-Processor *binarize_x_t_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_x_t_sse2_op, binarize_x_t>;
-Processor *binarize_t_0_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_t_0_sse2_op, binarize_t_0>;
-Processor *binarize_0_t_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_0_t_sse2_op, binarize_0_t>;
-Processor *binarize_x_255_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_x_255_sse2_op, binarize_x_255>;
-Processor *binarize_t_255_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_t_255_sse2_op, binarize_t_255>;
-Processor *binarize_255_x_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_255_x_sse2_op, binarize_255_x>;
-Processor *binarize_255_t_asse2 = &binarize_sse2_t<simd_load_epi128, simd_store_epi128, binarize_255_t_sse2_op, binarize_255_t>;
+DEFINE_SSE2_VERSIONS(sse2, simd_loadu_epi128, simd_storeu_epi128)
+DEFINE_SSE2_VERSIONS(asse2, simd_load_epi128, simd_store_epi128)
+
 
 
 
