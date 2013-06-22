@@ -1,10 +1,7 @@
 #include "adddiff.h"
 #include "../../../common/simd.h"
 
-using namespace Filtering;
-
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Support  { namespace AddDiff {
-
 
 void adddiff_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nWidth, int nHeight)
 {
@@ -38,8 +35,8 @@ static void adddiff_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, pt
             auto srcsub = _mm_sub_epi8(src, v128);
             auto srcsub2 = _mm_sub_epi8(src2, v128);
 
-            auto added = _mm_adds_epi8(srcsub, dstsub);
-            auto added2 = _mm_adds_epi8(srcsub2, dstsub2);
+            auto added = _mm_adds_epi8(dstsub, srcsub);
+            auto added2 = _mm_adds_epi8(dstsub2, srcsub2);
 
             auto result = _mm_add_epi8(added, v128);
             auto result2 = _mm_add_epi8(added2, v128);

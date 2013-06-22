@@ -8,11 +8,8 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Suppor
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nWidth, int nHeight);
 
 Processor makediff_c;
-extern "C" Processor MakeDiff_makediff8_mmx;
-extern "C" Processor MakeDiff_makediff8_isse;
-extern "C" Processor MakeDiff_makediff8_3dnow;
-extern "C" Processor MakeDiff_makediff8_sse2;
-extern "C" Processor MakeDiff_makediff8_asse2;
+extern Processor *makediff_sse2;
+extern Processor *makediff_asse2;
 
 class MakeDiff : public MaskTools::Filter
 {
@@ -32,11 +29,8 @@ public:
    {
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(&makediff_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-      processors.push_back(Filtering::Processor<Processor>(&MakeDiff_makediff8_mmx, Constraint(CPU_MMX, 8, 1, 1, 1), 1));
-      processors.push_back(Filtering::Processor<Processor>(&MakeDiff_makediff8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 2));
-      processors.push_back(Filtering::Processor<Processor>(&MakeDiff_makediff8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 3));
-      processors.push_back(Filtering::Processor<Processor>(&MakeDiff_makediff8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 4));
-      processors.push_back(Filtering::Processor<Processor>(&MakeDiff_makediff8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 5));
+      processors.push_back(Filtering::Processor<Processor>(makediff_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
+      processors.push_back(Filtering::Processor<Processor>(makediff_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
    }
 
    InputConfiguration &input_configuration() const { return InPlaceTwoFrame(); }

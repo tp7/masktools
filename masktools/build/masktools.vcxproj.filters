@@ -254,9 +254,6 @@
     <YASM Include="..\filters\support\clamp\clamp.asm">
       <Filter>filters\support\clamp</Filter>
     </YASM>
-    <YASM Include="..\filters\support\makediff\makediff.asm">
-      <Filter>filters\support\makediff</Filter>
-    </YASM>
     <YASM Include="..\filters\morphologic\inpand\inpand.asm">
       <Filter>filters\morphologic\inpand</Filter>
     </YASM>
