@@ -87,7 +87,7 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
     }
 
     if (nWidth > wMod16) {
-        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pSrc2_s + wMod16, nSrc2Pitch, nWidth, nHeight);
+        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pSrc2_s + wMod16, nSrc2Pitch, nWidth-wMod16, nHeight);
     }
 }
 
@@ -152,9 +152,8 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
         pSrc1 += nSrc1Pitch;
         pSrc2 += nSrc2Pitch * 2;
     }
-
     if (nWidth > wMod16) {
-        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pSrc2_s + wMod16, nSrc2Pitch, nWidth, nHeight);
+        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pSrc2_s + wMod16*2, nSrc2Pitch, nWidth-wMod16, nHeight);
     }
 }
 
