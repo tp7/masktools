@@ -260,9 +260,6 @@
     <YASM Include="..\filters\merge\merge.asm">
       <Filter>filters\merge</Filter>
     </YASM>
-    <YASM Include="..\filters\mask\motion\motionmask.asm">
-      <Filter>filters\mask\motion</Filter>
-    </YASM>
     <YASM Include="..\filters\mask\edge\edgemask.asm">
       <Filter>filters\mask\edge</Filter>
     </YASM>

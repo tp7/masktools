@@ -65,7 +65,7 @@ static unsigned int sad_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSr
 template <decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nLowThreshold, int nHighThreshold, int nWidth, int nHeight)
 {
-    int wMod32 = (nWidth / 16) * 16;
+    int wMod16 = (nWidth / 16) * 16;
     auto pDst2 = pDst;
     auto pSrc2 = pSrc;
 
@@ -76,7 +76,7 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     highThr_v = _mm_sub_epi8(highThr_v, v128);
 
     for ( int j = 0; j < nHeight; ++j ) {
-        for ( int i = 0; i < wMod32; i+=16 ) {
+        for ( int i = 0; i < wMod16; i+=16 ) {
             auto dst1 = load(reinterpret_cast<const __m128i*>(pDst+i));
             auto src1 = load(reinterpret_cast<const __m128i*>(pSrc+i));
 
@@ -96,8 +96,8 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
         pSrc += nSrcPitch;
     }
 
-    if (nWidth > wMod32) {
-        mask_c_op(pDst2 + wMod32, nDstPitch, pSrc2 + wMod32, nSrcPitch, nLowThreshold, nHighThreshold, nWidth - wMod32, nHeight);
+    if (nWidth > wMod16) {
+        mask_c_op(pDst2 + wMod16, nDstPitch, pSrc2 + wMod16, nSrcPitch, nLowThreshold, nHighThreshold, nWidth - wMod16, nHeight);
     }
 }
 
