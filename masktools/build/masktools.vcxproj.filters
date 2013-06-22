@@ -278,9 +278,6 @@
     <YASM Include="..\filters\mask\edge\edgemask.asm">
       <Filter>filters\mask\edge</Filter>
     </YASM>
-    <YASM Include="..\filters\support\adddiff\adddiff.asm">
-      <Filter>filters\support\adddiff</Filter>
-    </YASM>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
