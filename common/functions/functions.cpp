@@ -4,15 +4,28 @@ using namespace Filtering;
 
 void Functions::memset_c(Byte *pPlane, ptrdiff_t nPitch, int nWidth, int nHeight, Byte value)
 {
-   for ( int i = 0; i < nHeight; i++, pPlane += nPitch )
-      memset(pPlane, value, nWidth);
+    if (nPitch == nWidth) {
+        memset(pPlane, value, nWidth*nHeight);
+    } else {
+        for (int y = 0; y < nHeight; ++y) {
+            memset(pPlane, value, nWidth);
+            pPlane += nPitch;
+        }
+    }
 }
 
 void Functions::copy_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch,
                        int nWidth, int nHeight)
 {
-   for ( int i = 0; i < nHeight; i++, pDst += nDstPitch, pSrc += nSrcPitch )
-      memcpy(pDst, pSrc, nWidth);
+    if (nDstPitch == nWidth && nSrcPitch == nWidth) {
+        memcpy(pDst, pSrc, nWidth*nHeight);
+    } else {
+        for (int y = 0; y < nHeight; ++y) {
+            memcpy(pDst, pSrc, nWidth);
+            pDst += nDstPitch;
+            pSrc += nSrcPitch;
+        }
+    }
 }
 
 extern "C" void start_asm(Byte *pbBytes);
