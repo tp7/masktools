@@ -660,17 +660,6 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
-    <YASM Include="..\filters\logic\logic.asm">
-      <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">
-      </ListFileName>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
-      <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">
-      </ListFileName>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
-    </YASM>
     <YASM Include="..\filters\support\makediff\makediff.asm">
       <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">e:\list.txt</ListFileName>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>

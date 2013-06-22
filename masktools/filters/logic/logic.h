@@ -7,29 +7,20 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Logic 
 
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch, int nWidth, int nHeight, Byte nThresholdDestination, Byte nThresholdSource);
 
-#define DEFINE_PROCESSOR_NO_MMX(name) \
-   extern Processor *name##_c; \
-   extern "C" Processor Logic_##name##8_mmx; \
-   extern "C" Processor Logic_##name##8_isse; \
-   extern "C" Processor Logic_##name##8_3dnow; \
-   extern "C" Processor Logic_##name##8_sse2; \
-   extern "C" Processor Logic_##name##8_asse2
-
 #define DEFINE_PROCESSOR(name) \
-   DEFINE_PROCESSOR_NO_MMX(name); \
-   extern "C" Processor Logic_##name##8_mmx
+   extern Processor *name##_c; \
+   extern Processor *name##_sse2; \
+   extern Processor *name##_asse2;
 
 DEFINE_PROCESSOR(and);
 DEFINE_PROCESSOR(or);
 DEFINE_PROCESSOR(andn);
 DEFINE_PROCESSOR(xor);
-DEFINE_PROCESSOR_NO_MMX(max);
-DEFINE_PROCESSOR_NO_MMX(min);
 
 #define DEFINE_TRIPLE(mode) \
-DEFINE_PROCESSOR_NO_MMX(mode); \
-DEFINE_PROCESSOR_NO_MMX(mode##add); \
-DEFINE_PROCESSOR_NO_MMX(mode##sub)
+DEFINE_PROCESSOR(mode); \
+DEFINE_PROCESSOR(mode##add); \
+DEFINE_PROCESSOR(mode##sub)
 
 #define DEFINE_NINE(mode) \
 DEFINE_TRIPLE(mode); \
@@ -62,19 +53,11 @@ public:
    Logic(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )
    {
 
-#define SET_MODE_NO_MMX(mode) \
-   do { \
-      processors.push_back( Filtering::Processor<Processor>( mode##_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) ); \
-      processors.push_back( Filtering::Processor<Processor>( Logic_##mode##8_isse, Constraint( CPU_ISSE , 8, 1, 1, 1 ), 2 ) ); \
-      processors.push_back( Filtering::Processor<Processor>( Logic_##mode##8_3dnow, Constraint( CPU_3DNOW , 8, 1, 1, 1 ), 3 ) ); \
-      processors.push_back( Filtering::Processor<Processor>( Logic_##mode##8_sse2, Constraint( CPU_SSE2 , 8, 1, 1, 1 ), 4 ) ); \
-      processors.push_back( Filtering::Processor<Processor>( Logic_##mode##8_asse2, Constraint( CPU_SSE2 , 8, 1, 16, 16 ), 5 ) ); \
-   } while(0)
-
 #define SET_MODE(mode) \
    do { \
-      SET_MODE_NO_MMX(mode); \
-      processors.push_back( Filtering::Processor<Processor>( Logic_##mode##8_mmx, Constraint( CPU_MMX , 8, 1, 1, 1 ), 2 ) ); \
+      processors.push_back( Filtering::Processor<Processor>( mode##_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) ); \
+      processors.push_back( Filtering::Processor<Processor>( mode##_sse2, Constraint( CPU_SSE2 , 1, 1, 1, 1 ), 1 ) ); \
+      processors.push_back( Filtering::Processor<Processor>( mode##_asse2, Constraint( CPU_SSE2 , 1, 1, 16, 16 ), 2 ) ); \
    } while(0)
 
       int nTh1 = parameters["th1"].toInt();
@@ -100,27 +83,27 @@ public:
 
          if (parameters["mode"].toString() == "min")
          {
-            if (isDstAdd && isSrcAdd) SET_MODE_NO_MMX(addminadd);
-            else if (isDstAdd && isSrcSub) SET_MODE_NO_MMX(addminsub);
-            else if (isDstSub && isSrcAdd) SET_MODE_NO_MMX(subminadd);
-            else if (isDstSub && isSrcSub) SET_MODE_NO_MMX(subminsub);
-            else if (isDstAdd) SET_MODE_NO_MMX(addmin);
-            else if (isSrcAdd) SET_MODE_NO_MMX(minadd);
-            else if (isDstSub) SET_MODE_NO_MMX(submin);
-            else if (isSrcSub) SET_MODE_NO_MMX(minsub);
-            else SET_MODE_NO_MMX(min);
+            if (isDstAdd && isSrcAdd) SET_MODE(addminadd);
+            else if (isDstAdd && isSrcSub) SET_MODE(addminsub);
+            else if (isDstSub && isSrcAdd) SET_MODE(subminadd);
+            else if (isDstSub && isSrcSub) SET_MODE(subminsub);
+            else if (isDstAdd) SET_MODE(addmin);
+            else if (isSrcAdd) SET_MODE(minadd);
+            else if (isDstSub) SET_MODE(submin);
+            else if (isSrcSub) SET_MODE(minsub);
+            else SET_MODE(min);
          }
          else if (parameters["mode"].toString() == "max")
          {
-            if (isDstAdd && isSrcAdd) SET_MODE_NO_MMX(addmaxadd);
-            else if (isDstAdd && isSrcSub) SET_MODE_NO_MMX(addmaxsub);
-            else if (isDstSub && isSrcAdd) SET_MODE_NO_MMX(submaxadd);
-            else if (isDstSub && isSrcSub) SET_MODE_NO_MMX(submaxsub);
-            else if (isDstAdd) SET_MODE_NO_MMX(addmax);
-            else if (isSrcAdd) SET_MODE_NO_MMX(maxadd);
-            else if (isDstSub) SET_MODE_NO_MMX(submax);
-            else if (isSrcSub) SET_MODE_NO_MMX(maxsub);
-            else SET_MODE_NO_MMX(max);
+            if (isDstAdd && isSrcAdd) SET_MODE(addmaxadd);
+            else if (isDstAdd && isSrcSub) SET_MODE(addmaxsub);
+            else if (isDstSub && isSrcAdd) SET_MODE(submaxadd);
+            else if (isDstSub && isSrcSub) SET_MODE(submaxsub);
+            else if (isDstAdd) SET_MODE(addmax);
+            else if (isSrcAdd) SET_MODE(maxadd);
+            else if (isDstSub) SET_MODE(submax);
+            else if (isSrcSub) SET_MODE(maxsub);
+            else SET_MODE(max);
          }
          else
             error = "\"mode\" must be either \"and\", \"or\", \"xor\", \"andn\", \"min\" or \"max\"";
