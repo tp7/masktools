@@ -245,12 +245,6 @@
     <YASM Include="..\common\asm\morphologic.asm">
       <Filter>common\asm</Filter>
     </YASM>
-    <YASM Include="..\common\asm\support.asm">
-      <Filter>common\asm</Filter>
-    </YASM>
-    <YASM Include="..\filters\support\clamp\clamp.asm">
-      <Filter>filters\support\clamp</Filter>
-    </YASM>
     <YASM Include="..\filters\morphologic\inpand\inpand.asm">
       <Filter>filters\morphologic\inpand</Filter>
     </YASM>

@@ -64,8 +64,6 @@ static void average_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, pt
     if (nWidth > wMod8) {
         average_c(pDst2 + wMod8, nDstPitch, pSrc2 + wMod8, nSrcPitch, nWidth - wMod8, nHeight);
     }
-
-    
 }
 
 Processor *average_sse2 = &average_sse2_t<simd_loadu_epi128, simd_storeu_epi128>;
