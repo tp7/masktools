@@ -105,6 +105,8 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
     auto zero = _mm_setzero_si128();
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {
+            _mm_prefetch(reinterpret_cast<const char*>(pSrc2)+ i*2 + 64, _MM_HINT_T0);
+            _mm_prefetch(reinterpret_cast<const char*>(pSrc2)+ nSrc2Pitch + i*2 + 64, _MM_HINT_T0);
             // preparing mask
             auto src2_row1_t1 = load(reinterpret_cast<const __m128i*>(pSrc2 + i*2));
             auto src2_row1_t2 = load(reinterpret_cast<const __m128i*>(pSrc2 + i*2 + 16));
