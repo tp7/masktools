@@ -660,13 +660,6 @@
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>
-    <YASM Include="..\filters\support\average\average.asm">
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
-    </YASM>
     <YASM Include="..\filters\support\clamp\clamp.asm">
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>

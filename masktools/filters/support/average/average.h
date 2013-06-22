@@ -8,10 +8,8 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Suppor
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nWidth, int nHeight);
 
 Processor average_c;
-extern "C" Processor Average_average8_isse;
-extern "C" Processor Average_average8_3dnow;
-extern "C" Processor Average_average8_sse2;
-extern "C" Processor Average_average8_asse2;
+extern Processor *average_sse2;
+extern Processor *average_asse2;
 
 class Average : public MaskTools::Filter
 {
@@ -31,10 +29,8 @@ public:
    {
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(&average_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-      processors.push_back(Filtering::Processor<Processor>(&Average_average8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-      processors.push_back(Filtering::Processor<Processor>(&Average_average8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 2));
-      processors.push_back(Filtering::Processor<Processor>(&Average_average8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
-      processors.push_back(Filtering::Processor<Processor>(&Average_average8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
+      processors.push_back(Filtering::Processor<Processor>(average_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 3));
+      processors.push_back(Filtering::Processor<Processor>(average_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 4));
    }
 
    InputConfiguration &input_configuration() const { return InPlaceTwoFrame(); }

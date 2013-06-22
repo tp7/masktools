@@ -248,9 +248,6 @@
     <YASM Include="..\common\asm\support.asm">
       <Filter>common\asm</Filter>
     </YASM>
-    <YASM Include="..\filters\support\average\average.asm">
-      <Filter>filters\support\average</Filter>
-    </YASM>
     <YASM Include="..\filters\support\clamp\clamp.asm">
       <Filter>filters\support\clamp</Filter>
     </YASM>
