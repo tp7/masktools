@@ -70,8 +70,8 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     auto pSrc2 = pSrc;
 
     auto v128 = _mm_set1_epi32(0x80808080);
-    auto lowThr_v = _mm_set1_epi32((nLowThreshold << 24) | (nLowThreshold << 16) | (nLowThreshold << 8) | nLowThreshold);
-    auto highThr_v = _mm_set1_epi32((nHighThreshold << 24) | (nHighThreshold << 16) | (nHighThreshold << 8) | nHighThreshold);
+    auto lowThr_v = simd_set8_epi32(nLowThreshold);
+    auto highThr_v = simd_set8_epi32(nHighThreshold);
     lowThr_v = _mm_sub_epi8(lowThr_v, v128);
     highThr_v = _mm_sub_epi8(highThr_v, v128);
 

@@ -74,8 +74,8 @@ template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store,
     int wMod32 = (nWidth / 32) * 32;
     auto pDst2 = pDst;
     auto pSrc2 = pSrc;
-    auto tDest = _mm_set1_epi32((nThresholdDestination << 24) | (nThresholdDestination << 16) | (nThresholdDestination << 8) | nThresholdDestination);
-    auto tSource = _mm_set1_epi32((nThresholdSource << 24) | (nThresholdSource << 16) | (nThresholdSource << 8) | nThresholdSource);
+    auto tDest = simd_set8_epi32(nThresholdDestination);
+    auto tSource = simd_set8_epi32(nThresholdSource);
 
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod32; i+=32 ) {

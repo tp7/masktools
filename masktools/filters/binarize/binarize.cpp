@@ -93,7 +93,7 @@ template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store,
     decltype(upper_sse2_op) op, decltype(upper) op_c>
 void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidth, int nHeight)
 {
-    auto t = _mm_set1_epi32((nThreshold << 24) | (nThreshold << 16) | (nThreshold << 8) | nThreshold);
+    auto t = simd_set8_epi32(nThreshold);
     auto t128 = _mm_add_epi8(t, _mm_set1_epi32(0x80808080));
     int wMod32 = (nWidth / 32) * 32;
     auto pDst2 = pDst;
