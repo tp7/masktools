@@ -6,10 +6,8 @@
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Inflate {
 
 extern Processor *inflate_c;
-extern "C" Processor Inflate_inflate8_isse;
-extern "C" Processor Inflate_inflate8_3dnow;
-extern "C" Processor Inflate_inflate8_sse2;
-extern "C" Processor Inflate_inflate8_asse2;
+extern Processor *inflate_sse2;
+extern Processor *inflate_asse2;
 
 class Inflate : public Morphologic::MorphologicFilter
 {
@@ -18,10 +16,8 @@ public:
    {
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(inflate_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-      processors.push_back(Filtering::Processor<Processor>(Inflate_inflate8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-      processors.push_back(Filtering::Processor<Processor>(Inflate_inflate8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 2));
-      processors.push_back(Filtering::Processor<Processor>(Inflate_inflate8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
-      processors.push_back(Filtering::Processor<Processor>(Inflate_inflate8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
+      processors.push_back(Filtering::Processor<Processor>(inflate_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 4));
+      processors.push_back(Filtering::Processor<Processor>(inflate_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 4));
    }
 
    static Signature Inflate::filter_signature()

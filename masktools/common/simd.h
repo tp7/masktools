@@ -3,6 +3,8 @@
 
 #include <emmintrin.h>
 
+extern "C" {
+
 static inline __m128i simd_load_epi128(const __m128i* ptr) {
     return _mm_load_si128(ptr);
 }
@@ -24,4 +26,5 @@ static inline __m128i simd_set8_epi32(unsigned int value) {
     return _mm_set1_epi32((value << 24) | (value << 16) | (value << 8) | value);
 }
 
+};
 #endif __Mt_SIMD_H__
