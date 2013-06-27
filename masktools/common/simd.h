@@ -3,6 +3,13 @@
 
 #include <emmintrin.h>
 
+//because ICC is smart enough on its own and force inlining actually makes it slower
+#ifdef __INTEL_COMPILER
+    #define FORCEINLINE inline
+#else
+    #define FORCEINLINE __forceinline
+#endif
+
 extern "C" {
 
 static inline __m128i simd_load_epi128(const __m128i* ptr) {

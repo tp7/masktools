@@ -25,10 +25,8 @@ static inline Byte meanMaxThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a
    return static_cast<Byte>(nMeanMax);
 }
 
-
-
 template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static __forceinline void process_line(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+static FORCEINLINE void process_line(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     auto zero = _mm_setzero_si128();
 
     __m128i mask_left, mask_right;
