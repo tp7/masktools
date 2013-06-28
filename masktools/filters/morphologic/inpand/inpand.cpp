@@ -1,5 +1,5 @@
 #include "inpand.h"
-#include "../../../filters/morphologic/functions.h"
+#include "../functions.h"
 
 using namespace Filtering;
 

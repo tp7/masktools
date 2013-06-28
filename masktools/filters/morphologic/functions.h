@@ -71,10 +71,10 @@ void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrc
 template<Border borderMode, Xxflate op, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     auto zero = _mm_setzero_si128();
-
+#pragma warning(disable: 4309)
     auto mask_left = _mm_setr_epi8(0xFF, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00);
     auto mask_right = _mm_setr_epi8(00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0xFF);
-
+#pragma warning(default: 4309)
     for ( int x = 0; x < width; x+=16 ) {
         __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
 

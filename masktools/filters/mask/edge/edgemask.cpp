@@ -1,5 +1,5 @@
 #include "edgemask.h"
-#include "../../../filters/mask/functions.h"
+#include "../functions.h"
 
 using namespace Filtering;
 

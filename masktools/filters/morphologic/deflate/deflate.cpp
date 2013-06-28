@@ -1,5 +1,5 @@
 #include "deflate.h"
-#include "../../../filters/morphologic/functions.h"
+#include "../functions.h"
 #include "../../../common/simd.h"
 
 using namespace Filtering;
