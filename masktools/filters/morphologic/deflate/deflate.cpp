@@ -1,5 +1,6 @@
 #include "deflate.h"
 #include "../../../filters/morphologic/functions.h"
+#include "../../../common/simd.h"
 
 using namespace Filtering;
 
@@ -18,8 +19,15 @@ static inline Byte meanMinThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a
    return static_cast<Byte>(nMeanMin);
 }
 
+static inline __m128i deflateOperator_sse2(__m128i source, __m128i sum, __m128i deviation) {
+    auto limit = _mm_subs_epu8(source, deviation);
+    return _mm_max_epu8(limit, _mm_min_epu8(source, sum));
+}
+
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Deflate {
 
 Processor *deflate_c = &generic_c<meanMinThresholded>;
+Processor *deflate_sse2 = &generic_sse2<deflateOperator_sse2, simd_loadu_epi128, simd_storeu_epi128>;
+Processor *deflate_asse2 = &generic_sse2<deflateOperator_sse2, simd_load_epi128, simd_store_epi128>;
 
 } } } } }
