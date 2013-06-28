@@ -248,14 +248,8 @@
     <YASM Include="..\filters\morphologic\inpand\inpand.asm">
       <Filter>filters\morphologic\inpand</Filter>
     </YASM>
-    <YASM Include="..\filters\morphologic\inflate\inflate.asm">
-      <Filter>filters\morphologic\inflate</Filter>
-    </YASM>
     <YASM Include="..\filters\morphologic\expand\expand.asm">
       <Filter>filters\morphologic\expand</Filter>
-    </YASM>
-    <YASM Include="..\filters\morphologic\deflate\deflate.asm">
-      <Filter>filters\morphologic\deflate</Filter>
     </YASM>
     <YASM Include="..\filters\mask\edge\edgemask.asm">
       <Filter>filters\mask\edge</Filter>
