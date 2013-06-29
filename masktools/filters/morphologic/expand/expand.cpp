@@ -54,13 +54,16 @@ static inline Byte maximum_both(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byt
    return nMax;
 }
 
-
 template<local_maximum_f Maximum>
 static inline Byte maximumThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byte a6, Byte a7, Byte a8, Byte a9, int nMaxDeviation)
 {
    int nMaximum = Maximum(a1, a2, a3, a4, a5, a6, a7, a8, a9);
    if ( nMaximum - a5 > nMaxDeviation ) nMaximum = a5 + nMaxDeviation;
    return static_cast<Byte>(nMaximum);
+}
+
+extern "C" static FORCEINLINE __m128i expand_operator_sse2(__m128i a, __m128i b) {
+    return _mm_max_epu8(a, b);
 }
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Expand {
@@ -79,6 +82,22 @@ Processor *expand_square_c       = &generic_c<maximumThresholded<::maximum_squar
 Processor *expand_both_c         = &generic_c<maximumThresholded<::maximum_both> >;
 Processor *expand_horizontal_c   = &generic_c<maximumThresholded<::maximum_horizontal> >;
 Processor *expand_vertical_c     = &generic_c<maximumThresholded<::maximum_vertical> >;
+
+#define DEFINE_SSE2_DIRECTION_VERSION(direction, enum_val, name, load, store) \
+Processor *expand_##direction##_##name       = &generic_sse2< \
+    process_line_xxpand<enum_val, Border::Left, expand_operator_sse2, limit_up_sse2, load, store>, \
+    process_line_xxpand<enum_val, Border::None, expand_operator_sse2, limit_up_sse2, load, store>, \
+    process_line_xxpand<enum_val, Border::Right, expand_operator_sse2, limit_up_sse2, load, store> \
+>; 
+
+#define DEFINE_SSE2_VERSIONS(name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(square, Directions::Square, name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(both, Directions::Both, name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(horizontal, Directions::Horizontal, name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(vertical, Directions::Vertical, name, load, store)
+
+DEFINE_SSE2_VERSIONS(sse2, simd_loadu_epi128, simd_storeu_epi128)
+DEFINE_SSE2_VERSIONS(asse2, simd_load_epi128, simd_store_epi128)
 
 Processor *expand_custom_c       = &generic_custom_c<NewValue>;
 

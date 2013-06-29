@@ -6,29 +6,21 @@
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Inpand {
 
 
-extern "C" Processor Inpand_square_inpand8_isse;
-extern "C" Processor Inpand_square_inpand8_3dnow;
-extern "C" Processor Inpand_square_inpand8_sse2;
-extern "C" Processor Inpand_square_inpand8_asse2;
 extern Processor *inpand_square_c;
+extern Processor *inpand_square_sse2;
+extern Processor *inpand_square_asse2;
 
-extern "C" Processor Inpand_horizontal_inpand8_isse;
-extern "C" Processor Inpand_horizontal_inpand8_3dnow;
-extern "C" Processor Inpand_horizontal_inpand8_sse2;
-extern "C" Processor Inpand_horizontal_inpand8_asse2;
 extern Processor *inpand_horizontal_c;
+extern Processor *inpand_horizontal_sse2;
+extern Processor *inpand_horizontal_asse2;
 
-extern "C" Processor Inpand_vertical_inpand8_isse;
-extern "C" Processor Inpand_vertical_inpand8_3dnow;
-extern "C" Processor Inpand_vertical_inpand8_sse2;
-extern "C" Processor Inpand_vertical_inpand8_asse2;
 extern Processor *inpand_vertical_c;
+extern Processor *inpand_vertical_sse2;
+extern Processor *inpand_vertical_asse2;
 
-extern "C" Processor Inpand_both_inpand8_isse;
-extern "C" Processor Inpand_both_inpand8_3dnow;
-extern "C" Processor Inpand_both_inpand8_sse2;
-extern "C" Processor Inpand_both_inpand8_asse2;
 extern Processor *inpand_both_c;
+extern Processor *inpand_both_sse2;
+extern Processor *inpand_both_asse2;
 
 extern Processor *inpand_custom_c;
 
@@ -41,34 +33,26 @@ public:
       if ( parameters["mode"].toString() == "square" )
       {
          processors.push_back( Filtering::Processor<Processor>( inpand_square_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-         processors.push_back( Filtering::Processor<Processor>( Inpand_square_inpand8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_square_inpand8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 2));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_square_inpand8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_square_inpand8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
+         processors.push_back( Filtering::Processor<Processor>( inpand_square_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
+         processors.push_back( Filtering::Processor<Processor>( inpand_square_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
       }
       else if ( parameters["mode"].toString() == "horizontal" )
       {
          processors.push_back( Filtering::Processor<Processor>( inpand_horizontal_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-         processors.push_back( Filtering::Processor<Processor>( Inpand_horizontal_inpand8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_horizontal_inpand8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 2));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_horizontal_inpand8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_horizontal_inpand8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
+         processors.push_back( Filtering::Processor<Processor>( inpand_horizontal_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
+         processors.push_back( Filtering::Processor<Processor>( inpand_horizontal_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
       }
       else if ( parameters["mode"].toString() == "vertical" )
       {
          processors.push_back( Filtering::Processor<Processor>( inpand_vertical_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-         processors.push_back( Filtering::Processor<Processor>( Inpand_vertical_inpand8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_vertical_inpand8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 2));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_vertical_inpand8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_vertical_inpand8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
+         processors.push_back( Filtering::Processor<Processor>( inpand_vertical_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
+         processors.push_back( Filtering::Processor<Processor>( inpand_vertical_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
      }
       else if ( parameters["mode"].toString() == "both" )
       {
          processors.push_back( Filtering::Processor<Processor>( inpand_both_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
-         processors.push_back( Filtering::Processor<Processor>( Inpand_both_inpand8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_both_inpand8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 2));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_both_inpand8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
-         processors.push_back( Filtering::Processor<Processor>( Inpand_both_inpand8_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
+         processors.push_back( Filtering::Processor<Processor>( inpand_both_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 3));
+         processors.push_back( Filtering::Processor<Processor>( inpand_both_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 4));
      }
       else
       {

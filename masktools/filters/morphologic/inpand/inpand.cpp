@@ -62,6 +62,10 @@ static inline Byte minimumThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a
    return static_cast<Byte>(nMinimum);
 }
 
+extern "C" static FORCEINLINE __m128i inpand_operator_sse2(__m128i a, __m128i b) {
+    return _mm_min_epu8(a, b);
+}
+
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Inpand {
 
 class NewValue {
@@ -78,6 +82,22 @@ Processor *inpand_square_c       = &generic_c<minimumThresholded<::minimum_squar
 Processor *inpand_horizontal_c   = &generic_c<minimumThresholded<::minimum_horizontal> >;
 Processor *inpand_vertical_c     = &generic_c<minimumThresholded<::minimum_vertical> >;
 Processor *inpand_both_c         = &generic_c<minimumThresholded<::minimum_both> >;
+
+#define DEFINE_SSE2_DIRECTION_VERSION(direction, enum_val, name, load, store) \
+    Processor *inpand_##direction##_##name       = &generic_sse2< \
+    process_line_xxpand<enum_val, Border::Left, inpand_operator_sse2, limit_down_sse2, load, store>, \
+    process_line_xxpand<enum_val, Border::None, inpand_operator_sse2, limit_down_sse2, load, store>, \
+    process_line_xxpand<enum_val, Border::Right, inpand_operator_sse2, limit_down_sse2, load, store> \
+    >; 
+
+#define DEFINE_SSE2_VERSIONS(name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(square, Directions::Square, name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(both, Directions::Both, name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(horizontal, Directions::Horizontal, name, load, store) \
+    DEFINE_SSE2_DIRECTION_VERSION(vertical, Directions::Vertical, name, load, store)
+
+DEFINE_SSE2_VERSIONS(sse2, simd_loadu_epi128, simd_storeu_epi128)
+    DEFINE_SSE2_VERSIONS(asse2, simd_load_epi128, simd_store_epi128)
 
 Processor *inpand_custom_c       = &generic_custom_c<NewValue>;
 

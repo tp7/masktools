@@ -16,6 +16,13 @@ enum class Border {
     None
 };
 
+enum Directions {
+    Vertical = 1,
+    Horizontal = 2,
+    Both = Vertical | Horizontal,
+    Square = 7
+};
+
 
 template<Operator op>
 void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight)
@@ -68,6 +75,17 @@ void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrc
    /* bottom-right */
    pDst[nWidth-1] = op(pSrcp[nWidth-2], pSrcp[nWidth-1], pSrcp[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], nMaxDeviation);
 }
+
+extern "C" static FORCEINLINE __m128i limit_up_sse2(__m128i source, __m128i sum, __m128i deviation) {
+    auto limit = _mm_adds_epu8(source, deviation);
+    return _mm_min_epu8(limit, _mm_max_epu8(source, sum));
+}
+
+extern "C" static FORCEINLINE __m128i limit_down_sse2(__m128i source, __m128i sum, __m128i deviation) {
+    auto limit = _mm_subs_epu8(source, deviation);
+    return _mm_max_epu8(limit, _mm_min_epu8(source, sum));
+}
+
 
 template<bool isBorder, decltype(simd_load_epi128) load>
 static FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
@@ -154,6 +172,55 @@ static FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, cons
         auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc + x));
         
         result = limit(middle_center, result, maxDeviation);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
+template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limiter, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+    for ( int x = 0; x < width; x+=16 ) {
+        __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
+
+        if (directions == Directions::Square) {
+            up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+            up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+            down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+            down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        }
+
+        if (directions & Directions::Vertical) {
+            up_center = load(reinterpret_cast<const __m128i*>(pSrcp + x));
+            down_center = load(reinterpret_cast<const __m128i*>(pSrcn + x));
+        }
+
+        if (directions & Directions::Horizontal) {
+            middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+            middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        }
+
+        __m128i acc;
+        if (directions == Directions::Square) {
+            acc = op(up_left, up_center);
+            acc = op(acc, up_right);
+            acc = op(acc, middle_left);
+            acc = op(acc, middle_right);
+            acc = op(acc, down_left);
+            acc = op(acc, down_center);
+            acc = op(acc, down_right);
+        } else if (directions == Directions::Horizontal) {
+            acc = op(middle_left, middle_right);
+        } else if (directions == Directions::Vertical) {
+            acc = op(up_center, down_center); 
+        } else  if (directions == Directions::Both) {
+            acc = op(up_center, middle_left);
+            acc = op(acc, middle_right); 
+            acc = op(acc, down_center); 
+        }
+
+        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc + x));
+
+        auto result = limiter(middle_center, acc, maxDeviation);
 
         store(reinterpret_cast<__m128i*>(pDst+x), result);
     }
