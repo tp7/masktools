@@ -19,7 +19,7 @@ static inline Byte meanMaxThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a
    return static_cast<Byte>(nMeanMax);
 }
 
-extern "C" static inline __m128i inflateOperator_sse2(__m128i source, __m128i sum, __m128i deviation) {
+extern "C" static inline __m128i inflateLimiter_sse2(__m128i source, __m128i sum, __m128i deviation) {
     auto limit = _mm_adds_epu8(source, deviation);
     return _mm_min_epu8(limit, _mm_max_epu8(source, sum));
 }
@@ -27,7 +27,15 @@ extern "C" static inline __m128i inflateOperator_sse2(__m128i source, __m128i su
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Inflate {
 
 Processor *inflate_c = &generic_c<meanMaxThresholded>;
-Processor *inflate_sse2 = &generic_sse2<inflateOperator_sse2, simd_loadu_epi128, simd_storeu_epi128>;
-Processor *inflate_asse2 = &generic_sse2<inflateOperator_sse2, simd_load_epi128, simd_store_epi128>;
+Processor *inflate_sse2 = &generic_sse2<
+    process_line_xxflate<Border::Left, inflateLimiter_sse2, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_xxflate<Border::None, inflateLimiter_sse2, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_xxflate<Border::Right, inflateLimiter_sse2, simd_loadu_epi128, simd_storeu_epi128>
+>;
+Processor *inflate_asse2 = &generic_sse2<
+    process_line_xxflate<Border::Left, inflateLimiter_sse2, simd_load_epi128, simd_store_epi128>,
+    process_line_xxflate<Border::Left, inflateLimiter_sse2, simd_load_epi128, simd_store_epi128>,
+    process_line_xxflate<Border::Left, inflateLimiter_sse2, simd_load_epi128, simd_store_epi128>
+>;
 
 } } } } }

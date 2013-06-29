@@ -7,7 +7,8 @@
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic {
 
 typedef Byte (Operator)(Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte, int);
-typedef __m128i (Xxflate)(__m128i source, __m128i sum, __m128i deviation);
+typedef __m128i (Limit)(__m128i source, __m128i sum, __m128i deviation);
+typedef void (ProcessLineSse2)(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width);
 
 enum class Border {
     Left,
@@ -90,8 +91,8 @@ static FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
     }
 }
 
-template<Border borderMode, Xxflate op, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+template<Border borderMode, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     auto zero = _mm_setzero_si128();
     for ( int x = 0; x < width; x+=16 ) {
         auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
@@ -152,13 +153,13 @@ static FORCEINLINE void process_line(Byte *pDst, const Byte *pSrcp, const Byte *
 
         auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc + x));
         
-        result = op(middle_center, result, maxDeviation);
+        result = limit(middle_center, result, maxDeviation);
 
         store(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<Xxflate op, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<ProcessLineSse2 process_line_left, ProcessLineSse2 process_line, ProcessLineSse2 process_line_right>
 static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight) {
     const Byte *pSrcp = pSrc - nSrcPitch;
     const Byte *pSrcn = pSrc + nSrcPitch;
@@ -167,12 +168,12 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     auto max_dev_v = simd_set8_epi32(nMaxDeviation);
     int sse2_width = (nWidth - 1 - 16) / 16 * 16 + 16;
     /* top-left */
-    process_line<Border::Left, op, load, store>(pDst, pSrc, pSrc, pSrcn, max_dev_v, 16);
+    process_line_left(pDst, pSrc, pSrc, pSrcn, max_dev_v, 16);
     /* top */
-    process_line<Border::None, op, load, store>(pDst + 16, pSrc+16, pSrc+16, pSrcn+16, max_dev_v, sse2_width - 16);
+    process_line(pDst + 16, pSrc+16, pSrc+16, pSrcn+16, max_dev_v, sse2_width - 16);
 
     /* top-right */
-    process_line<Border::Right, op, load, store>(pDst + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, max_dev_v, 16);
+    process_line_right(pDst + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, max_dev_v, 16);
 
     pDst  += nDstPitch;
     pSrcp += nSrcPitch;
@@ -182,11 +183,11 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     for ( int y = 1; y < nHeight-1; y++ )
     {
         /* left */
-        process_line<Border::Left, op, load, store>(pDst, pSrcp, pSrc, pSrcn, max_dev_v, 16);
+        process_line_left(pDst, pSrcp, pSrc, pSrcn, max_dev_v, 16);
         /* center */
-        process_line<Border::None, op, load, store>(pDst + 16, pSrcp+16, pSrc+16, pSrcn+16, max_dev_v, sse2_width - 16);
+        process_line(pDst + 16, pSrcp+16, pSrc+16, pSrcn+16, max_dev_v, sse2_width - 16);
         /* right */
-        process_line<Border::Right, op, load, store>(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, max_dev_v, 16);
+        process_line_right(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, max_dev_v, 16);
 
         pDst  += nDstPitch;
         pSrcp += nSrcPitch;
@@ -195,11 +196,11 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     }
 
     /* bottom-left */
-    process_line<Border::Left, op, load, store>(pDst, pSrcp, pSrc, pSrc, max_dev_v, 16);
+    process_line_left(pDst, pSrcp, pSrc, pSrc, max_dev_v, 16);
     /* bottom */
-    process_line<Border::None, op, load, store>(pDst + 16, pSrcp+16, pSrc+16, pSrc+16, max_dev_v, sse2_width - 16);
+    process_line(pDst + 16, pSrcp+16, pSrc+16, pSrc+16, max_dev_v, sse2_width - 16);
     /* bottom-right */
-    process_line<Border::Right, op, load, store>(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, max_dev_v, 16);
+    process_line_right(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, max_dev_v, 16);
 }
 
 template<class T>
