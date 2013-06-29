@@ -19,7 +19,7 @@ static inline Byte meanMinThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a
    return static_cast<Byte>(nMeanMin);
 }
 
-static inline __m128i deflateOperator_sse2(__m128i source, __m128i sum, __m128i deviation) {
+extern "C" static inline __m128i deflateOperator_sse2(__m128i source, __m128i sum, __m128i deviation) {
     auto limit = _mm_subs_epu8(source, deviation);
     return _mm_max_epu8(limit, _mm_min_epu8(source, sum));
 }

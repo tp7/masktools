@@ -170,7 +170,7 @@ static FORCEINLINE void process_line(Byte *pDst, const Byte *pSrcp, const Byte *
 
         auto result = _mm_packus_epi16(sum_lo, sum_hi);
 
-        auto middle_center = simd_loadu_epi128(reinterpret_cast<const __m128i*>(pSrc + x));
+        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc + x));
         
         result = op(middle_center, result, maxDeviation);
 
