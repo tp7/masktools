@@ -87,7 +87,7 @@ Processor *expand_vertical_c     = &generic_c<maximumThresholded<::maximum_verti
 Processor *expand_##direction##_##name       = &generic_sse2< \
     process_line_xxpand<enum_val, Border::Left, expand_operator_sse2, limit_up_sse2, load, store>, \
     process_line_xxpand<enum_val, Border::None, expand_operator_sse2, limit_up_sse2, load, store>, \
-    process_line_xxpand<enum_val, Border::Right, expand_operator_sse2, limit_up_sse2, load, store> \
+    process_line_xxpand<enum_val, Border::Right, expand_operator_sse2, limit_up_sse2, simd_loadu_epi128, simd_storeu_epi128> \
 >; 
 
 #define DEFINE_SSE2_VERSIONS(name, load, store) \

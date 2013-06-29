@@ -33,26 +33,26 @@ public:
       if ( parameters["mode"].toString() == "square" )
       {
          processors.push_back(Filtering::Processor<Processor>(expand_square_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(expand_square_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(expand_square_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 2));
+         processors.push_back(Filtering::Processor<Processor>(expand_square_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
+         processors.push_back(Filtering::Processor<Processor>(expand_square_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
       }
       else if ( parameters["mode"].toString() == "horizontal" )
       {
          processors.push_back(Filtering::Processor<Processor>(expand_horizontal_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(expand_horizontal_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(expand_horizontal_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 2));
+         processors.push_back(Filtering::Processor<Processor>(expand_horizontal_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
+         processors.push_back(Filtering::Processor<Processor>(expand_horizontal_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
       }
       else if ( parameters["mode"].toString() == "vertical" )
       {
          processors.push_back(Filtering::Processor<Processor>(expand_vertical_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(expand_vertical_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(expand_vertical_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 2));
+         processors.push_back(Filtering::Processor<Processor>(expand_vertical_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
+         processors.push_back(Filtering::Processor<Processor>(expand_vertical_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
       }
       else if ( parameters["mode"].toString() == "both" )
       {
          processors.push_back(Filtering::Processor<Processor>(expand_both_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(expand_both_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(expand_both_asse2, Constraint(CPU_SSE2, 8, 1, 16, 16), 2));
+         processors.push_back(Filtering::Processor<Processor>(expand_both_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
+         processors.push_back(Filtering::Processor<Processor>(expand_both_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
       }
       else
       {

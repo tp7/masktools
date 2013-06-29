@@ -87,7 +87,7 @@ Processor *inpand_both_c         = &generic_c<minimumThresholded<::minimum_both>
     Processor *inpand_##direction##_##name       = &generic_sse2< \
     process_line_xxpand<enum_val, Border::Left, inpand_operator_sse2, limit_down_sse2, load, store>, \
     process_line_xxpand<enum_val, Border::None, inpand_operator_sse2, limit_down_sse2, load, store>, \
-    process_line_xxpand<enum_val, Border::Right, inpand_operator_sse2, limit_down_sse2, load, store> \
+    process_line_xxpand<enum_val, Border::Right, inpand_operator_sse2, limit_down_sse2, simd_loadu_epi128, simd_storeu_epi128> \
     >; 
 
 #define DEFINE_SSE2_VERSIONS(name, load, store) \
