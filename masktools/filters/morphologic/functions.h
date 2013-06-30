@@ -23,6 +23,10 @@ enum Directions {
     Square = 7
 };
 
+#ifdef __INTEL_COMPILER
+    #define XXPAND_LOCAL_STORE
+#endif
+
 
 template<Operator op>
 void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight)
@@ -181,55 +185,87 @@ static FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, cons
     }
 }
 
+
 template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
-    for ( int x = 0; x < width; x+=16 ) {
-        __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
+static FORCEINLINE __m128i process_block_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation) {
+    __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
 
-        if (directions == Directions::Square) {
-            up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
-            up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
-            down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
-            down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
-        }
-        
-        if (directions & Directions::Vertical) {
-            up_center = load(reinterpret_cast<const __m128i*>(pSrcp + x));
-            down_center = load(reinterpret_cast<const __m128i*>(pSrcn + x));
-        }
-
-        if (directions & Directions::Horizontal) {
-            middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
-            middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
-        }
-
-        __m128i acc;
-        if (directions == Directions::Square) {
-            acc = op(up_left, up_center);
-            acc = op(acc, up_right);
-            acc = op(acc, middle_left);
-            acc = op(acc, middle_right);
-            acc = op(acc, down_left);
-            acc = op(acc, down_center);
-            acc = op(acc, down_right);
-        } else if (directions == Directions::Horizontal) {
-            acc = op(middle_left, middle_right);
-        } else if (directions == Directions::Vertical) {
-            acc = op(up_center, down_center); 
-        } else  if (directions == Directions::Both) {
-            acc = op(up_center, middle_left);
-            acc = op(acc, middle_right); 
-            acc = op(acc, down_center); 
-        }
-
-        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc + x));
-
-        auto result = limit(middle_center, acc, maxDeviation);
-
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    if (directions == Directions::Square) {
+        up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp);
+        up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp);
+        down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn);
+        down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn);
     }
+
+    if (directions & Directions::Vertical) {
+        up_center = load(reinterpret_cast<const __m128i*>(pSrcp));
+        down_center = load(reinterpret_cast<const __m128i*>(pSrcn));
+    }
+
+    if (directions & Directions::Horizontal) {
+        middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc);
+        middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc);
+    }
+
+    __m128i acc;
+    if (directions == Directions::Square) {
+        acc = op(up_left, up_center);
+        acc = op(acc, up_right);
+        acc = op(acc, middle_left);
+        acc = op(acc, middle_right);
+        acc = op(acc, down_left);
+        acc = op(acc, down_center);
+        acc = op(acc, down_right);
+    } else if (directions == Directions::Horizontal) {
+        acc = op(middle_left, middle_right);
+    } else if (directions == Directions::Vertical) {
+        acc = op(up_center, down_center); 
+    } else  if (directions == Directions::Both) {
+        acc = op(up_center, middle_left);
+        acc = op(acc, middle_right); 
+        acc = op(acc, down_center); 
+    }
+
+    auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc));
+
+    auto result = limit(middle_center, acc, maxDeviation);
+#ifdef XXPAND_LOCAL_STORE
+    store(reinterpret_cast<__m128i*>(pDst), result);
+#endif
+    return result;
 }
 
+/*
+ * This whole loop unrolling thing is needed to make vc110 generate less awful code (use more registers).
+ * ICC is much more efficient if store is called from the same function and a bit more more efficient without loop unrolling.
+ * vc110 generates faster code if store is used outside of the function with unrolling.
+ * Please remove this when vc++ gets better.
+ */
+template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+    if (width <= 16) {
+        auto result = process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst, pSrcp, pSrc, pSrcn, maxDeviation);
+#ifndef XXPAND_LOCAL_STORE
+        store(reinterpret_cast<__m128i*>(pDst), result);
+#endif
+        return;
+    }
+    int x;
+    for (x = 0; x < width; x+=32) {
+        auto result_t1 = process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst+x, pSrcp+x, pSrc+x, pSrcn+x, maxDeviation);
+        auto result_t2 = process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst+x+16, pSrcp+x+16, pSrc+x+16, pSrcn+x+16, maxDeviation);
+#ifndef XXPAND_LOCAL_STORE
+        store(reinterpret_cast<__m128i*>(pDst+x), result_t1);
+        store(reinterpret_cast<__m128i*>(pDst+x+16), result_t2);
+#endif
+    }
+    if ((x - 16) < width) {
+        auto result = process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst+x-16, pSrcp+x-16, pSrc+x-16, pSrcn+x-16, maxDeviation);
+#ifndef XXPAND_LOCAL_STORE
+        store(reinterpret_cast<__m128i*>(pDst+x-16), result);
+#endif
+    }
+}
 template<ProcessLineSse2 process_line_left, ProcessLineSse2 process_line, ProcessLineSse2 process_line_right>
 static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight) {
     const Byte *pSrcp = pSrc - nSrcPitch;
