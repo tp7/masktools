@@ -101,13 +101,13 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     }
 }
 
-template <decltype(sad_c_op) sad, decltype(mask_c_op) mask, Functions::Memset memsetPlane>
+template <decltype(sad_c_op) sad, decltype(mask_c_op) mask>
 bool mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nLowThreshold, int nHighThreshold, int nMotionThreshold, int nSceneChange, int nSceneChangeValue, int nWidth, int nHeight)
 {
     bool scenechange = nSceneChange >= 2 ? nSceneChange == 3 : sad(pDst, nDstPitch, pSrc, nSrcPitch, nWidth, nHeight) > (unsigned int)(nMotionThreshold * nWidth * nHeight);
 
     if ( scenechange )
-        memsetPlane(pDst, nDstPitch, nWidth, nHeight, static_cast<Byte>(nSceneChangeValue));
+        Functions::memset_c(pDst, nDstPitch, nWidth, nHeight, static_cast<Byte>(nSceneChangeValue));
     else
         mask(pDst, nDstPitch, pSrc, nSrcPitch, nLowThreshold, nHighThreshold, nWidth, nHeight);
 
@@ -115,8 +115,8 @@ bool mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
 }
 
 
-Processor *mask_c       = &mask_t<sad_c_op, mask_c_op, Functions::memset_c>;
-Processor *mask8_sse2   = &mask_t<sad_sse2_op<simd_loadu_epi128>, mask_sse2_op<simd_loadu_epi128, simd_storeu_epi128>, Functions::memset_c>;
-Processor *mask8_asse2  = &mask_t<sad_sse2_op<simd_load_epi128>, mask_sse2_op<simd_load_epi128, simd_store_epi128>, Functions::memset_c>;
+Processor *mask_c       = &mask_t<sad_c_op, mask_c_op>;
+Processor *mask8_sse2   = &mask_t<sad_sse2_op<simd_loadu_epi128>, mask_sse2_op<simd_loadu_epi128, simd_storeu_epi128>>;
+Processor *mask8_asse2  = &mask_t<sad_sse2_op<simd_load_epi128>, mask_sse2_op<simd_load_epi128, simd_store_epi128>>;
 
 } } } } }

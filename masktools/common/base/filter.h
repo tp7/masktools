@@ -37,10 +37,6 @@ protected:
 
 private:
 
-    ProcessorList<Functions::Memset>  memsets;
-    ProcessorList<Functions::Copy>    copies;
-
-
 protected:
 
    virtual void process(int n, const Plane<Byte> &dst, int nPlane) = 0;
@@ -174,19 +170,6 @@ public:
         /* effective offset */
         print( LOG_DEBUG, "offset : %i %i, width x height : %i x %i\n", nXOffset, nYOffset, nCoreWidth, nCoreHeight );
 
-        /* default processors */
-        /* memsets */
-        memsets.push_back(Processor<Functions::Memset>(&Functions::memset_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-        memsets.push_back(Processor<Functions::Memset>(&memset8_mmx, Constraint(CPU_MMX, 8, 1, 1, 1), 1));
-        memsets.push_back(Processor<Functions::Memset>(&memset8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 2));
-        memsets.push_back(Processor<Functions::Memset>(&memset8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 3));
-
-        /* copy */
-        copies.push_back(Processor<Functions::Copy>(&Functions::copy_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-        copies.push_back(Processor<Functions::Copy>(&copy8_mmx, Constraint(CPU_MMX, 8, 1, 1, 1), 1));
-        copies.push_back(Processor<Functions::Copy>(&copy8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 2));
-        copies.push_back(Processor<Functions::Copy>(&copy8_3dnow, Constraint(CPU_3DNOW, 8, 1, 1, 1), 3));
-
         /* check the colorspace */
         if ( C == COLORSPACE_NONE )
             error = "unsupported colorspace. masktools only support planar YUV colorspaces (YV12, YV16, YV24)";
@@ -199,16 +182,16 @@ public:
 
         switch (operators[nPlane].getMode())
         {
-        case COPY: copies.best_processor(constraint)( output_plane, output_plane.pitch(),
+        case COPY: Functions::copy_c( output_plane, output_plane.pitch(),
                        frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(),
                        output_plane.width(), output_plane.height() ); break;
-        case COPY_SECOND: copies.best_processor(constraint)( output_plane, output_plane.pitch(),
+        case COPY_SECOND: Functions::copy_c( output_plane, output_plane.pitch(),
                               frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(),
                               output_plane.width(), output_plane.height() ); break;
-        case COPY_THIRD: copies.best_processor(constraint)( output_plane, output_plane.pitch(),
+        case COPY_THIRD: Functions::copy_c( output_plane, output_plane.pitch(),
                              frames[2].plane(nPlane), frames[2].plane(nPlane).pitch(),
                              output_plane.width(), output_plane.height() ); break;
-        case MEMSET: memsets.best_processor(constraint)( output_plane, output_plane.pitch(), output_plane.width(), output_plane.height(), static_cast<Byte>(operators[nPlane].value()) ); break;
+        case MEMSET: Functions::memset_c( output_plane, output_plane.pitch(), output_plane.width(), output_plane.height(), static_cast<Byte>(operators[nPlane].value()) ); break;
         case PROCESS: process( n, output_plane, nPlane ); break;
         case NONE: 
         default: break;
