@@ -623,24 +623,6 @@
     <ClInclude Include="..\helpers\parser\spirit.h" />
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="..\filters\morphologic\expand\expand.asm">
-      <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">
-      </ListFileName>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
-      <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">
-      </ListFileName>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
-    </YASM>
-    <YASM Include="..\filters\morphologic\inpand\inpand.asm">
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
-    </YASM>
     <YASM Include="..\filters\mask\edge\edgemask.asm">
       <ListFileName Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">e:\list.txt</ListFileName>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
@@ -648,20 +630,6 @@
       </ListFileName>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
-    </YASM>
-    <YASM Include="..\common\asm\morphologic.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">true</ExcludedFromBuild>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">..\..\common\asm</IncludePaths>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">true</ExcludedFromBuild>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|Win32'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">..\..\common\asm</IncludePaths>
-      <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">..\..\common\asm</IncludePaths>
       <IncludePaths Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">..\..\common\asm</IncludePaths>
     </YASM>

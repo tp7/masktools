@@ -97,9 +97,6 @@
     <Filter Include="common\base">
       <UniqueIdentifier>{82c90d37-ce72-441a-a2f7-827e6574eede}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\asm">
-      <UniqueIdentifier>{d2792b6c-f20c-49f4-9fd3-3ba0ab0dc74d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="common\params">
       <UniqueIdentifier>{26d70e27-19b4-490b-9b86-58c56951e7d5}</UniqueIdentifier>
     </Filter>
@@ -242,15 +239,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="..\common\asm\morphologic.asm">
-      <Filter>common\asm</Filter>
-    </YASM>
-    <YASM Include="..\filters\morphologic\inpand\inpand.asm">
-      <Filter>filters\morphologic\inpand</Filter>
-    </YASM>
-    <YASM Include="..\filters\morphologic\expand\expand.asm">
-      <Filter>filters\morphologic\expand</Filter>
-    </YASM>
     <YASM Include="..\filters\mask\edge\edgemask.asm">
       <Filter>filters\mask\edge</Filter>
     </YASM>
