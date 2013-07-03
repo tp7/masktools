@@ -200,6 +200,84 @@ static FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp,
     }
 }
 
+template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    UNUSED(pSrcp);
+    auto v128 = simd_set8_epi32(0x80);
+    auto zero = _mm_setzero_si128();
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+
+        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+
+        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+
+        auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
+        auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
+
+        auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
+        auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
+
+        auto up_right_lo = _mm_unpacklo_epi8(up_right, zero);
+        auto up_right_hi = _mm_unpackhi_epi8(up_right, zero);
+
+        auto middle_left_lo = _mm_unpacklo_epi8(middle_left, zero);
+        auto middle_left_hi = _mm_unpackhi_epi8(middle_left, zero);
+
+        auto middle_center_lo = _mm_unpacklo_epi8(middle_center, zero);
+        auto middle_center_hi = _mm_unpackhi_epi8(middle_center, zero);
+
+        auto middle_right_lo = _mm_unpacklo_epi8(middle_right, zero);
+        auto middle_right_hi = _mm_unpackhi_epi8(middle_right, zero);
+
+        auto down_left_lo = _mm_unpacklo_epi8(down_left, zero);
+        auto down_left_hi = _mm_unpackhi_epi8(down_left, zero);
+
+        auto down_center_lo = _mm_unpacklo_epi8(down_center, zero);
+        auto down_center_hi = _mm_unpackhi_epi8(down_center, zero);
+
+        auto down_right_lo = _mm_unpacklo_epi8(down_right, zero);
+        auto down_right_hi = _mm_unpackhi_epi8(down_right, zero);
+
+        auto acc_lo = _mm_add_epi16(up_left_lo, up_center_lo);
+        acc_lo = _mm_add_epi16(acc_lo, up_right_lo);
+        acc_lo = _mm_add_epi16(acc_lo, middle_left_lo);
+        acc_lo = _mm_add_epi16(acc_lo, middle_right_lo);
+        acc_lo = _mm_add_epi16(acc_lo, down_left_lo);
+        acc_lo = _mm_add_epi16(acc_lo, down_center_lo);
+        acc_lo = _mm_add_epi16(acc_lo, down_right_lo);
+
+        auto acc_hi = _mm_add_epi16(up_left_hi, up_center_hi);
+        acc_hi = _mm_add_epi16(acc_hi, up_right_hi);
+        acc_hi = _mm_add_epi16(acc_hi, middle_left_hi);
+        acc_hi = _mm_add_epi16(acc_hi, middle_right_hi);
+        acc_hi = _mm_add_epi16(acc_hi, down_left_hi);
+        acc_hi = _mm_add_epi16(acc_hi, down_center_hi);
+        acc_hi = _mm_add_epi16(acc_hi, down_right_hi);
+
+        auto pos_lo = _mm_slli_epi16(middle_center_lo, 3);
+        auto pos_hi = _mm_slli_epi16(middle_center_hi, 3);
+
+        auto diff_lo = simd_abs_diff_epu16(pos_lo, acc_lo);
+        auto diff_hi = simd_abs_diff_epu16(pos_hi, acc_hi);
+        
+        diff_lo = _mm_srai_epi16(diff_lo, 3);
+        diff_hi = _mm_srai_epi16(diff_hi, 3);
+
+        auto diff = _mm_packus_epi16(diff_lo, diff_hi);
+        auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
 template<Border borderMode,decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width) {
     auto v128 = simd_set8_epi32(0x80);
@@ -281,8 +359,11 @@ Processor *roberts_sse2 = &generic_sse2<
 >;
 
 Processor *laplace_c = &mask_t<laplace>;
-Processor *laplace8_mmx = &Edge_laplace8_mmx;
-Processor *laplace8_sse2 = &Edge_laplace8_sse2;
+Processor *laplace_sse2 = &generic_sse2<
+    process_line_laplace_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_laplace_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_laplace_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+>;
 
 Processor *prewitt_c = &mask_t<prewitt>;
 Processor *prewitt8_isse = &Edge_prewitt8_isse;

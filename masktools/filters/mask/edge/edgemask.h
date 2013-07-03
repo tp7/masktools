@@ -18,8 +18,7 @@ extern Processor *roberts_c;
 extern Processor *roberts_sse2;
 
 extern Processor *laplace_c;
-extern Processor *laplace8_mmx;
-extern Processor *laplace8_sse2;
+extern Processor *laplace_sse2;
 
 extern Processor *cartoon_c;
 
@@ -77,8 +76,7 @@ public:
       {
          print(LOG_DEBUG, "Edge : using laplace detector");
          processors.push_back(Filtering::Processor<Processor>(laplace_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(laplace8_mmx, Constraint(CPU_MMX, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(laplace8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(laplace_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
       }
       else if ( parameters["mode"].toString() == "cartoon" )
       {
