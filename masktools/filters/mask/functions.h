@@ -63,6 +63,66 @@ void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrc
    pDst[nWidth-1] = op(pSrcp[nWidth-2], pSrcp[nWidth-1], pSrcp[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], matrix, thresholds.min(nWidth-1), thresholds.max(nWidth-1));
 }
 
+static FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
+    auto sat = _mm_sub_epi8(value, v128);
+    auto low = _mm_cmpgt_epi8(sat, lowThresh);
+    auto high = _mm_cmpgt_epi8(sat, highThresh);
+    auto result = _mm_and_si128(value, low);
+    return _mm_or_si128(result, high);
+}
+
+
+template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    auto v128 = simd_set8_epi32(0x80);
+    auto zero = _mm_setzero_si128();
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+
+        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+
+        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+
+        auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
+        auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
+
+        auto middle_left_lo = _mm_unpacklo_epi8(middle_left, zero);
+        auto middle_left_hi = _mm_unpackhi_epi8(middle_left, zero);
+
+        auto middle_right_lo = _mm_unpacklo_epi8(middle_right, zero);
+        auto middle_right_hi = _mm_unpackhi_epi8(middle_right, zero);
+
+        auto down_center_lo = _mm_unpacklo_epi8(down_center, zero);
+        auto down_center_hi = _mm_unpackhi_epi8(down_center, zero);
+
+        auto pos_lo = _mm_add_epi16(middle_right_lo, down_center_lo);
+        auto pos_hi = _mm_add_epi16(middle_right_hi, down_center_hi);
+        
+        auto neg_lo = _mm_add_epi16(middle_left_lo, up_center_lo);
+        auto neg_hi = _mm_add_epi16(middle_left_hi, up_center_hi);
+        
+        //todo: use ssse3 _mm_abs_epi16?
+        auto gt_lo = _mm_subs_epu16(pos_lo, neg_lo);
+        auto gt_hi = _mm_subs_epu16(pos_hi, neg_hi);
+        
+        auto lt_lo = _mm_subs_epu16(neg_lo, pos_lo);
+        auto lt_hi = _mm_subs_epu16(neg_hi, pos_hi);
+        
+        auto diff_lo = _mm_add_epi16(gt_lo, lt_lo);
+        auto diff_hi = _mm_add_epi16(gt_hi, lt_hi);
+        
+        diff_lo = _mm_srai_epi16(diff_lo, 1);
+        diff_hi = _mm_srai_epi16(diff_hi, 1);
+        
+        auto diff = _mm_packus_epi16(diff_lo, diff_hi);
+        auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
 template<Border borderMode,decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width) {
     auto v128 = simd_set8_epi32(0x80);
@@ -99,11 +159,7 @@ static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, 
         minv = _mm_min_epu8(minv, down_right);
 
         auto diff = _mm_sub_epi8(maxv, minv);
-        auto diff_sat = _mm_sub_epi8(diff, v128);
-        auto low = _mm_cmpgt_epi8(diff_sat, lowThresh);
-        auto high = _mm_cmpgt_epi8(diff_sat, highThresh);
-        auto result = _mm_and_si128(diff, low);
-        result = _mm_or_si128(result, high);
+        auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
         store(reinterpret_cast<__m128i*>(pDst+x), result);
     }

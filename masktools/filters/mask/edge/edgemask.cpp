@@ -139,8 +139,11 @@ Processor *convolution8_mmx = &Edge_convolution8_mmx;
 Processor *convolution8_sse2 = &Edge_convolution8_sse2;
 
 Processor *sobel_c = &mask_t<sobel>;
-Processor *sobel8_mmx = &Edge_sobel8_mmx;
-Processor *sobel8_sse2 = &Edge_sobel8_sse2;
+Processor *sobel_sse2 = &generic_sse2<
+    process_line_sobel_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_sobel_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_sobel_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+>;
 
 Processor *roberts_c = &mask_t<roberts>;
 Processor *roberts8_mmx = &Edge_roberts8_mmx;
