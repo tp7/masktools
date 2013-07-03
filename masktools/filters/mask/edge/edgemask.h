@@ -8,8 +8,7 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Mask {
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, const Short matrix[10], int nLowThreshold, int nHighThreshold, int nWidth, int nHeight);
 
 extern Processor *convolution_c;
-extern Processor *convolution8_mmx;
-extern Processor *convolution8_sse2;
+extern Processor *convolution_sse2;
 
 extern Processor *sobel_c;
 extern Processor *sobel_sse2;
@@ -166,8 +165,7 @@ public:
          processors.push_back(Filtering::Processor<Processor>(convolution_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
          if (isAsmOk)
          {
-            processors.push_back(Filtering::Processor<Processor>(convolution8_mmx, Constraint(CPU_MMX, 8, 1, 1, 1), 1));
-            processors.push_back(Filtering::Processor<Processor>(convolution8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
+            processors.push_back(Filtering::Processor<Processor>(convolution_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
          }
       }
    }

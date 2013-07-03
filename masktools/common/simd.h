@@ -61,6 +61,16 @@ static FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
     return _mm_add_epi16(gt, lt);
 }
 
+static FORCEINLINE int simd_bit_scan_forward(int value) {
+#ifdef __INTEL_COMPILER
+    return _bit_scan_forward(value);
+#else
+    unsigned long index;
+    _BitScanForward(&index, value);
+    return index;
+#endif
+}
+
 };
 
 enum class Border {
