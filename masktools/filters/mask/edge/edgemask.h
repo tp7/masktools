@@ -15,8 +15,7 @@ extern Processor *sobel_c;
 extern Processor *sobel_sse2;
 
 extern Processor *roberts_c;
-extern Processor *roberts8_mmx;
-extern Processor *roberts8_sse2;
+extern Processor *roberts_sse2;
 
 extern Processor *laplace_c;
 extern Processor *laplace8_mmx;
@@ -72,8 +71,7 @@ public:
       {
          print(LOG_DEBUG, "Edge : using roberts detector");
          processors.push_back(Filtering::Processor<Processor>(roberts_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(roberts8_mmx, Constraint(CPU_MMX, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(roberts8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(roberts_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
       }
       else if ( parameters["mode"].toString() == "laplace" )
       {
