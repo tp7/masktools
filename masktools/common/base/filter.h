@@ -35,10 +35,6 @@ protected:
     std::vector<Frame<const Byte> > frames;
     Constraint constraints[3];
 
-private:
-
-protected:
-
    virtual void process(int n, const Plane<Byte> &dst, int nPlane) = 0;
    virtual InputConfiguration &input_configuration() const = 0;
 

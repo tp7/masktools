@@ -91,32 +91,6 @@ extern "C" static FORCEINLINE __m128i limit_down_sse2(__m128i source, __m128i su
 }
 
 
-template<bool isBorder, decltype(simd_load_epi128) load>
-static FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
-    if (isBorder) {
-#pragma warning(disable: 4309)
-        auto mask_left = _mm_setr_epi8(0xFF, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00);
-#pragma warning(default: 4309)
-        auto val = load(reinterpret_cast<const __m128i*>(ptr));
-        return _mm_or_si128(_mm_slli_si128(val, 1), _mm_and_si128(val, mask_left));
-    } else {
-        return simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr - 1));
-    }
-}
-
-template<bool isBorder, decltype(simd_load_epi128) load>
-static FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
-    if (isBorder) {
-#pragma warning(disable: 4309)
-        auto mask_right = _mm_setr_epi8(00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0xFF);
-#pragma warning(default: 4309)
-        auto val = load(reinterpret_cast<const __m128i*>(ptr));
-        return _mm_or_si128(_mm_srli_si128(val, 1), _mm_and_si128(val, mask_right));
-    } else {
-        return simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr + 1));
-    }
-}
-
 template<Border borderMode, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     auto zero = _mm_setzero_si128();
@@ -231,6 +205,8 @@ static FORCEINLINE __m128i process_block_xxpand(Byte *pDst, const Byte *pSrcp, c
     auto result = limit(middle_center, acc, maxDeviation);
 #ifdef XXPAND_LOCAL_STORE
     store(reinterpret_cast<__m128i*>(pDst), result);
+#else
+    UNUSED(pDst);
 #endif
     return result;
 }

@@ -138,13 +138,13 @@ public:
          }
          int nSum = max<int>(nNegative, nPositive);
 
-         bool isAsmOk = TRUE;
+         bool isAsmOk = true;
          if (coeffs.size())
             nSum = static_cast<Short>(coeffs.front().getValue(0,0,0));
 
          /* disable asm if sum of coefficients indicates a risk of overflow */
          if (nNegative > 128 || nPositive > 128)
-            isAsmOk = FALSE;
+            isAsmOk = false;
          
          /* find the upper power of 2, if possible */
          int i;
@@ -163,7 +163,7 @@ public:
          if (i >= 15)
             error = "Too high divisor, please specify a divisor between 1 and 32767";
          if (1 << i != matrix[9])
-            isAsmOk = FALSE;
+            isAsmOk = false;
          if (matrix[9] <= 0)
             error = "Divisor must be positive";
 

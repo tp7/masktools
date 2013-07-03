@@ -2,6 +2,9 @@
 #define __Mt_SIMD_H__
 
 #include <emmintrin.h>
+#include "../../common/utils/utils.h"
+
+using namespace Filtering;
 
 //because ICC is smart enough on its own and force inlining actually makes it slower
 #ifdef __INTEL_COMPILER
@@ -52,4 +55,31 @@ static FORCEINLINE __m128i simd_set8_epi32(unsigned int value) {
 }
 
 };
+
+#pragma warning(disable: 4309)
+
+template<bool isBorder, decltype(simd_load_epi128) load>
+static FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
+    if (isBorder) {
+        auto mask_left = _mm_setr_epi8(0xFF, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00);
+        auto val = load(reinterpret_cast<const __m128i*>(ptr));
+        return _mm_or_si128(_mm_slli_si128(val, 1), _mm_and_si128(val, mask_left));
+    } else {
+        return simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr - 1));
+    }
+}
+
+template<bool isBorder, decltype(simd_load_epi128) load>
+static FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
+    if (isBorder) {
+        auto mask_right = _mm_setr_epi8(00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0xFF);
+        auto val = load(reinterpret_cast<const __m128i*>(ptr));
+        return _mm_or_si128(_mm_srli_si128(val, 1), _mm_and_si128(val, mask_right));
+    } else {
+        return simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr + 1));
+    }
+}
+
+#pragma warning(default: 4309)
+
 #endif __Mt_SIMD_H__
