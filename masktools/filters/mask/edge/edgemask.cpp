@@ -115,6 +115,8 @@ void mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
    Filters::Mask::generic_c<op, Thresholds>(pDst, nDstPitch, pSrc, nSrcPitch, thresholds, matrix, nWidth, nHeight);
 }
 
+using namespace Filters::Mask;
+
 extern "C" Processor Edge_sobel8_mmx;
 extern "C" Processor Edge_sobel8_sse2;
 extern "C" Processor Edge_roberts8_mmx;
@@ -161,7 +163,10 @@ Processor *half_prewitt8_ssse3 = &Edge_half_prewitt8_ssse3;
 Processor *cartoon_c = &mask_t<cartoon>;
 
 Processor *morpho_c = &mask_t<morpho>;
-Processor *morpho8_isse = &Edge_morpho8_isse;
-Processor *morpho8_sse2 = &Edge_morpho8_sse2;
+Processor *morpho_sse2 = &generic_sse2<
+    process_line_morpho_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_morpho_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_morpho_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    >;
 
 } } } } }

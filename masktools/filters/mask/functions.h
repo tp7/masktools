@@ -2,14 +2,15 @@
 #define __Mt_MaskFunctions_H__
 
 #include "../../../common/utils/utils.h"
+#include "../../common/simd.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Mask {
 
 typedef Byte (Operator)(Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte, const Short matrix[10], int nLowThreshold, int nHighThreshold);
+typedef void (ProcessLineSse2)(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width);
 
 template<Operator op, class T>
-void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, 
-               T &thresholds, const Short matrix[10], int nWidth, int nHeight)
+void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, T &thresholds, const Short matrix[10], int nWidth, int nHeight)
 {
    const Byte *pSrcp = pSrc - nSrcPitch;
    const Byte *pSrcn = pSrc + nSrcPitch;
@@ -60,6 +61,101 @@ void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrc
 
    /* bottom-right */
    pDst[nWidth-1] = op(pSrcp[nWidth-2], pSrcp[nWidth-1], pSrcp[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], matrix, thresholds.min(nWidth-1), thresholds.max(nWidth-1));
+}
+
+template<Border borderMode,decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    auto v128 = simd_set8_epi32(0x80);
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+
+        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+
+        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+
+        auto maxv = _mm_max_epu8(up_left, up_center);
+        maxv = _mm_max_epu8(maxv, up_right);
+        maxv = _mm_max_epu8(maxv, middle_left);
+        maxv = _mm_max_epu8(maxv, middle_center);
+        maxv = _mm_max_epu8(maxv, middle_right);
+        maxv = _mm_max_epu8(maxv, down_left);
+        maxv = _mm_max_epu8(maxv, down_center);
+        maxv = _mm_max_epu8(maxv, down_right);
+
+        auto minv = _mm_min_epu8(up_left, up_center);
+        minv = _mm_min_epu8(minv, up_right);
+        minv = _mm_min_epu8(minv, middle_left);
+        minv = _mm_min_epu8(minv, middle_center);
+        minv = _mm_min_epu8(minv, middle_right);
+        minv = _mm_min_epu8(minv, down_left);
+        minv = _mm_min_epu8(minv, down_center);
+        minv = _mm_min_epu8(minv, down_right);
+
+        auto diff = _mm_sub_epi8(maxv, minv);
+        auto diff_sat = _mm_sub_epi8(diff, v128);
+        auto low = _mm_cmpgt_epi8(diff_sat, lowThresh);
+        auto high = _mm_cmpgt_epi8(diff_sat, highThresh);
+        auto result = _mm_and_si128(diff, low);
+        result = _mm_or_si128(result, high);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
+template<ProcessLineSse2 process_line_left, ProcessLineSse2 process_line, ProcessLineSse2 process_line_right>
+static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, const Short matrix[10], int nLowThreshold, int nHighThreshold, int nWidth, int nHeight) {
+    const Byte *pSrcp = pSrc - nSrcPitch;
+    const Byte *pSrcn = pSrc + nSrcPitch;
+
+    UNUSED(matrix);
+    auto v128 = simd_set8_epi32(128);
+    auto low_thr_v = simd_set8_epi32(nLowThreshold);
+    low_thr_v = _mm_sub_epi8(low_thr_v, v128);
+    auto high_thr_v = simd_set8_epi32(nHighThreshold);
+    high_thr_v = _mm_sub_epi8(high_thr_v, v128);
+
+    int sse2_width = (nWidth - 1 - 16) / 16 * 16 + 16;
+    /* top-left */
+    process_line_left(pDst, pSrc, pSrc, pSrcn, low_thr_v, high_thr_v, 16);
+    /* top */
+    process_line(pDst + 16, pSrc+16, pSrc+16, pSrcn+16, low_thr_v, high_thr_v, sse2_width - 16);
+
+    /* top-right */
+    process_line_right(pDst + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, low_thr_v, high_thr_v, 16);
+
+    pDst  += nDstPitch;
+    pSrcp += nSrcPitch;
+    pSrc  += nSrcPitch;
+    pSrcn += nSrcPitch;
+
+    for ( int y = 1; y < nHeight-1; y++ )
+    {
+        /* left */
+        process_line_left(pDst, pSrcp, pSrc, pSrcn, low_thr_v, high_thr_v, 16);
+        /* center */
+        process_line(pDst + 16, pSrcp+16, pSrc+16, pSrcn+16, low_thr_v, high_thr_v, sse2_width - 16);
+        /* right */
+        process_line_right(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, low_thr_v, high_thr_v, 16);
+
+        pDst  += nDstPitch;
+        pSrcp += nSrcPitch;
+        pSrc  += nSrcPitch;
+        pSrcn += nSrcPitch;
+    }
+
+    /* bottom-left */
+    process_line_left(pDst, pSrcp, pSrc, pSrc, low_thr_v, high_thr_v, 16);
+    /* bottom */
+    process_line(pDst + 16, pSrcp+16, pSrc+16, pSrc+16, low_thr_v, high_thr_v, sse2_width - 16);
+    /* bottom-right */
+    process_line_right(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, low_thr_v, high_thr_v, 16);
 }
 
 } } } }

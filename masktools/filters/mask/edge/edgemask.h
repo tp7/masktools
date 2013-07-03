@@ -36,8 +36,7 @@ extern Processor *prewitt8_sse2;
 extern Processor *prewitt8_ssse3;
 
 extern Processor *morpho_c;
-extern Processor *morpho8_isse;
-extern Processor *morpho8_sse2;
+extern Processor *morpho_sse2;
 
 class EdgeMask : public MaskTools::Filter
 {
@@ -94,8 +93,7 @@ public:
       {
          print(LOG_DEBUG, "Edge : using morphologic detector");
          processors.push_back(Filtering::Processor<Processor>(morpho_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(morpho8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(morpho8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(morpho_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
       }
       else if ( parameters["mode"].toString() == "prewitt" )
       {

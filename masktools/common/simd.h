@@ -56,6 +56,12 @@ static FORCEINLINE __m128i simd_set8_epi32(unsigned int value) {
 
 };
 
+enum class Border {
+    Left,
+    Right,
+    None
+};
+
 #pragma warning(disable: 4309)
 
 template<bool isBorder, decltype(simd_load_epi128) load>

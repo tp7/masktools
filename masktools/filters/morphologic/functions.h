@@ -10,12 +10,6 @@ typedef Byte (Operator)(Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte, in
 typedef __m128i (Limit)(__m128i source, __m128i sum, __m128i deviation);
 typedef void (ProcessLineSse2)(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width);
 
-enum class Border {
-    Left,
-    Right,
-    None
-};
-
 enum Directions {
     Vertical = 1,
     Horizontal = 2,
