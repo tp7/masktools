@@ -1,5 +1,6 @@
 #include "edgemask.h"
 #include "../functions.h"
+#include "../../../common/simd.h"
 
 using namespace Filtering;
 
@@ -114,6 +115,100 @@ void mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
 
    Filters::Mask::generic_c<op, Thresholds>(pDst, nDstPitch, pSrc, nSrcPitch, thresholds, matrix, nWidth, nHeight);
 }
+
+template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    auto v128 = simd_set8_epi32(0x80);
+    auto zero = _mm_setzero_si128();
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+
+        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+
+        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+
+        auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
+        auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
+
+        auto middle_left_lo = _mm_unpacklo_epi8(middle_left, zero);
+        auto middle_left_hi = _mm_unpackhi_epi8(middle_left, zero);
+
+        auto middle_right_lo = _mm_unpacklo_epi8(middle_right, zero);
+        auto middle_right_hi = _mm_unpackhi_epi8(middle_right, zero);
+
+        auto down_center_lo = _mm_unpacklo_epi8(down_center, zero);
+        auto down_center_hi = _mm_unpackhi_epi8(down_center, zero);
+
+        auto pos_lo = _mm_add_epi16(middle_right_lo, down_center_lo);
+        auto pos_hi = _mm_add_epi16(middle_right_hi, down_center_hi);
+
+        auto neg_lo = _mm_add_epi16(middle_left_lo, up_center_lo);
+        auto neg_hi = _mm_add_epi16(middle_left_hi, up_center_hi);
+
+        //todo: use ssse3 _mm_abs_epi16?
+        auto gt_lo = _mm_subs_epu16(pos_lo, neg_lo);
+        auto gt_hi = _mm_subs_epu16(pos_hi, neg_hi);
+
+        auto lt_lo = _mm_subs_epu16(neg_lo, pos_lo);
+        auto lt_hi = _mm_subs_epu16(neg_hi, pos_hi);
+
+        auto diff_lo = _mm_add_epi16(gt_lo, lt_lo);
+        auto diff_hi = _mm_add_epi16(gt_hi, lt_hi);
+
+        diff_lo = _mm_srai_epi16(diff_lo, 1);
+        diff_hi = _mm_srai_epi16(diff_hi, 1);
+
+        auto diff = _mm_packus_epi16(diff_lo, diff_hi);
+        auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
+template<Border borderMode,decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    auto v128 = simd_set8_epi32(0x80);
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+
+        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+
+        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+
+        auto maxv = _mm_max_epu8(up_left, up_center);
+        maxv = _mm_max_epu8(maxv, up_right);
+        maxv = _mm_max_epu8(maxv, middle_left);
+        maxv = _mm_max_epu8(maxv, middle_center);
+        maxv = _mm_max_epu8(maxv, middle_right);
+        maxv = _mm_max_epu8(maxv, down_left);
+        maxv = _mm_max_epu8(maxv, down_center);
+        maxv = _mm_max_epu8(maxv, down_right);
+
+        auto minv = _mm_min_epu8(up_left, up_center);
+        minv = _mm_min_epu8(minv, up_right);
+        minv = _mm_min_epu8(minv, middle_left);
+        minv = _mm_min_epu8(minv, middle_center);
+        minv = _mm_min_epu8(minv, middle_right);
+        minv = _mm_min_epu8(minv, down_left);
+        minv = _mm_min_epu8(minv, down_center);
+        minv = _mm_min_epu8(minv, down_right);
+        
+        auto diff = _mm_sub_epi8(maxv, minv);
+        auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
 
 using namespace Filters::Mask;
 
