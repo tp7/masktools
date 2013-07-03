@@ -147,15 +147,8 @@ static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, c
         auto neg_lo = _mm_add_epi16(middle_left_lo, up_center_lo);
         auto neg_hi = _mm_add_epi16(middle_left_hi, up_center_hi);
 
-        //todo: use ssse3 _mm_abs_epi16?
-        auto gt_lo = _mm_subs_epu16(pos_lo, neg_lo);
-        auto gt_hi = _mm_subs_epu16(pos_hi, neg_hi);
-
-        auto lt_lo = _mm_subs_epu16(neg_lo, pos_lo);
-        auto lt_hi = _mm_subs_epu16(neg_hi, pos_hi);
-
-        auto diff_lo = _mm_add_epi16(gt_lo, lt_lo);
-        auto diff_hi = _mm_add_epi16(gt_hi, lt_hi);
+        auto diff_lo = simd_abs_diff_epu16(pos_lo, neg_lo);
+        auto diff_hi = simd_abs_diff_epu16(pos_hi, neg_hi);
 
         diff_lo = _mm_srai_epi16(diff_lo, 1);
         diff_hi = _mm_srai_epi16(diff_hi, 1);
@@ -194,15 +187,8 @@ static FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp,
         auto neg_lo = _mm_add_epi16(middle_right_lo, down_center_lo);
         auto neg_hi = _mm_add_epi16(middle_right_hi, down_center_hi);
 
-        //todo: use ssse3 _mm_abs_epi16?
-        auto gt_lo = _mm_subs_epu16(pos_lo, neg_lo);
-        auto gt_hi = _mm_subs_epu16(pos_hi, neg_hi);
-
-        auto lt_lo = _mm_subs_epu16(neg_lo, pos_lo);
-        auto lt_hi = _mm_subs_epu16(neg_hi, pos_hi);
-
-        auto diff_lo = _mm_add_epi16(gt_lo, lt_lo);
-        auto diff_hi = _mm_add_epi16(gt_hi, lt_hi);
+        auto diff_lo = simd_abs_diff_epu16(pos_lo, neg_lo);
+        auto diff_hi = simd_abs_diff_epu16(pos_hi, neg_hi);
 
         diff_lo = _mm_srai_epi16(diff_lo, 1);
         diff_hi = _mm_srai_epi16(diff_hi, 1);
