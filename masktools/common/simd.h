@@ -103,6 +103,8 @@ static FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
     }
 }
 
+
+
 #pragma warning(default: 4309)
 
 #endif __Mt_SIMD_H__

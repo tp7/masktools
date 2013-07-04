@@ -116,6 +116,14 @@ void mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
    Filters::Mask::generic_c<op, Thresholds>(pDst, nDstPitch, pSrc, nSrcPitch, thresholds, matrix, nWidth, nHeight);
 }
 
+static FORCEINLINE __m128i simd_packed_abs_epi16(__m128i a, __m128i b) {
+    auto suba = _mm_sub_epi16(_mm_setzero_si128(), a);
+    auto subb = _mm_sub_epi16(_mm_setzero_si128(), b);
+    auto t1 = _mm_packus_epi16(a, b);
+    auto t2 = _mm_packus_epi16(suba, subb);
+    return _mm_max_epu8(t1, t2);
+}
+
 static FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
     auto sat = _mm_sub_epi8(value, v128);
     auto low = _mm_cmpgt_epi8(sat, lowThresh);
@@ -385,7 +393,7 @@ static FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp,
     }
 }
 
-template<Border borderMode,decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -428,6 +436,182 @@ static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, 
     }
 }
 
+template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    UNUSED(matrix);
+    auto v128 = simd_set8_epi32(0x80);
+    auto zero = _mm_setzero_si128();
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+
+        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+
+        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+
+        auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
+        auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
+
+        auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
+        auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
+
+        auto up_right_lo = _mm_unpacklo_epi8(up_right, zero);
+        auto up_right_hi = _mm_unpackhi_epi8(up_right, zero);
+
+        auto middle_left_lo = _mm_unpacklo_epi8(middle_left, zero);
+        auto middle_left_hi = _mm_unpackhi_epi8(middle_left, zero);
+
+        auto middle_right_lo = _mm_unpacklo_epi8(middle_right, zero);
+        auto middle_right_hi = _mm_unpackhi_epi8(middle_right, zero);
+
+        auto down_left_lo = _mm_unpacklo_epi8(down_left, zero);
+        auto down_left_hi = _mm_unpackhi_epi8(down_left, zero);
+
+        auto down_center_lo = _mm_unpacklo_epi8(down_center, zero);
+        auto down_center_hi = _mm_unpackhi_epi8(down_center, zero);
+
+        auto down_right_lo = _mm_unpacklo_epi8(down_right, zero);
+        auto down_right_hi = _mm_unpackhi_epi8(down_right, zero);
+
+        auto a21_minus_a23_lo = _mm_sub_epi16(up_center_lo, down_center_lo); // a21 - a23
+        auto a21_minus_a23_hi = _mm_sub_epi16(up_center_hi, down_center_hi);
+        
+        auto a11_minus_a33_lo = _mm_sub_epi16(up_left_lo, down_right_lo); // a11 - a33
+        auto a11_minus_a33_hi = _mm_sub_epi16(up_left_hi, down_right_hi);
+
+        auto t1_lo = _mm_add_epi16(a21_minus_a23_lo, a11_minus_a33_lo); // a11 + a21 - a23 - a33
+        auto t1_hi = _mm_add_epi16(a21_minus_a23_hi, a11_minus_a33_hi);
+
+        auto a12_minus_a32_lo = _mm_sub_epi16(middle_left_lo, middle_right_lo); // a12 - a32
+        auto a12_minus_a32_hi = _mm_sub_epi16(middle_left_hi, middle_right_hi);
+
+        auto a13_minus_a31_lo = _mm_sub_epi16(down_left_lo, up_right_lo); // a13 - a31
+        auto a13_minus_a31_hi = _mm_sub_epi16(down_left_hi, up_right_hi);
+
+        auto t2_lo = _mm_add_epi16(a12_minus_a32_lo, a13_minus_a31_lo); //a13 + a12 - a31 - a32
+        auto t2_hi = _mm_add_epi16(a12_minus_a32_hi, a13_minus_a31_hi);
+
+        auto p135_lo = _mm_sub_epi16(t2_lo, a21_minus_a23_lo); //a13 + a12 + a23 - a31 - a32 - a21
+        auto p135_hi = _mm_sub_epi16(t2_hi, a21_minus_a23_hi);
+
+        auto p180_lo = _mm_add_epi16(t2_lo, a11_minus_a33_lo); //a11+ a12+ a13 - a31 - a32 - a33
+        auto p180_hi = _mm_add_epi16(t2_hi, a11_minus_a33_hi);
+
+        auto p90_lo = _mm_sub_epi16(a13_minus_a31_lo, t1_lo); // a13 - a31 - a11 - a21 + a23 + a33 //negative
+        auto p90_hi = _mm_sub_epi16(a13_minus_a31_hi, t1_hi);
+
+        auto p45_lo = _mm_add_epi16(t1_lo, a12_minus_a32_lo); // a12 + a11 + a21 - a33 - a32 - a23
+        auto p45_hi = _mm_add_epi16(t1_hi, a12_minus_a32_hi);
+
+        auto p45 = simd_packed_abs_epi16(p45_lo, p45_hi);
+        auto p90 = simd_packed_abs_epi16(p90_lo, p90_hi);
+        auto p135 = simd_packed_abs_epi16(p135_lo, p135_hi);
+        auto p180 = simd_packed_abs_epi16(p180_lo, p180_hi);
+
+        auto max1 = _mm_max_epu8(p45, p90);
+        auto max2 = _mm_max_epu8(p135, p180);
+
+        auto result = _mm_max_epu8(max1, max2);
+
+        result = threshold_sse2(result, lowThresh, highThresh, v128);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
+template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    UNUSED(matrix);
+    auto v128 = simd_set8_epi32(0x80);
+    auto zero = _mm_setzero_si128();
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+
+        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+
+        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+
+        auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
+        auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
+
+        auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
+        auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
+
+        auto up_right_lo = _mm_unpacklo_epi8(up_right, zero);
+        auto up_right_hi = _mm_unpackhi_epi8(up_right, zero);
+
+        auto middle_left_lo = _mm_unpacklo_epi8(middle_left, zero);
+        auto middle_left_hi = _mm_unpackhi_epi8(middle_left, zero);
+
+        auto middle_right_lo = _mm_unpacklo_epi8(middle_right, zero);
+        auto middle_right_hi = _mm_unpackhi_epi8(middle_right, zero);
+
+        auto down_left_lo = _mm_unpacklo_epi8(down_left, zero);
+        auto down_left_hi = _mm_unpackhi_epi8(down_left, zero);
+
+        auto down_center_lo = _mm_unpacklo_epi8(down_center, zero);
+        auto down_center_hi = _mm_unpackhi_epi8(down_center, zero);
+
+        auto down_right_lo = _mm_unpacklo_epi8(down_right, zero);
+        auto down_right_hi = _mm_unpackhi_epi8(down_right, zero);
+
+        //a11 + 2 * (a21 - a23) + a31 - a13 - a33
+        auto t1_lo = _mm_sub_epi16(up_center_lo, down_center_lo); //2 * (a21 - a23)
+        auto t1_hi = _mm_sub_epi16(up_center_hi, down_center_hi);
+        t1_lo = _mm_slli_epi16(t1_lo, 1);
+        t1_hi = _mm_slli_epi16(t1_hi, 1);
+        
+        auto t2_lo = _mm_sub_epi16(up_left_lo, down_left_lo); //a11 - a13
+        auto t2_hi = _mm_sub_epi16(up_left_hi, down_left_hi);
+        
+        auto t3_lo = _mm_sub_epi16(up_right_lo, down_right_lo); //a31 - a33
+        auto t3_hi = _mm_sub_epi16(up_right_hi, down_right_hi);
+
+        t1_lo = _mm_add_epi16(t1_lo, t2_lo);
+        t1_hi = _mm_add_epi16(t1_hi, t2_hi);
+
+        auto p90_lo = _mm_add_epi16(t1_lo, t3_lo);
+        auto p90_hi = _mm_add_epi16(t1_hi, t3_hi);
+
+        //a11 + 2 * (a12 - a32) + a13 - a31 - a33
+        t1_lo = _mm_sub_epi16(middle_left_lo, middle_right_lo); //2 * (a12 - a32)
+        t1_hi = _mm_sub_epi16(middle_left_hi, middle_right_hi);
+        t1_lo = _mm_slli_epi16(t1_lo, 1);
+        t1_hi = _mm_slli_epi16(t1_hi, 1);
+
+        t2_lo = _mm_sub_epi16(up_left_lo, up_right_lo); //a11 - a31
+        t2_hi = _mm_sub_epi16(up_left_hi, up_right_hi);
+
+        t3_lo = _mm_sub_epi16(down_left_lo, down_right_lo); //a13 - a33
+        t3_hi = _mm_sub_epi16(down_left_hi, down_right_hi);
+
+        t1_lo = _mm_add_epi16(t1_lo, t2_lo);
+        t1_hi = _mm_add_epi16(t1_hi, t2_hi);
+
+        auto p180_lo = _mm_add_epi16(t1_lo, t3_lo);
+        auto p180_hi = _mm_add_epi16(t1_hi, t3_hi);
+
+        auto p90 = simd_packed_abs_epi16(p90_lo, p90_hi);
+        auto p180 = simd_packed_abs_epi16(p180_lo, p180_hi);
+
+        auto result = _mm_max_epu8(p90, p180);
+
+        result = threshold_sse2(result, lowThresh, highThresh, v128);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
 
 using namespace Filters::Mask;
 
@@ -477,14 +661,18 @@ Processor *laplace_sse2 = &generic_sse2<
 >;
 
 Processor *prewitt_c = &mask_t<prewitt>;
-Processor *prewitt8_isse = &Edge_prewitt8_isse;
-Processor *prewitt8_sse2 = &Edge_prewitt8_sse2;
-Processor *prewitt8_ssse3 = &Edge_prewitt8_ssse3;
+Processor *prewitt_sse2 = &generic_sse2<
+    process_line_prewitt_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_prewitt_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_prewitt_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+>;
 
 Processor *half_prewitt_c = &mask_t<half_prewitt>;
-Processor *half_prewitt8_isse = &Edge_half_prewitt8_isse;
-Processor *half_prewitt8_sse2 = &Edge_half_prewitt8_sse2;
-Processor *half_prewitt8_ssse3 = &Edge_half_prewitt8_ssse3;
+Processor *half_prewitt_sse2 = &generic_sse2<
+    process_line_half_prewitt_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_half_prewitt_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_half_prewitt_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+>;
 
 Processor *cartoon_c = &mask_t<cartoon>;
 

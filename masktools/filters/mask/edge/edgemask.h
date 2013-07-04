@@ -22,14 +22,10 @@ extern Processor *laplace_sse2;
 extern Processor *cartoon_c;
 
 extern Processor *half_prewitt_c;
-extern Processor *half_prewitt8_isse;
-extern Processor *half_prewitt8_sse2;
-extern Processor *half_prewitt8_ssse3;
+extern Processor *half_prewitt_sse2;
 
 extern Processor *prewitt_c;
-extern Processor *prewitt8_isse;
-extern Processor *prewitt8_sse2;
-extern Processor *prewitt8_ssse3;
+extern Processor *prewitt_sse2;
 
 extern Processor *morpho_c;
 extern Processor *morpho_sse2;
@@ -92,17 +88,13 @@ public:
       {
          print(LOG_DEBUG, "Edge : using prewitt detector");
          processors.push_back(Filtering::Processor<Processor>(prewitt_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(prewitt8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(prewitt8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
-         processors.push_back(Filtering::Processor<Processor>(prewitt8_ssse3, Constraint(CPU_SSSE3, 8, 1, 1, 1), 3));
+         processors.push_back(Filtering::Processor<Processor>(prewitt_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
       }
       else if ( parameters["mode"].toString() == "hprewitt" )
       {
          print(LOG_DEBUG, "Edge : using hprewitt detector");
          processors.push_back(Filtering::Processor<Processor>(half_prewitt_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(half_prewitt8_isse, Constraint(CPU_ISSE, 8, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(half_prewitt8_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
-         processors.push_back(Filtering::Processor<Processor>(half_prewitt8_ssse3, Constraint(CPU_SSSE3, 8, 1, 1, 1), 3));
+         processors.push_back(Filtering::Processor<Processor>(half_prewitt_sse2, Constraint(CPU_SSE2, 8, 1, 1, 1), 2));
       }
       else
       {
