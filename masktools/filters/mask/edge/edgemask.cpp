@@ -430,23 +430,23 @@ static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, 
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
         auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
 
-        auto maxv = _mm_max_epu8(up_left, up_center);
-        maxv = _mm_max_epu8(maxv, up_right);
-        maxv = _mm_max_epu8(maxv, middle_left);
-        maxv = _mm_max_epu8(maxv, middle_center);
-        maxv = _mm_max_epu8(maxv, middle_right);
-        maxv = _mm_max_epu8(maxv, down_left);
+        auto maxv = _mm_max_epu8(middle_right, up_right);
         maxv = _mm_max_epu8(maxv, down_center);
         maxv = _mm_max_epu8(maxv, down_right);
+        maxv = _mm_max_epu8(maxv, middle_center);
+        maxv = _mm_max_epu8(maxv, up_left);
+        maxv = _mm_max_epu8(maxv, down_left);
+        maxv = _mm_max_epu8(maxv, up_center);
+        maxv = _mm_max_epu8(maxv, middle_left);
 
-        auto minv = _mm_min_epu8(up_left, up_center);
-        minv = _mm_min_epu8(minv, up_right);
-        minv = _mm_min_epu8(minv, middle_left);
-        minv = _mm_min_epu8(minv, middle_center);
-        minv = _mm_min_epu8(minv, middle_right);
-        minv = _mm_min_epu8(minv, down_left);
+        auto minv = _mm_min_epu8(middle_right, up_right);
         minv = _mm_min_epu8(minv, down_center);
         minv = _mm_min_epu8(minv, down_right);
+        minv = _mm_min_epu8(minv, middle_center);
+        minv = _mm_min_epu8(minv, up_left);
+        minv = _mm_min_epu8(minv, down_left);
+        minv = _mm_min_epu8(minv, up_center);
+        minv = _mm_min_epu8(minv, middle_left);
         
         auto diff = _mm_sub_epi8(maxv, minv);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
