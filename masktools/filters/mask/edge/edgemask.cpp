@@ -116,12 +116,19 @@ void mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
    Filters::Mask::generic_c<op, Thresholds>(pDst, nDstPitch, pSrc, nSrcPitch, thresholds, matrix, nWidth, nHeight);
 }
 
+template <CpuFlags flags>
 static FORCEINLINE __m128i simd_packed_abs_epi16(__m128i a, __m128i b) {
-    auto suba = _mm_sub_epi16(_mm_setzero_si128(), a);
-    auto subb = _mm_sub_epi16(_mm_setzero_si128(), b);
-    auto t1 = _mm_packus_epi16(a, b);
-    auto t2 = _mm_packus_epi16(suba, subb);
-    return _mm_max_epu8(t1, t2);
+    if (flags >= CPU_SSSE3) {
+        auto absa = _mm_abs_epi16(a);
+        auto absb = _mm_abs_epi16(b);
+        return _mm_packus_epi16(absa, absb);
+    } else {
+        auto suba = _mm_sub_epi16(_mm_setzero_si128(), a);
+        auto subb = _mm_sub_epi16(_mm_setzero_si128(), b);
+        auto t1 = _mm_packus_epi16(a, b);
+        auto t2 = _mm_packus_epi16(suba, subb);
+        return _mm_max_epu8(t1, t2);
+    }
 }
 
 static FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
@@ -132,7 +139,7 @@ static FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &l
     return _mm_or_si128(result, high);
 }
 
-template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     auto v128 = simd_set8_epi32(0x80);
@@ -228,7 +235,7 @@ static FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pS
     }
 }
 
-template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -273,7 +280,7 @@ static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, c
     }
 }
 
-template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
@@ -314,7 +321,7 @@ static FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp,
     }
 }
 
-template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
@@ -393,7 +400,7 @@ static FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp,
     }
 }
 
-template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -436,7 +443,7 @@ static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, 
     }
 }
 
-template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -508,10 +515,10 @@ static FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp,
         auto p45_lo = _mm_add_epi16(t1_lo, a12_minus_a32_lo); // a12 + a11 + a21 - a33 - a32 - a23
         auto p45_hi = _mm_add_epi16(t1_hi, a12_minus_a32_hi);
 
-        auto p45 = simd_packed_abs_epi16(p45_lo, p45_hi);
-        auto p90 = simd_packed_abs_epi16(p90_lo, p90_hi);
-        auto p135 = simd_packed_abs_epi16(p135_lo, p135_hi);
-        auto p180 = simd_packed_abs_epi16(p180_lo, p180_hi);
+        auto p45 = simd_packed_abs_epi16<flags>(p45_lo, p45_hi);
+        auto p90 = simd_packed_abs_epi16<flags>(p90_lo, p90_hi);
+        auto p135 = simd_packed_abs_epi16<flags>(p135_lo, p135_hi);
+        auto p180 = simd_packed_abs_epi16<flags>(p180_lo, p180_hi);
 
         auto max1 = _mm_max_epu8(p45, p90);
         auto max2 = _mm_max_epu8(p135, p180);
@@ -524,7 +531,7 @@ static FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp,
     }
 }
 
-template<Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -602,8 +609,8 @@ static FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *p
         auto p180_lo = _mm_add_epi16(t1_lo, t3_lo);
         auto p180_hi = _mm_add_epi16(t1_hi, t3_hi);
 
-        auto p90 = simd_packed_abs_epi16(p90_lo, p90_hi);
-        auto p180 = simd_packed_abs_epi16(p180_lo, p180_hi);
+        auto p90 = simd_packed_abs_epi16<flags>(p90_lo, p90_hi);
+        auto p180 = simd_packed_abs_epi16<flags>(p180_lo, p180_hi);
 
         auto result = _mm_max_epu8(p90, p180);
 
@@ -634,53 +641,63 @@ extern "C" Processor Edge_half_prewitt8_ssse3;
 
 Processor *convolution_c = &mask_t<convolution>;
 Processor *convolution_sse2 = &generic_sse2<
-    process_line_convolution_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_convolution_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_convolution_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    process_line_convolution_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_convolution_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_convolution_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
 Processor *sobel_c = &mask_t<sobel>;
 Processor *sobel_sse2 = &generic_sse2<
-    process_line_sobel_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_sobel_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_sobel_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    process_line_sobel_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_sobel_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_sobel_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
 Processor *roberts_c = &mask_t<roberts>;
 Processor *roberts_sse2 = &generic_sse2<
-    process_line_roberts_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_roberts_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_roberts_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    process_line_roberts_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_roberts_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_roberts_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
 Processor *laplace_c = &mask_t<laplace>;
 Processor *laplace_sse2 = &generic_sse2<
-    process_line_laplace_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_laplace_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_laplace_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    process_line_laplace_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_laplace_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_laplace_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
 Processor *prewitt_c = &mask_t<prewitt>;
 Processor *prewitt_sse2 = &generic_sse2<
-    process_line_prewitt_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_prewitt_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_prewitt_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    process_line_prewitt_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_prewitt_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_prewitt_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+>;
+Processor *prewitt_ssse3 = &generic_sse2<
+    process_line_prewitt_sse2<CPU_SSSE3, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_prewitt_sse2<CPU_SSSE3, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_prewitt_sse2<CPU_SSSE3, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
 Processor *half_prewitt_c = &mask_t<half_prewitt>;
 Processor *half_prewitt_sse2 = &generic_sse2<
-    process_line_half_prewitt_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_half_prewitt_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_half_prewitt_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    process_line_half_prewitt_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_half_prewitt_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_half_prewitt_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+>;
+Processor *half_prewitt_ssse3 = &generic_sse2<
+    process_line_half_prewitt_sse2<CPU_SSSE3, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_half_prewitt_sse2<CPU_SSSE3, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_half_prewitt_sse2<CPU_SSSE3, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
 Processor *cartoon_c = &mask_t<cartoon>;
 
 Processor *morpho_c = &mask_t<morpho>;
 Processor *morpho_sse2 = &generic_sse2<
-    process_line_morpho_sse2<Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_morpho_sse2<Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_morpho_sse2<Border::Right, simd_loadu_epi128, simd_storeu_epi128>
+    process_line_morpho_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_morpho_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
+    process_line_morpho_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
     >;
 
 } } } } }
