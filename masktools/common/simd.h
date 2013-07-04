@@ -54,13 +54,6 @@ static FORCEINLINE __m128i simd_set8_epi32(unsigned int value) {
     return _mm_set1_epi32((value << 24) | (value << 16) | (value << 8) | value);
 }
 
-static FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
-    //todo: ssse3 version
-    auto gt = _mm_subs_epu16(a, b);
-    auto lt = _mm_subs_epu16(b, a);
-    return _mm_add_epi16(gt, lt);
-}
-
 static FORCEINLINE int simd_bit_scan_forward(int value) {
 #ifdef __INTEL_COMPILER
     return _bit_scan_forward(value);

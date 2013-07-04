@@ -131,6 +131,18 @@ static FORCEINLINE __m128i simd_packed_abs_epi16(__m128i a, __m128i b) {
     }
 }
 
+template <CpuFlags flags>
+static FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
+    if (flags >= CPU_SSSE3) {
+        auto diff = _mm_sub_epi16(a, b);
+        return _mm_abs_epi16(diff);
+    } else {
+        auto gt = _mm_subs_epu16(a, b);
+        auto lt = _mm_subs_epu16(b, a);
+        return _mm_add_epi16(gt, lt);
+    }
+}
+
 static FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
     auto sat = _mm_sub_epi8(value, v128);
     auto low = _mm_cmpgt_epi8(sat, lowThresh);
@@ -267,8 +279,8 @@ static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, c
         auto neg_lo = _mm_add_epi16(middle_left_lo, up_center_lo);
         auto neg_hi = _mm_add_epi16(middle_left_hi, up_center_hi);
 
-        auto diff_lo = simd_abs_diff_epu16(pos_lo, neg_lo);
-        auto diff_hi = simd_abs_diff_epu16(pos_hi, neg_hi);
+        auto diff_lo = simd_abs_diff_epu16<flags>(pos_lo, neg_lo);
+        auto diff_hi = simd_abs_diff_epu16<flags>(pos_hi, neg_hi);
 
         diff_lo = _mm_srai_epi16(diff_lo, 1);
         diff_hi = _mm_srai_epi16(diff_hi, 1);
@@ -308,8 +320,8 @@ static FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp,
         auto neg_lo = _mm_add_epi16(middle_right_lo, down_center_lo);
         auto neg_hi = _mm_add_epi16(middle_right_hi, down_center_hi);
 
-        auto diff_lo = simd_abs_diff_epu16(pos_lo, neg_lo);
-        auto diff_hi = simd_abs_diff_epu16(pos_hi, neg_hi);
+        auto diff_lo = simd_abs_diff_epu16<flags>(pos_lo, neg_lo);
+        auto diff_hi = simd_abs_diff_epu16<flags>(pos_hi, neg_hi);
 
         diff_lo = _mm_srai_epi16(diff_lo, 1);
         diff_hi = _mm_srai_epi16(diff_hi, 1);
@@ -387,8 +399,8 @@ static FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp,
         auto pos_lo = _mm_slli_epi16(middle_center_lo, 3);
         auto pos_hi = _mm_slli_epi16(middle_center_hi, 3);
 
-        auto diff_lo = simd_abs_diff_epu16(pos_lo, acc_lo);
-        auto diff_hi = simd_abs_diff_epu16(pos_hi, acc_hi);
+        auto diff_lo = simd_abs_diff_epu16<flags>(pos_lo, acc_lo);
+        auto diff_hi = simd_abs_diff_epu16<flags>(pos_hi, acc_hi);
         
         diff_lo = _mm_srai_epi16(diff_lo, 3);
         diff_hi = _mm_srai_epi16(diff_hi, 3);
@@ -622,22 +634,18 @@ static FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *p
 
 using namespace Filters::Mask;
 
-extern "C" Processor Edge_sobel8_mmx;
-extern "C" Processor Edge_sobel8_sse2;
-extern "C" Processor Edge_roberts8_mmx;
-extern "C" Processor Edge_roberts8_sse2;
-extern "C" Processor Edge_laplace8_mmx;
-extern "C" Processor Edge_laplace8_sse2;
-extern "C" Processor Edge_morpho8_isse;
-extern "C" Processor Edge_morpho8_sse2;
-extern "C" Processor Edge_convolution8_mmx;
-extern "C" Processor Edge_convolution8_sse2;
-extern "C" Processor Edge_prewitt8_isse;
-extern "C" Processor Edge_prewitt8_sse2;
-extern "C" Processor Edge_prewitt8_ssse3;
-extern "C" Processor Edge_half_prewitt8_isse;
-extern "C" Processor Edge_half_prewitt8_sse2;
-extern "C" Processor Edge_half_prewitt8_ssse3;
+#define DEFINE_ALL_VERSIONS(name) \
+Processor *name##_c          = &mask_t<name>; \
+Processor *name##_sse2 = &generic_sse2< \
+    process_line_##name##_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>, \
+    process_line_##name##_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>, \
+    process_line_##name##_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128> \
+>; \
+Processor *name##_ssse3 = &generic_sse2< \
+    process_line_##name##_sse2<CPU_SSSE3, Border::Left, simd_loadu_epi128, simd_storeu_epi128>, \
+    process_line_##name##_sse2<CPU_SSSE3, Border::None, simd_loadu_epi128, simd_storeu_epi128>, \
+    process_line_##name##_sse2<CPU_SSSE3, Border::Right, simd_loadu_epi128, simd_storeu_epi128> \
+>;
 
 Processor *convolution_c = &mask_t<convolution>;
 Processor *convolution_sse2 = &generic_sse2<
@@ -646,50 +654,11 @@ Processor *convolution_sse2 = &generic_sse2<
     process_line_convolution_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
-Processor *sobel_c = &mask_t<sobel>;
-Processor *sobel_sse2 = &generic_sse2<
-    process_line_sobel_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_sobel_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_sobel_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
->;
-
-Processor *roberts_c = &mask_t<roberts>;
-Processor *roberts_sse2 = &generic_sse2<
-    process_line_roberts_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_roberts_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_roberts_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
->;
-
-Processor *laplace_c = &mask_t<laplace>;
-Processor *laplace_sse2 = &generic_sse2<
-    process_line_laplace_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_laplace_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_laplace_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
->;
-
-Processor *prewitt_c = &mask_t<prewitt>;
-Processor *prewitt_sse2 = &generic_sse2<
-    process_line_prewitt_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_prewitt_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_prewitt_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
->;
-Processor *prewitt_ssse3 = &generic_sse2<
-    process_line_prewitt_sse2<CPU_SSSE3, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_prewitt_sse2<CPU_SSSE3, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_prewitt_sse2<CPU_SSSE3, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
->;
-
-Processor *half_prewitt_c = &mask_t<half_prewitt>;
-Processor *half_prewitt_sse2 = &generic_sse2<
-    process_line_half_prewitt_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_half_prewitt_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_half_prewitt_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
->;
-Processor *half_prewitt_ssse3 = &generic_sse2<
-    process_line_half_prewitt_sse2<CPU_SSSE3, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_half_prewitt_sse2<CPU_SSSE3, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_half_prewitt_sse2<CPU_SSSE3, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
->;
+DEFINE_ALL_VERSIONS(sobel)
+DEFINE_ALL_VERSIONS(roberts)
+DEFINE_ALL_VERSIONS(laplace)
+DEFINE_ALL_VERSIONS(prewitt)
+DEFINE_ALL_VERSIONS(half_prewitt)
 
 Processor *cartoon_c = &mask_t<cartoon>;
 
