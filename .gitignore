@@ -1,4 +1,5 @@
 */build/Win32
+*/build/x64
 Test
 *.*sdf
 *.suo

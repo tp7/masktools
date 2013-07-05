@@ -239,11 +239,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="..\filters\mask\edge\edgemask.asm">
-      <Filter>filters\mask\edge</Filter>
-    </YASM>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
       <Filter>avs2x</Filter>
     </ClCompile>
