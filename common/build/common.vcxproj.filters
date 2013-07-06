@@ -22,9 +22,6 @@
     <Filter Include="plane">
       <UniqueIdentifier>{cd20e1c3-b9a4-4e38-9c22-0c448c205ac5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="asm">
-      <UniqueIdentifier>{68422455-9938-4914-84dc-dba1bc3763d2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="constraints">
       <UniqueIdentifier>{c8e45b31-1b50-4a98-b006-7de93436492b}</UniqueIdentifier>
     </Filter>
@@ -92,28 +89,5 @@
     <ClCompile Include="..\constraints\constraints.cpp">
       <Filter>constraints</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <YASM Include="..\functions\functions.asm">
-      <Filter>functions</Filter>
-    </YASM>
-    <YASM Include="..\asm\asm-constants.asm">
-      <Filter>asm</Filter>
-    </YASM>
-    <YASM Include="..\asm\asm-portability.asm">
-      <Filter>asm</Filter>
-    </YASM>
-    <YASM Include="..\asm\asm-simd.asm">
-      <Filter>asm</Filter>
-    </YASM>
-    <YASM Include="..\asm\asm-tools.asm">
-      <Filter>asm</Filter>
-    </YASM>
-    <YASM Include="..\asm\asm.asm">
-      <Filter>asm</Filter>
-    </YASM>
-    <YASM Include="..\asm\common.asm">
-      <Filter>asm</Filter>
-    </YASM>
   </ItemGroup>
 </Project>

@@ -125,9 +125,6 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-    <Import Project="yasm.props" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug-avs26|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
@@ -223,9 +220,6 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -259,9 +253,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release-avs25|x64'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
@@ -297,9 +288,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
@@ -334,9 +322,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|Win32'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
@@ -378,9 +363,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release-avs26|x64'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
@@ -416,9 +398,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
@@ -461,9 +440,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>C:\Soft\Boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -492,9 +468,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug-avs25|x64'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
@@ -524,9 +497,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug-avs26|Win32'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>C:\Soft\Boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -553,9 +523,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug-avs26|x64'">
-    <YASM>
-      <IncludePaths>..\..\common\asm;..\..\masktools\common\asm</IncludePaths>
-    </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
@@ -691,7 +658,4 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="yasm.targets" />
-  </ImportGroup>
 </Project>
