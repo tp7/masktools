@@ -28,21 +28,6 @@ void Functions::copy_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdif
     }
 }
 
-extern "C" void start_asm(Byte *pbBytes);
-extern "C" void stop_asm(const Byte *pbBytes);
-
-Functions::Asm::Asm()
-{
-    pbBytes = new Byte[16*10];
-    start_asm(pbBytes);
-}
-
-Functions::Asm::~Asm()
-{
-    stop_asm(pbBytes);
-    delete[] pbBytes;
-}
-
 extern "C" unsigned int cpuid_asm( unsigned int nOp, unsigned int *pEax, unsigned int *pEbx, unsigned int *pEcx, unsigned int *pEdx);
 extern "C" unsigned int cpu_test_asm( );
 

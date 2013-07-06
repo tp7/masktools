@@ -11,12 +11,6 @@ void copy_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
 
 CpuFlags get_cpu_flags();
 
-class Asm {
-    Byte *pbBytes;
-public:
-    Asm();
-    ~Asm();
-};
 
 }
 }

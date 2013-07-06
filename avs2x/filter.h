@@ -14,7 +14,6 @@ class Filter : public GenericVideoFilter
    static AVSValue __cdecl _create(AVSValue args, void *user_data, IScriptEnvironment *env)
    {
       UNUSED(user_data);
-      Functions::Asm asmLock;
       return new Filter<T>(args[0].AsClip(), GetParameters(args, T::filter_signature(), env), env);
    }
 public:
