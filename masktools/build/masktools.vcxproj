@@ -342,6 +342,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
       <AssemblerListingLocation>$(IntDir)asm\</AssemblerListingLocation>
+      <Cpp0xSupport>true</Cpp0xSupport>
     </ClCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>

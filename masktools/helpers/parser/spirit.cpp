@@ -3,7 +3,6 @@
 
 /* conditional compilation */
 #ifdef MT_HAVE_BOOST_SPIRIT
-
 #include <boost/spirit/home/classic.hpp>
 
 using namespace boost;

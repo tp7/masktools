@@ -62,7 +62,7 @@ static inline Byte maximumThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a
    return static_cast<Byte>(nMaximum);
 }
 
-extern "C" static FORCEINLINE __m128i expand_operator_sse2(__m128i a, __m128i b) {
+extern "C" static MT_FORCEINLINE __m128i expand_operator_sse2(__m128i a, __m128i b) {
     return _mm_max_epu8(a, b);
 }
 
@@ -73,7 +73,7 @@ class NewValue {
    int nMaxDeviation;
    Byte nValue;
 public:
-   NewValue(Byte nValue, int nMaxDeviation) : nMax(-1), nValue(nValue), nMaxDeviation(nMaxDeviation) { }
+   NewValue(Byte nValue, int nMaxDeviation) : nMax(-1), nMaxDeviation(nMaxDeviation), nValue(nValue) { }
    void add(Byte nValue) { if ( nValue > nMax ) nMax = nValue; }
    Byte finalize() const { return static_cast<Byte>(nMax < 0 ? nValue : (nMax - nValue > nMaxDeviation ? nValue + nMaxDeviation : nMax)); }
 };

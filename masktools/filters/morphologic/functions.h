@@ -74,19 +74,19 @@ void generic_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrc
    pDst[nWidth-1] = op(pSrcp[nWidth-2], pSrcp[nWidth-1], pSrcp[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], pSrc[nWidth-2], pSrc[nWidth-1], pSrc[nWidth-1], nMaxDeviation);
 }
 
-extern "C" static FORCEINLINE __m128i limit_up_sse2(__m128i source, __m128i sum, __m128i deviation) {
+extern "C" static MT_FORCEINLINE __m128i limit_up_sse2(__m128i source, __m128i sum, __m128i deviation) {
     auto limit = _mm_adds_epu8(source, deviation);
     return _mm_min_epu8(limit, _mm_max_epu8(source, sum));
 }
 
-extern "C" static FORCEINLINE __m128i limit_down_sse2(__m128i source, __m128i sum, __m128i deviation) {
+extern "C" static MT_FORCEINLINE __m128i limit_down_sse2(__m128i source, __m128i sum, __m128i deviation) {
     auto limit = _mm_subs_epu8(source, deviation);
     return _mm_max_epu8(limit, _mm_min_epu8(source, sum));
 }
 
 
 template<Border borderMode, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+static MT_FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     auto zero = _mm_setzero_si128();
     for ( int x = 0; x < width; x+=16 ) {
         auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
@@ -155,7 +155,7 @@ static FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, cons
 
 
 template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE __m128i process_block_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation) {
+static MT_FORCEINLINE __m128i process_block_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation) {
     __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
 
     if (directions == Directions::Square) {
@@ -212,7 +212,7 @@ static FORCEINLINE __m128i process_block_xxpand(Byte *pDst, const Byte *pSrcp, c
  * Please remove this when vc++ gets better.
  */
 template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+static MT_FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     if (width <= 16) {
         auto result = process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst, pSrcp, pSrc, pSrcn, maxDeviation);
 #ifndef XXPAND_LOCAL_STORE

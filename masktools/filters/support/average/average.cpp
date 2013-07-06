@@ -11,7 +11,7 @@ void average_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrc
 }
 
 template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_block_average_sse2(Byte *pDst, const Byte *pSrc)
+static MT_FORCEINLINE void process_block_average_sse2(Byte *pDst, const Byte *pSrc)
 {
     auto dst  = load(reinterpret_cast<const __m128i*>(pDst));
     auto src  = load(reinterpret_cast<const __m128i*>(pSrc));

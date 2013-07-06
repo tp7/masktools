@@ -40,8 +40,8 @@ public:
    Value(bool b) : type(TYPE_BOOL), defined(true), val_bool(b) { }
    Value(const PClip& c) : type(TYPE_CLIP), defined(true), val_clip(c) { }
    Value(Type t) : type(t), defined(false) { }
-   Value(const Value &v) : type(v.type), val_clip(v.val_clip), val_int(v.val_int), val_float(v.val_float),
-                           val_string(v.val_string), val_bool(v.val_bool), defined(v.defined) { }
+   Value(const Value &v) : type(v.type), defined(v.defined), val_clip(v.val_clip), val_int(v.val_int), 
+                            val_string(v.val_string), val_bool(v.val_bool), val_float(v.val_float) { }
 
    operator int() const { return val_int; }
    operator double() const { return val_float; }

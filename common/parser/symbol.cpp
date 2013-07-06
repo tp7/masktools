@@ -121,7 +121,7 @@ type(type), value(value), value2(value2), nParameter(nParameter), process(proces
 }
 
 Symbol::Symbol(String value, double dValue, Type type, int nParameter, Process process) :
-type(type), value(value), value2(""), nParameter(nParameter), process(process), dValue(dValue)
+type(type), value(value), value2(""), nParameter(nParameter), dValue(dValue), process(process)
 {
 }
 

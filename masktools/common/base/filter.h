@@ -59,13 +59,13 @@ protected:
 public:
 
     Filter(const Parameters &parameters, FilterProcessingType processingType) :
+        parameters(parameters), 
+        flags(Functions::get_cpu_flags()),
         inPlace_(processingType == FilterProcessingType::INPLACE),
         nXOffset( parameters["offx"] ),
         nYOffset( parameters["offy"] ),
         nCoreWidth( parameters["w"] ),
-        nCoreHeight( parameters["h"] ),
-        parameters(parameters), 
-        flags(Functions::get_cpu_flags())
+        nCoreHeight( parameters["h"] )
     {
         for(auto &param: parameters) {
             if (param.getType() == TYPE_CLIP) {

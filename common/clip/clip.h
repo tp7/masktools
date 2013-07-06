@@ -9,8 +9,8 @@ class Clip : public RefCounted {
 
 protected:
 
-   int nWidth, nHeight;
    int nFrames;
+   int nWidth, nHeight;
    Colorspace C;
 
 public:

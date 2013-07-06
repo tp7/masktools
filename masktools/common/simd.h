@@ -8,16 +8,16 @@ using namespace Filtering;
 
 //because ICC is smart enough on its own and force inlining actually makes it slower
 #ifdef __INTEL_COMPILER
-#define FORCEINLINE inline
+#define MT_FORCEINLINE inline
 #else
-#define FORCEINLINE __forceinline
+#define MT_FORCEINLINE __forceinline
 #endif
 
 #define USE_MOVPS
 
 extern "C" {
 
-static FORCEINLINE __m128i simd_load_epi128(const __m128i* ptr) {
+static MT_FORCEINLINE __m128i simd_load_epi128(const __m128i* ptr) {
 #ifdef USE_MOVPS
     return _mm_castps_si128(_mm_load_ps(reinterpret_cast<const float*>(ptr)));
 #else
@@ -25,7 +25,7 @@ static FORCEINLINE __m128i simd_load_epi128(const __m128i* ptr) {
 #endif
 }
 
-static FORCEINLINE __m128i simd_loadu_epi128(const __m128i* ptr) {
+static MT_FORCEINLINE __m128i simd_loadu_epi128(const __m128i* ptr) {
 #ifdef USE_MOVPS
     return _mm_castps_si128(_mm_loadu_ps(reinterpret_cast<const float*>(ptr)));
 #else
@@ -33,7 +33,7 @@ static FORCEINLINE __m128i simd_loadu_epi128(const __m128i* ptr) {
 #endif
 }
 
-static FORCEINLINE void simd_store_epi128(__m128i *ptr, __m128i value) {
+static MT_FORCEINLINE void simd_store_epi128(__m128i *ptr, __m128i value) {
 #ifdef USE_MOVPS
     _mm_store_ps(reinterpret_cast<float*>(ptr), _mm_castsi128_ps(value));
 #else
@@ -41,7 +41,7 @@ static FORCEINLINE void simd_store_epi128(__m128i *ptr, __m128i value) {
 #endif
 }
 
-static FORCEINLINE void simd_storeu_epi128(__m128i *ptr, __m128i value) {
+static MT_FORCEINLINE void simd_storeu_epi128(__m128i *ptr, __m128i value) {
 #ifdef USE_MOVPS
     _mm_storeu_ps(reinterpret_cast<float*>(ptr), _mm_castsi128_ps(value));
 #else
@@ -50,11 +50,11 @@ static FORCEINLINE void simd_storeu_epi128(__m128i *ptr, __m128i value) {
 }
 
 // because for some reason _mm_set1_epi8 is super slow with vc110
-static FORCEINLINE __m128i simd_set8_epi32(unsigned int value) {
+static MT_FORCEINLINE __m128i simd_set8_epi32(unsigned int value) {
     return _mm_set1_epi32((value << 24) | (value << 16) | (value << 8) | value);
 }
 
-static FORCEINLINE int simd_bit_scan_forward(int value) {
+static MT_FORCEINLINE int simd_bit_scan_forward(int value) {
 #ifdef __INTEL_COMPILER
     return _bit_scan_forward(value);
 #else
@@ -75,7 +75,7 @@ enum class Border {
 #pragma warning(disable: 4309)
 
 template<bool isBorder, decltype(simd_load_epi128) load>
-static FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
+static MT_FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
     if (isBorder) {
         auto mask_left = _mm_setr_epi8(0xFF, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00);
         auto val = load(reinterpret_cast<const __m128i*>(ptr));
@@ -86,7 +86,7 @@ static FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
 }
 
 template<bool isBorder, decltype(simd_load_epi128) load>
-static FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
+static MT_FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
     if (isBorder) {
         auto mask_right = _mm_setr_epi8(00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0xFF);
         auto val = load(reinterpret_cast<const __m128i*>(ptr));

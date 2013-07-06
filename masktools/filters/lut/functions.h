@@ -18,7 +18,7 @@ typedef enum {
 
    NUM_MODES,
 
-};
+} MPROCESSOR_MODE;
 
 #define EXPRESSION_SINGLE( base, mode1, mode2 ) &base< mode2 >
 #define EXPRESSION_DUAL( base, mode1, mode2 ) &base< mode1, mode2 >

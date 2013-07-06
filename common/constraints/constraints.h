@@ -80,8 +80,8 @@ class Processor {
 public:
 
    Processor() : processor(NULL), nSpeed(-1) { }
-   Processor(P *processor) : processor(processor), constraint( CPU_NONE, 1, 1, 1, 1 ), nSpeed( 0 ) { }
-   Processor(P *processor, const Constraint &constraint, int nSpeed) : processor(processor), constraint(constraint), nSpeed(nSpeed) { }
+   Processor(P *processor) : processor(processor), nSpeed( 0 ), constraint( CPU_NONE, 1, 1, 1, 1 ) { }
+   Processor(P *processor, const Constraint &constraint, int nSpeed) : processor(processor), nSpeed(nSpeed), constraint(constraint) { }
    bool respect( const Constraint &constraint) const { return this->constraint.respect(constraint); }
    int speed() const { return nSpeed; }
    P* getFunction() const { return processor; }

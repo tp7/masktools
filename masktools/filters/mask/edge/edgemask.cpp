@@ -117,7 +117,7 @@ void mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
 }
 
 template <CpuFlags flags>
-static FORCEINLINE __m128i simd_packed_abs_epi16(__m128i a, __m128i b) {
+static MT_FORCEINLINE __m128i simd_packed_abs_epi16(__m128i a, __m128i b) {
     if (flags >= CPU_SSSE3) {
         auto absa = _mm_abs_epi16(a);
         auto absb = _mm_abs_epi16(b);
@@ -132,7 +132,7 @@ static FORCEINLINE __m128i simd_packed_abs_epi16(__m128i a, __m128i b) {
 }
 
 template <CpuFlags flags>
-static FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
+static MT_FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
     if (flags >= CPU_SSSE3) {
         auto diff = _mm_sub_epi16(a, b);
         return _mm_abs_epi16(diff);
@@ -143,7 +143,7 @@ static FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
     }
 }
 
-static FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
+static MT_FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
     auto sat = _mm_sub_epi8(value, v128);
     auto low = _mm_cmpgt_epi8(sat, lowThresh);
     auto high = _mm_cmpgt_epi8(sat, highThresh);
@@ -152,7 +152,7 @@ static FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &l
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     auto v128 = simd_set8_epi32(0x80);
     auto zero = _mm_setzero_si128();
@@ -248,7 +248,7 @@ static FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pS
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+static MT_FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
     auto zero = _mm_setzero_si128();
@@ -293,7 +293,7 @@ static FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, c
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -334,7 +334,7 @@ static FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp,
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -413,7 +413,7 @@ static FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp,
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
 
@@ -456,7 +456,7 @@ static FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, 
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
     auto zero = _mm_setzero_si128();
@@ -544,7 +544,7 @@ static FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp,
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
     auto zero = _mm_setzero_si128();

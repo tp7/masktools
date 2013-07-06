@@ -62,7 +62,7 @@ static inline Byte minimumThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a
    return static_cast<Byte>(nMinimum);
 }
 
-extern "C" static FORCEINLINE __m128i inpand_operator_sse2(__m128i a, __m128i b) {
+extern "C" static MT_FORCEINLINE __m128i inpand_operator_sse2(__m128i a, __m128i b) {
     return _mm_min_epu8(a, b);
 }
 
@@ -73,7 +73,7 @@ class NewValue {
    int nMaxDeviation;
    Byte nValue;
 public:
-   NewValue(Byte nValue, int nMaxDeviation) : nMin(256), nValue(nValue), nMaxDeviation(nMaxDeviation) { }
+   NewValue(Byte nValue, int nMaxDeviation) : nMin(256), nMaxDeviation(nMaxDeviation), nValue(nValue) { }
    void add(Byte nValue) { if ( nValue < nMin ) nMin = nValue; }
    Byte finalize() const { return static_cast<Byte>(nMin > 255 ? nValue : (nValue - nMin > nMaxDeviation ? nValue - nMaxDeviation : nMin)); }
 };

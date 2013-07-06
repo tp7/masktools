@@ -353,6 +353,7 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <Cpp0xSupport>true</Cpp0xSupport>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)common.lib</OutputFile>
