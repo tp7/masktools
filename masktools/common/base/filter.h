@@ -48,12 +48,8 @@ protected:
       signature.add( Parameter( 0, "offY" ) );
       signature.add( Parameter( -1, "w" ) );
       signature.add( Parameter( -1, "h" ) );
-      signature.add( Parameter( true, "mmx" ) );
-      signature.add( Parameter( true, "isse" ) );
       signature.add( Parameter( true, "sse2" ) );
       signature.add( Parameter( true, "sse3" ) );
-      signature.add( Parameter( true, "d3now" ) );
-      signature.add( Parameter( true, "d3now2" ) );
       signature.add( Parameter( true, "ssse3" ) );
       signature.add( Parameter( true, "sse4" ) );
 
@@ -143,12 +139,8 @@ public:
         print( LOG_DEBUG, "modes : %i %i %i\n", operators[0].getMode(), operators[1].getMode(), operators[2].getMode() );
 
         /* cpu flags */
-        if ( !parameters["mmx"].toBool() ) flags &= ~CPU_MMX;
-        if ( !parameters["isse"].toBool() ) flags &= ~CPU_ISSE;
         if ( !parameters["sse2"].toBool() ) flags &= ~CPU_SSE2;
         if ( !parameters["sse3"].toBool() ) flags &= ~CPU_SSE3;
-        if ( !parameters["d3now"].toBool() ) flags &= ~CPU_3DNOW;
-        if ( !parameters["d3now2"].toBool() ) flags &= ~CPU_3DNOW2;
         if ( !parameters["ssse3"].toBool() ) flags &= ~CPU_SSSE3;
         if ( !parameters["sse4"].toBool() ) { 
             flags &= ~CPU_SSE4_1;
