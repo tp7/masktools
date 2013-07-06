@@ -191,8 +191,6 @@ public:
 
     virtual Frame<Byte> get_frame(int n, const Frame<Byte> &output_frame)
     {
-        /* TODO : correct SSE2 alignement check for multiclip functions, once there is SSE2 functions */
-
         Frame<Byte> output = output_frame.offset( nXOffset, nYOffset, nCoreWidth, nCoreHeight );
 
         for ( int i = 0; i < int( input_configuration().size() ); i++ )

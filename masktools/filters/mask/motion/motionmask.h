@@ -8,8 +8,8 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Mask {
 typedef bool (Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nLowThreshold, int nHighThreshold, int nMotionThreshold, int nSceneChange, int nSceneChangeValue, int nWidth, int nHeight);
 
 extern Processor *mask_c;
-extern Processor *mask8_sse2;
-extern Processor *mask8_asse2;
+extern Processor *mask_sse2;
+extern Processor *mask_asse2;
 
 class MotionMask : public MaskTools::Filter
 {
@@ -45,8 +45,8 @@ public:
 
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(mask_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-      processors.push_back(Filtering::Processor<Processor>(mask8_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
-      processors.push_back(Filtering::Processor<Processor>(mask8_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
+      processors.push_back(Filtering::Processor<Processor>(mask_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
+      processors.push_back(Filtering::Processor<Processor>(mask_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
    }
 
    InputConfiguration &input_configuration() const { return InPlaceTemporalOneFrame(); }
