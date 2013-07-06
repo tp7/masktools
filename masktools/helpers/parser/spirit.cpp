@@ -159,9 +159,14 @@ String Infix(const String &str)
 
 #else
 
-Filtering::String Filtering::MaskTools::Helpers::PolishConverter::Converter(const Filtering::String &str)
+Filtering::String Filtering::MaskTools::Helpers::PolishConverter::Converter(const Filtering::String&)
 {
    return "spirit parser not available";
+}
+
+Filtering::String Filtering::MaskTools::Helpers::PolishConverter::Infix(const Filtering::String&)
+{
+    return "spirit parser not available";
 }
 
 #endif

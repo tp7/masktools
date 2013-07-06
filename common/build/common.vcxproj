@@ -415,6 +415,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile-avs26|x64'">
     <YASM>
       <IncludePaths>..\..\common\asm</IncludePaths>
+      <Defines>ASM_CHIP_X64;ASM_OS_WIN </Defines>
     </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
