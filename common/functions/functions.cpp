@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <immintrin.h>
 
 using namespace Filtering;
 
@@ -28,42 +29,20 @@ void Functions::copy_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdif
     }
 }
 
-extern "C" unsigned int cpuid_asm( unsigned int nOp, unsigned int *pEax, unsigned int *pEbx, unsigned int *pEcx, unsigned int *pEdx);
-extern "C" unsigned int cpu_test_asm( );
-
 CpuFlags Functions::get_cpu_flags()
 {
-   unsigned int nEax, nEbx, nEcx, nEdx;
-   unsigned int vendor[4] = { 0 };
+   int CPUInfo[4]; //eax, ebx, ecx, edx
    CpuFlags flags = CPU_NONE;
 
-   if ( !cpu_test_asm() )
-      return flags;
+   __cpuid(CPUInfo, 1);
 
-   cpuid_asm( 0, &nEax, vendor + 0, vendor + 2, vendor + 1 );
-
-   if ( !nEax )
-      return flags;
-
-   cpuid_asm( 1, &nEax, &nEbx, &nEcx, &nEdx );
-
-   /* default checks */
-   if ( nEdx & 0x00800000 ) flags |= CPU_MMX;
-   else return flags;
-   if ( nEdx & 0x02000000 ) flags |= CPU_ISSE;
-   if ( nEdx & 0x04000000 ) flags |= CPU_SSE2;
-   if ( nEcx & 0x00000001 ) flags |= CPU_SSE3;
-   if ( nEcx & 0x00000200 ) flags |= CPU_SSSE3;
-
-   cpuid_asm( 0x80000000, &nEax, &nEbx, &nEcx, &nEdx );
-
-   /* amd specific checks */
-   if ( !strcmp((char*)vendor, "AuthenticAMD") && nEax >= 0x80000001 )
-   {
-      cpuid_asm( 0x80000001, &nEax, &nEbx, &nEcx, &nEdx );
-      if ( nEdx & 0x80000000 ) flags |= CPU_3DNOW;
-      if ( nEdx & 0x00400000 ) flags |= CPU_ISSE;
-   }
+   if ( CPUInfo[3] & 0x00800000 ) flags |= CPU_MMX;
+   if ( CPUInfo[3] & 0x02000000 ) flags |= CPU_ISSE;
+   if ( CPUInfo[3] & 0x04000000 ) flags |= CPU_SSE2;
+   if ( CPUInfo[2] & 0x00000001 ) flags |= CPU_SSE3;
+   if ( CPUInfo[2] & 0x00000200 ) flags |= CPU_SSSE3;
+   if ( CPUInfo[2] & 0x00080000 ) flags |= CPU_SSE4_1;
+   if ( CPUInfo[2] & 0x00100000 ) flags |= CPU_SSE4_2;
 
    return flags;
 } 

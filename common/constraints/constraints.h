@@ -16,8 +16,8 @@ enum {
    CPU_3DNOW   = 0x10,
    CPU_3DNOW2  = 0x20,
    CPU_SSSE3   = 0x40,
-   CPU_SSE4    = 0x80,
-
+   CPU_SSE4_1    = 0x80,
+   CPU_SSE4_2    = 0x100,
 };
 
 typedef int CpuFlags;

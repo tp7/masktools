@@ -150,7 +150,10 @@ public:
         if ( !parameters["d3now"].toBool() ) flags &= ~CPU_3DNOW;
         if ( !parameters["d3now2"].toBool() ) flags &= ~CPU_3DNOW2;
         if ( !parameters["ssse3"].toBool() ) flags &= ~CPU_SSSE3;
-        if ( !parameters["sse4"].toBool() ) flags &= ~CPU_SSE4;
+        if ( !parameters["sse4"].toBool() ) { 
+            flags &= ~CPU_SSE4_1;
+            flags &= ~CPU_SSE4_2;
+        }
 
         print( LOG_DEBUG, "using cpu flags : 0x%x\n", flags );
 
