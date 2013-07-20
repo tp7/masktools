@@ -32,8 +32,35 @@ void merge_luma_420_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdif
    }
 }
 
+MT_FORCEINLINE __m128i merge_sse2_core(Byte *pDst, const Byte *pSrc, const __m128i& mask_lo, const __m128i& mask_hi, 
+                                       const __m128i& v128, const __m128i& v256, const __m128i& zero) {
+    auto dst_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst));
+    auto dst_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+8));
+    auto unpacked_dst_t1 = _mm_unpacklo_epi8(dst_t1, zero);
+    auto unpacked_dst_t2 = _mm_unpacklo_epi8(dst_t2, zero);
 
+    auto src_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc));
+    auto src_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc+8));
+    auto unpacked_src1_t1 = _mm_unpacklo_epi8(src_t1, zero);
+    auto unpacked_src1_t2 = _mm_unpacklo_epi8(src_t2, zero);
 
+    auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_lo), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
+    auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_hi), unpacked_dst_t2);
+
+    auto temp2_t1 = _mm_mullo_epi16(mask_lo, unpacked_src1_t1); // pSrc2[x] * pSrc1[x]
+    auto temp2_t2 = _mm_mullo_epi16(mask_hi, unpacked_src1_t2);
+
+    temp1_t1 = _mm_add_epi16(temp1_t1, temp2_t1);
+    temp1_t2 = _mm_add_epi16(temp1_t2, temp2_t2);
+
+    temp1_t1 = _mm_add_epi16(temp1_t1, v128);
+    temp1_t2 = _mm_add_epi16(temp1_t2, v128);
+
+    auto result1 = _mm_srli_epi16(temp1_t1, 8);
+    auto result2 = _mm_srli_epi16(temp1_t2, 8);
+
+    return _mm_packus_epi16(result1, result2);
+}
 
 template <decltype(simd_store_epi128) store>
 void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
@@ -53,32 +80,8 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
             auto mask_t1 = _mm_unpacklo_epi8(src2_t1, zero);
             auto mask_t2 = _mm_unpacklo_epi8(src2_t2, zero);
 
-            auto dst_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+i));
-            auto dst_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+8+i));
-            auto unpacked_dst_t1 = _mm_unpacklo_epi8(dst_t1, zero);
-            auto unpacked_dst_t2 = _mm_unpacklo_epi8(dst_t2, zero);
+            auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
 
-            auto src1_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+i));
-            auto src1_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+8+i));
-            auto unpacked_src1_t1 = _mm_unpacklo_epi8(src1_t1, zero);
-            auto unpacked_src1_t2 = _mm_unpacklo_epi8(src1_t2, zero);
-
-            auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t1), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
-            auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t2), unpacked_dst_t2);
-
-            auto temp2_t1 = _mm_mullo_epi16(mask_t1, unpacked_src1_t1); // pSrc2[x] * pSrc1[x]
-            auto temp2_t2 = _mm_mullo_epi16(mask_t2, unpacked_src1_t2);
-
-            temp1_t1 = _mm_add_epi16(temp1_t1, temp2_t1);
-            temp1_t2 = _mm_add_epi16(temp1_t2, temp2_t2);
-
-            temp1_t1 = _mm_add_epi16(temp1_t1, v128);
-            temp1_t2 = _mm_add_epi16(temp1_t2, v128);
-
-            auto result1 = _mm_srli_epi16(temp1_t1, 8);
-            auto result2 = _mm_srli_epi16(temp1_t2, 8);
-
-            auto result = _mm_packus_epi16(result1, result2);
             store(reinterpret_cast<__m128i*>(pDst+i), result);
         }
         pDst += nDstPitch;
@@ -121,33 +124,8 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
             auto mask_t1 = _mm_and_si128(avg_t1, v255);
             auto mask_t2 = _mm_and_si128(avg_t2, v255);
 
-            // merging 
-            auto dst_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+i));
-            auto dst_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+8+i));
-            auto unpacked_dst_t1 = _mm_unpacklo_epi8(dst_t1, zero);
-            auto unpacked_dst_t2 = _mm_unpacklo_epi8(dst_t2, zero);
-
-            auto src1_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+i));
-            auto src1_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc1+8+i));
-            auto unpacked_src1_t1 = _mm_unpacklo_epi8(src1_t1, zero);
-            auto unpacked_src1_t2 = _mm_unpacklo_epi8(src1_t2, zero);
-
-            auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t1), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
-            auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_t2), unpacked_dst_t2);
-
-            auto temp2_t1 = _mm_mullo_epi16(mask_t1, unpacked_src1_t1); // pSrc2[x] * pSrc1[x]
-            auto temp2_t2 = _mm_mullo_epi16(mask_t2, unpacked_src1_t2);
-
-            temp1_t1 = _mm_add_epi16(temp1_t1, temp2_t1);
-            temp1_t2 = _mm_add_epi16(temp1_t2, temp2_t2);
-
-            temp1_t1 = _mm_add_epi16(temp1_t1, v128);
-            temp1_t2 = _mm_add_epi16(temp1_t2, v128);
-
-            auto result1 = _mm_srli_epi16(temp1_t1, 8);
-            auto result2 = _mm_srli_epi16(temp1_t2, 8);
-
-            auto result = _mm_packus_epi16(result1, result2);
+            auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
+          
             store(reinterpret_cast<__m128i*>(pDst+i), result);
         }
         pDst += nDstPitch;
