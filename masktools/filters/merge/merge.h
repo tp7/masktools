@@ -26,26 +26,34 @@ class Merge : public MaskTools::Filter
 
 protected:
 
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      if ( use_luma && nPlane )
-         chroma_processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(0), frames[1].plane(0).pitch(), dst.width(), dst.height() );
-      else
-         processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), dst.width(), dst.height() );
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
+    {
+        UNUSED(n);
+        if ( use_luma && nPlane ) {
+            if (width_ratios[1][C] == 2) {
+                chroma_processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(0), frames[1].plane(0).pitch(), dst.width(), dst.height() );
+            } else {
+                processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(0), frames[1].plane(0).pitch(), dst.width(), dst.height() );
+            }
+        }
+        else
+            processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), dst.width(), dst.height() );
+    }
 
 public:
    Merge(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )
    {
       use_luma = parameters["luma"].toBool();
 
-      if ( use_luma && (width_ratios[1][C] != 2 || height_ratios[1][C] != 2) )
+      if ( use_luma && (width_ratios[1][C] != 2 || height_ratios[1][C] != 2) && (width_ratios[1][C] != 1 || height_ratios[1][C] != 1))
       {
-         error = "\"luma\" is unsupported in 422 and 444";
+         error = "\"luma\" is unsupported in 422";
          return;
       }
-
+      if (use_luma && childs[0]->colorspace() != childs[1]->colorspace()) {
+          error = "clips should have identical colorspace";
+          return;
+      }
 
       /* if "luma" is set, we force the chroma processing. Much more handy */
       if ( use_luma )
