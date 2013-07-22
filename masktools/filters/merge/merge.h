@@ -45,21 +45,22 @@ public:
    {
       use_luma = parameters["luma"].toBool();
 
-      if ( use_luma && (width_ratios[1][C] != 2 || height_ratios[1][C] != 2) && (width_ratios[1][C] != 1 || height_ratios[1][C] != 1))
-      {
-         error = "\"luma\" is unsupported in 422";
-         return;
-      }
-      if (use_luma && childs[0]->colorspace() != childs[1]->colorspace()) {
-          error = "clips should have identical colorspace";
-          return;
-      }
+      if (use_luma) {
+          if ((width_ratios[1][C] != 2 || height_ratios[1][C] != 2) && (width_ratios[1][C] != 1 || height_ratios[1][C] != 1)) {
+              error = "\"luma\" is unsupported in 422";
+              return;
+          }
+          auto c1 = childs[0]->colorspace();
+          auto c2 = childs[1]->colorspace();
+          if ((width_ratios[1][c1] != width_ratios[1][c2]) || (height_ratios[1][c1] != height_ratios[1][c2])) {
+              error = "clips should have identical colorspace";
+              return;
+          }
 
-      /* if "luma" is set, we force the chroma processing. Much more handy */
-      if ( use_luma )
-         operators[1] = operators[2] = PROCESS;
-
-      /* no need to change U/V default processing, because of in place filter */
+          /* if "luma" is set, we force the chroma processing. Much more handy */
+          operators[1] = operators[2] = PROCESS;
+          /* no need to change U/V default processing, because of in place filter */
+      }
 
       /* add the processors */
       processors.push_back( Filtering::Processor<Processor>( merge_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
