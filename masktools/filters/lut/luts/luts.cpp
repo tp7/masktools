@@ -22,7 +22,7 @@ static void custom_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_
             if ( y < 0 ) y = 0;
             if ( y >= nHeight ) y = nHeight - 1;
 
-            new_value.add( pLut[( pSrc[i] << 8 ) + pSrc[x + ( y - j ) * nSrcPitch]] );
+            new_value.add( pLut[( pDst[i] << 8 ) + pSrc[x + ( y - j ) * nSrcPitch]] );
          }
          pDst[i] = new_value.finalize();
       }
