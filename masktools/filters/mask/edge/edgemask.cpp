@@ -456,6 +456,42 @@ static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrc
 }
 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
+    UNUSED(matrix); UNUSED(pSrcn);
+    auto v128 = simd_set8_epi32(0x80);
+    auto zero = _mm_setzero_si128();
+
+    for (int x = 0; x < width; x+=16) {
+        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
+        
+        auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
+        auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
+
+        auto up_right_lo = _mm_unpacklo_epi8(up_right, zero);
+        auto up_right_hi = _mm_unpackhi_epi8(up_right, zero);
+
+        auto middle_center_lo = _mm_unpacklo_epi8(middle_center, zero);
+        auto middle_center_hi = _mm_unpackhi_epi8(middle_center, zero);
+
+        auto acc_lo = _mm_adds_epu16(up_right_lo, middle_center_lo);
+        auto acc_hi = _mm_adds_epu16(up_right_hi, middle_center_hi);
+
+        acc_lo = _mm_subs_epu16(acc_lo, up_center_lo);
+        acc_hi = _mm_subs_epu16(acc_hi, up_center_hi);
+
+        acc_lo = _mm_subs_epi16(acc_lo, up_center_lo);
+        acc_hi = _mm_subs_epi16(acc_hi, up_center_hi);
+
+        auto acc = _mm_packus_epi16(acc_lo, acc_hi);
+        auto result = threshold_sse2(acc, lowThresh, highThresh, v128);
+
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
+    }
+}
+
+template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = simd_set8_epi32(0x80);
@@ -634,24 +670,22 @@ static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte
 
 using namespace Filters::Mask;
 
-#define DEFINE_ALL_VERSIONS(name) \
+
+#define DEFINE_C_AND_SSE2_VERSIONS(name) \
 Processor *name##_c          = &mask_t<name>; \
 Processor *name##_sse2 = &generic_sse2< \
-    process_line_##name##_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>, \
-    process_line_##name##_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>, \
-    process_line_##name##_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128> \
->; \
+process_line_##name##_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>, \
+process_line_##name##_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>, \
+process_line_##name##_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128> \
+>; 
+
+
+#define DEFINE_ALL_VERSIONS(name) \
+DEFINE_C_AND_SSE2_VERSIONS(name) \
 Processor *name##_ssse3 = &generic_sse2< \
     process_line_##name##_sse2<CPU_SSSE3, Border::Left, simd_loadu_epi128, simd_storeu_epi128>, \
     process_line_##name##_sse2<CPU_SSSE3, Border::None, simd_loadu_epi128, simd_storeu_epi128>, \
     process_line_##name##_sse2<CPU_SSSE3, Border::Right, simd_loadu_epi128, simd_storeu_epi128> \
->;
-
-Processor *convolution_c = &mask_t<convolution>;
-Processor *convolution_sse2 = &generic_sse2<
-    process_line_convolution_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_convolution_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_convolution_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
 >;
 
 DEFINE_ALL_VERSIONS(sobel)
@@ -660,13 +694,9 @@ DEFINE_ALL_VERSIONS(laplace)
 DEFINE_ALL_VERSIONS(prewitt)
 DEFINE_ALL_VERSIONS(half_prewitt)
 
-Processor *cartoon_c = &mask_t<cartoon>;
+DEFINE_C_AND_SSE2_VERSIONS(convolution)
+DEFINE_C_AND_SSE2_VERSIONS(morpho)
+DEFINE_C_AND_SSE2_VERSIONS(cartoon)
 
-Processor *morpho_c = &mask_t<morpho>;
-Processor *morpho_sse2 = &generic_sse2<
-    process_line_morpho_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_morpho_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>,
-    process_line_morpho_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128>
-    >;
 
 } } } } }

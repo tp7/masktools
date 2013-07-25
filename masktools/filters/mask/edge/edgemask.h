@@ -23,6 +23,7 @@ extern Processor *laplace_sse2;
 extern Processor *laplace_ssse3;
 
 extern Processor *cartoon_c;
+extern Processor *cartoon_sse2;
 
 extern Processor *half_prewitt_c;
 extern Processor *half_prewitt_sse2;
@@ -85,6 +86,7 @@ public:
       {
          print(LOG_DEBUG, "Edge : using cartoon detector");
          processors.push_back(Filtering::Processor<Processor>(cartoon_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+         processors.push_back(Filtering::Processor<Processor>(cartoon_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 2));
       }
       else if ( parameters["mode"].toString() == "min/max" )
       {
