@@ -44,7 +44,7 @@ Constraint::Constraint(CpuFlags flags, Modulo moduloX, Modulo moduloY, Alignment
 flags(flags), moduloX(moduloX), moduloY(moduloY), alignment(alignment), nMinimumWidth(nMinimumWidth) { }
 
 Constraint::Constraint(CpuFlags flags, int nWidth, int nHeight, const Byte *pAddress, ptrdiff_t nPitch) :
-flags(flags), moduloX(toModulo(nWidth)), moduloY(toModulo(nHeight)), alignment(toAlignment(Int64(pAddress) | nPitch)), nMinimumWidth(nWidth) { }
+    flags(flags), moduloX(toModulo(nWidth)), moduloY(toModulo(nHeight)), alignment(toAlignment(Int64(pAddress) | nPitch)), nMinimumWidth(nWidth) { }
 
 Constraint::Constraint(CpuFlags flags, int nWidth, int nHeight, Int64 nAddress, ptrdiff_t nPitch) :
 flags(flags), moduloX(toModulo(nWidth)), moduloY(toModulo(nHeight)), alignment(toAlignment(nAddress | nPitch)), nMinimumWidth(nWidth) { }

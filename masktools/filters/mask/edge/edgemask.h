@@ -64,22 +64,22 @@ public:
       {
          print(LOG_DEBUG, "Edge : using sobel detector");
          processors.push_back(Filtering::Processor<Processor>(sobel_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(sobel_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(sobel_ssse3, Constraint(CPU_SSSE3, 1, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(sobel_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 1));
+         processors.push_back(Filtering::Processor<Processor>(sobel_ssse3, Constraint(CPU_SSSE3, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 2));
       }
       else if ( parameters["mode"].toString() == "roberts" )
       {
          print(LOG_DEBUG, "Edge : using roberts detector");
          processors.push_back(Filtering::Processor<Processor>(roberts_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(roberts_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(roberts_ssse3, Constraint(CPU_SSSE3, 1, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(roberts_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 1));
+         processors.push_back(Filtering::Processor<Processor>(roberts_ssse3, Constraint(CPU_SSSE3, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 2));
       }
       else if ( parameters["mode"].toString() == "laplace" )
       {
          print(LOG_DEBUG, "Edge : using laplace detector");
          processors.push_back(Filtering::Processor<Processor>(laplace_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(laplace_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(laplace_ssse3, Constraint(CPU_SSSE3, 1, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(laplace_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 1));
+         processors.push_back(Filtering::Processor<Processor>(laplace_ssse3, Constraint(CPU_SSSE3, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 2));
       }
       else if ( parameters["mode"].toString() == "cartoon" )
       {
@@ -90,21 +90,21 @@ public:
       {
          print(LOG_DEBUG, "Edge : using morphologic detector");
          processors.push_back(Filtering::Processor<Processor>(morpho_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(morpho_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(morpho_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 2));
       }
       else if ( parameters["mode"].toString() == "prewitt" )
       {
          print(LOG_DEBUG, "Edge : using prewitt detector");
          processors.push_back(Filtering::Processor<Processor>(prewitt_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(prewitt_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(prewitt_ssse3, Constraint(CPU_SSSE3, 1, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(prewitt_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 1));
+         processors.push_back(Filtering::Processor<Processor>(prewitt_ssse3, Constraint(CPU_SSSE3, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 2));
       }
       else if ( parameters["mode"].toString() == "hprewitt" )
       {
          print(LOG_DEBUG, "Edge : using hprewitt detector");
          processors.push_back(Filtering::Processor<Processor>(half_prewitt_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-         processors.push_back(Filtering::Processor<Processor>(half_prewitt_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
-         processors.push_back(Filtering::Processor<Processor>(half_prewitt_ssse3, Constraint(CPU_SSSE3, 1, 1, 1, 1), 2));
+         processors.push_back(Filtering::Processor<Processor>(half_prewitt_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 1));
+         processors.push_back(Filtering::Processor<Processor>(half_prewitt_ssse3, Constraint(CPU_SSSE3, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 2));
       }
       else
       {

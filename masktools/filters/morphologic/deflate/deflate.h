@@ -16,8 +16,8 @@ public:
    {
       /* add the processors */
       processors.push_back(Filtering::Processor<Processor>(deflate_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-      processors.push_back(Filtering::Processor<Processor>(deflate_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 4));
-      processors.push_back(Filtering::Processor<Processor>(deflate_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 4));
+      processors.push_back(Filtering::Processor<Processor>(deflate_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 16), 1));
+      processors.push_back(Filtering::Processor<Processor>(deflate_asse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_16, 16), 2));
    }
 
    static Signature Deflate::filter_signature()
