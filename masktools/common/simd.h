@@ -49,11 +49,6 @@ static MT_FORCEINLINE void simd_storeu_epi128(__m128i *ptr, __m128i value) {
 #endif
 }
 
-// because for some reason _mm_set1_epi8 is super slow with vc110
-static MT_FORCEINLINE __m128i simd_set8_epi32(unsigned int value) {
-    return _mm_set1_epi32((value << 24) | (value << 16) | (value << 8) | value);
-}
-
 static MT_FORCEINLINE int simd_bit_scan_forward(int value) {
 #ifdef __INTEL_COMPILER
     return _bit_scan_forward(value);

@@ -242,7 +242,7 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     const Byte *pSrcn = pSrc + nSrcPitch;
 
     UNUSED(nCoordinates); UNUSED(pCoordinates);
-    auto max_dev_v = simd_set8_epi32(nMaxDeviation);
+    auto max_dev_v = _mm_set1_epi8(Byte(nMaxDeviation));
     int sse2_width = (nWidth - 1 - 16) / 16 * 16 + 16;
     /* top-left */
     process_line_left(pDst, pSrc, pSrc, pSrcn, max_dev_v, 16);

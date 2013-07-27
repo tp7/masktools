@@ -23,8 +23,8 @@ static void clamp_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptr
     auto pSrc1_s = pSrc1;
     auto pSrc2_s = pSrc2;
 
-    auto overshoot_v = simd_set8_epi32(nOvershoot);
-    auto undershoot_v = simd_set8_epi32(nUndershoot);
+    auto overshoot_v = _mm_set1_epi8(Byte(nOvershoot));
+    auto undershoot_v = _mm_set1_epi8(Byte(nUndershoot));
 
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {

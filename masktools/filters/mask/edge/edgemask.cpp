@@ -146,7 +146,7 @@ static MT_FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
     auto coef0 = _mm_set1_epi16(matrix[0]);
     auto coef1 = _mm_set1_epi16(matrix[1]);
@@ -242,7 +242,7 @@ static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte 
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
@@ -288,7 +288,7 @@ template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, dec
 static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
@@ -329,7 +329,7 @@ template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, dec
 static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
@@ -407,7 +407,7 @@ static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSr
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
 
     for (int x = 0; x < width; x+=16) {
         auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
@@ -450,7 +450,7 @@ static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrc
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix); UNUSED(pSrcn);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
@@ -486,7 +486,7 @@ static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSr
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
@@ -574,7 +574,7 @@ static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSr
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
-    auto v128 = simd_set8_epi32(0x80);
+    auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {

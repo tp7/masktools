@@ -68,10 +68,10 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     const Byte *pSrcp = pSrc - nSrcPitch;
     const Byte *pSrcn = pSrc + nSrcPitch;
 
-    auto v128 = simd_set8_epi32(128);
-    auto low_thr_v = simd_set8_epi32(nLowThreshold);
+    auto v128 = _mm_set1_epi8(Byte(128));
+    auto low_thr_v = _mm_set1_epi8(Byte(nLowThreshold));
     low_thr_v = _mm_sub_epi8(low_thr_v, v128);
-    auto high_thr_v = simd_set8_epi32(nHighThreshold);
+    auto high_thr_v = _mm_set1_epi8(Byte(nHighThreshold));
     high_thr_v = _mm_sub_epi8(high_thr_v, v128);
 
     int sse2_width = (nWidth - 1 - 16) / 16 * 16 + 16;
