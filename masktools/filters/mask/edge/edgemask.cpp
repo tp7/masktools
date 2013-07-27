@@ -143,14 +143,6 @@ static MT_FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
     }
 }
 
-static MT_FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
-    auto sat = _mm_sub_epi8(value, v128);
-    auto low = _mm_cmpgt_epi8(sat, lowThresh);
-    auto high = _mm_cmpgt_epi8(sat, highThresh);
-    auto result = _mm_and_si128(value, low);
-    return _mm_or_si128(result, high);
-}
-
 template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);

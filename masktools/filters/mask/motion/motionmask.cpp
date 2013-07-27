@@ -66,10 +66,10 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     auto pSrc2 = pSrc;
 
     auto v128 = _mm_set1_epi32(0x80808080);
-    auto lowThr_v = simd_set8_epi32(nLowThreshold);
-    auto highThr_v = simd_set8_epi32(nHighThreshold);
-    lowThr_v = _mm_sub_epi8(lowThr_v, v128);
-    highThr_v = _mm_sub_epi8(highThr_v, v128);
+    auto lowThresh = simd_set8_epi32(nLowThreshold);
+    auto highThresh = simd_set8_epi32(nHighThreshold);
+    lowThresh = _mm_sub_epi8(lowThresh, v128);
+    highThresh = _mm_sub_epi8(highThresh, v128);
 
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {
@@ -80,12 +80,8 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
             auto smaller = _mm_subs_epu8(src1, dst1);
             auto diff = _mm_add_epi8(greater, smaller);
 
-            auto acc = _mm_sub_epi8(diff, v128);
+            auto mask = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-            auto gthlow = _mm_cmpgt_epi8(acc, lowThr_v);
-            auto gthigh = _mm_cmpgt_epi8(acc, highThr_v);
-            
-            auto mask = _mm_or_si128(_mm_and_si128(diff, gthlow), gthigh);
             store(reinterpret_cast<__m128i*>(pDst + i), mask);
         }
         pDst += nDstPitch;
