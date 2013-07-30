@@ -27,7 +27,7 @@ protected:
 
    void FillCoordinates(const String &coordinates)
    {
-      std::list<Parser::Symbol> coeffs = Parser::getDefaultParser().parse( coordinates, " (),;." ).getExpression();
+      auto coeffs = Parser::getDefaultParser().parse( coordinates, " (),;." ).getExpression();
       nCoordinates = coeffs.size();
       pCoordinates = new int[nCoordinates];
       int i = 0;

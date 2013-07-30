@@ -2,6 +2,7 @@
 #define __Mt_Symbol_H__
 
 #include "../utils/utils.h"
+#include <deque>
 
 namespace Filtering { namespace Parser {
 
@@ -107,7 +108,7 @@ class Context {
 
 public:
    
-   Context(const std::list<Symbol> &expression);
+   Context(const std::deque<Symbol> &expression);
 
    ~Context();
 

@@ -3,13 +3,14 @@
 
 #include "../utils/utils.h"
 #include "symbol.h"
+#include <deque>
 
 namespace Filtering { namespace Parser {
 
 class Parser {
    String parsed_string;
-   std::list<Symbol> elements;
-   std::list<Symbol> symbols;
+   std::deque<Symbol> elements;
+   std::deque<Symbol> symbols;
 
 public:
    Parser();
@@ -26,7 +27,7 @@ public:
    String getParsedString() const;
    int count() const;
 
-   std::list<Symbol> &getExpression() { return elements; }
+   std::deque<Symbol> &getExpression() { return elements; }
 
 };
 Parser getDefaultParser();

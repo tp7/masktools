@@ -39,8 +39,8 @@ public:
       i_vertical = i_horizontal = NULL;
       f_vertical = f_horizontal = NULL;
       vertical = horizontal = NULL;
-      std::list<Parser::Symbol> hcoeffs = Parser::getDefaultParser().parse(parameters["horizontal"].toString(), " ").getExpression();
-      std::list<Parser::Symbol> vcoeffs = Parser::getDefaultParser().parse(parameters["vertical"].toString(), " ").getExpression();
+      auto hcoeffs = Parser::getDefaultParser().parse(parameters["horizontal"].toString(), " ").getExpression();
+      auto vcoeffs = Parser::getDefaultParser().parse(parameters["vertical"].toString(), " ").getExpression();
       nHorizontal = hcoeffs.size();
       nVertical = vcoeffs.size();
       

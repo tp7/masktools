@@ -19,7 +19,7 @@ class Lutxyz : public MaskTools::Filter
 
    Lut luts[4];
 
-   static Byte *calculateLut(const std::list<Filtering::Parser::Symbol> &expr) {
+   static Byte *calculateLut(const std::deque<Filtering::Parser::Symbol> &expr) {
        Parser::Context ctx(expr);
        Byte *lut = new Byte[256 * 256 * 256];
 

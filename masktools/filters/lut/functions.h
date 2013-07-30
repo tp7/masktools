@@ -69,7 +69,7 @@ class Nonizer {
 public:
    Nonizer(const String &mode)
    {
-      std::list<Parser::Symbol> coefficients = Parser::getDefaultParser().parse(mode, " (),;").getExpression();
+      auto coefficients = Parser::getDefaultParser().parse(mode, " (),;").getExpression();
       nCoefficients = coefficients.size();
       pdCoefficients = new Double[nCoefficients];
       int i = 0;

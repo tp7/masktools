@@ -144,13 +144,13 @@ double Symbol::getValue(double x, double y, double z) const
    }
 }
 
-Context::Context(const std::list<Symbol> &expression)
+Context::Context(const std::deque<Symbol> &expression)
 {
    nPos = -1;
    nSymbols = expression.size();
    pSymbols = new Symbol[nSymbols];
 
-   std::list<Symbol>::const_iterator it = expression.begin();
+   auto it = expression.begin();
 
    for ( int i = 0; i < nSymbols; i++, it++ )
       pSymbols[i] = *it;

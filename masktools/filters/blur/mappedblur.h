@@ -26,7 +26,7 @@ protected:
 public:
    MappedBlur(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD )
    {
-      std::list<Parser::Symbol> coeffs = Parser::getDefaultParser().parse(parameters["kernel"].toString(), " ").getExpression();
+      auto coeffs = Parser::getDefaultParser().parse(parameters["kernel"].toString(), " ").getExpression();
       memset(matrix, 0, sizeof(matrix));
       for ( int i = 0; i < 9; i++ )
       {

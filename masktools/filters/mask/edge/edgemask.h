@@ -111,7 +111,7 @@ public:
       else
       {
          print(LOG_DEBUG, "Edge : using custom detector");
-         std::list<Parser::Symbol> coeffs = Parser::getDefaultParser().parse(parameters["mode"].toString(), " ").getExpression();
+         auto coeffs = Parser::getDefaultParser().parse(parameters["mode"].toString(), " ").getExpression();
          memset(matrix, 0, sizeof(matrix));
          int nNegative = 0, nPositive = 0;
          for ( int i = 0; i < 9; i++ )

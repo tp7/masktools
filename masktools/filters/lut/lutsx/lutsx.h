@@ -24,7 +24,7 @@ class Lutsx : public MaskTools::Filter
 
    void FillCoordinates(const String &coordinates)
    {
-      std::list<Parser::Symbol> coeffs = Parser::getDefaultParser().parse( coordinates, " (),;." ).getExpression();
+      auto coeffs = Parser::getDefaultParser().parse( coordinates, " (),;." ).getExpression();
       nCoordinates = coeffs.size();
       pCoordinates = new int[nCoordinates];
       int i = 0;
@@ -36,7 +36,7 @@ class Lutsx : public MaskTools::Filter
       }
    }
 
-   static Byte *calculateLut(const std::list<Filtering::Parser::Symbol> &expr) {
+   static Byte *calculateLut(const std::deque<Filtering::Parser::Symbol> &expr) {
        Parser::Context ctx(expr);
        Byte *lut = new Byte[256 * 256 * 256];
 
