@@ -3,7 +3,6 @@
 
 #include "../../../common/base/filter.h"
 #include "../../../../common/parser/parser.h"
-#include "../helpers.h"
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace Dual {
 
@@ -36,7 +35,7 @@ public:
               continue;
           }
 
-          if (stringValueEmpty(parameters[expr_strs[i]]) && stringValueEmpty(parameters["expr"])) {
+          if (parameters[expr_strs[i]].undefinedOrEmptyString() && parameters["expr"].undefinedOrEmptyString()) {
               operators[i] = NONE; //inplace
               continue;
           }

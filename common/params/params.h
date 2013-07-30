@@ -61,6 +61,9 @@ public:
    bool is_defined() const { return defined; }
    void set_defined(bool d) { defined = d; }
 
+   bool undefinedOrEmptyString() {
+       return !is_defined() || val_string.empty();
+   }
 };
 
 /* parameter will be used to defined a filter signature, but also to contain the actual value of
@@ -121,7 +124,6 @@ public:
     Value operator[](const String &name) const { return parameters[name]; }
     Parameter operator[](int index) const { return parameters.at(index); }
     int count() const { return int(parameters.size()); }
-
 };
 
 } // namespace Filtering
