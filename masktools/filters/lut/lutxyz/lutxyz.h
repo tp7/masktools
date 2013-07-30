@@ -12,7 +12,12 @@ Processor lut_c;
 
 class Lutxyz : public MaskTools::Filter
 {
-   std::pair<bool, Byte*> luts[4];
+    struct Lut {
+        bool used;
+        Byte *ptr;
+    };
+
+   Lut luts[4];
 
    static Byte *calculateLut(const std::list<Filtering::Parser::Symbol> &expr) {
        Parser::Context ctx(expr);
@@ -32,7 +37,7 @@ protected:
    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
    {
       UNUSED(n);
-      lut_c( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), dst.width(), dst.height(), luts[nPlane].second );
+      lut_c( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), dst.width(), dst.height(), luts[nPlane].ptr );
    }
 
 public:
@@ -41,8 +46,8 @@ public:
       static const char *expr_strs[] = { "yExpr", "uExpr", "vExpr" };
       
       for (int i = 0; i < 4; ++i) {
-          luts[i].first = false;
-          luts[i].second = nullptr;
+          luts[i].used = false;
+          luts[i].ptr = nullptr;
       }
 
       Parser::Parser parser = Parser::getDefaultParser().addSymbol(Parser::Symbol::X).addSymbol(Parser::Symbol::Y).addSymbol(Parser::Symbol::Z);
@@ -61,16 +66,16 @@ public:
 
           if (parameters[expr_strs[i]].is_defined()) {
               parser.parse(parameters[expr_strs[i]].toString(), " ");
-              luts[i].first = true;
-              luts[i].second = calculateLut(parser.getExpression());
+              luts[i].used = true;
+              luts[i].ptr = calculateLut(parser.getExpression());
           }
           else {
-              if (luts[3].second == nullptr) {
+              if (luts[3].ptr == nullptr) {
                   parser.parse(parameters["expr"].toString(), " ");
-                  luts[3].first = true;
-                  luts[3].second = calculateLut(parser.getExpression());
+                  luts[3].used = true;
+                  luts[3].ptr = calculateLut(parser.getExpression());
               }
-              luts[i].second = luts[3].second;
+              luts[i].ptr = luts[3].ptr;
           }
       }
    }
@@ -78,8 +83,8 @@ public:
    ~Lutxyz()
    {
        for (int i = 0; i < 4; ++i) {
-           if (luts[i].first) {
-               delete[] luts[i].second;
+           if (luts[i].used) {
+               delete[] luts[i].ptr;
            }
        }
    }
