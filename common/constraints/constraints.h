@@ -90,7 +90,7 @@ public:
 };
 
 template<class P>
-class ProcessorList : public std::list<Processor<P> >
+class ProcessorList : public std::list<Processor<P>>
 {
 
 public:
@@ -98,16 +98,16 @@ public:
    P *best_processor(const Constraint &constraint) const 
    {
       int nBestSpeed = -1;
-      Processor<P> best_proc;
+      const Processor<P> *best_proc;
 
       for(const auto &processor: *this) {
           if (processor.speed() > nBestSpeed && processor.respect(constraint)) {
               nBestSpeed = processor.speed();
-              best_proc = processor;
+              best_proc = &processor;
           }
       }
 
-      return best_proc.getFunction();
+      return best_proc->getFunction();
    }
 };
 
