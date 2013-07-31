@@ -37,7 +37,7 @@ static inline __m128i upper_sse2_op(__m128i x, __m128i t, __m128i) {
 }
 
 static inline __m128i lower_sse2_op(__m128i x, __m128i, __m128i t128) {
-    auto r = _mm_add_epi8(x, _mm_set1_epi32(0x80808080));
+    auto r = _mm_add_epi8(x, t128);
     return _mm_cmpgt_epi8(r, t128);
 }
 

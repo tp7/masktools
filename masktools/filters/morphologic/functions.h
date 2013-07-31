@@ -207,7 +207,7 @@ static MT_FORCEINLINE __m128i process_block_xxpand(Byte *pDst, const Byte *pSrcp
 
 /*
  * This whole loop unrolling thing is needed to make vc110 generate less awful code (use more registers).
- * ICC is much more efficient if store is called from the same function and a bit more more efficient without loop unrolling.
+ * ICC is much more efficient if store is called from the same function and a bit more efficient without loop unrolling.
  * vc110 generates faster code if store is used outside of the function with unrolling.
  * Please remove this when vc++ gets better.
  */

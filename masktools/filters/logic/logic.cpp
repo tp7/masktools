@@ -37,7 +37,7 @@ void logic_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPi
 /* sse2 */
 
 static inline __m128i add_sse2(__m128i a, __m128i b) { return _mm_adds_epu8(a, b); }
-static inline __m128i sub_sse2(__m128i a, __m128i b) { return _mm_subs_epu8(a,b); }
+static inline __m128i sub_sse2(__m128i a, __m128i b) { return _mm_subs_epu8(a, b); }
 static inline __m128i nop_sse2(__m128i a, __m128i) { return a; }
 
 static inline __m128i and_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
@@ -127,10 +127,10 @@ DEFINE_C_VERSIONS(max);
 
 
 #define DEFINE_SSE2_VERSIONS(name, load, store) \
-Processor *and_##name  = &logic_t_sse2<simd_loadu_epi128, simd_storeu_epi128, and_sse2_op, and>; \
-Processor *or_##name   = &logic_t_sse2<simd_loadu_epi128, simd_storeu_epi128, or_sse2_op, or>; \
-Processor *andn_##name = &logic_t_sse2<simd_loadu_epi128, simd_storeu_epi128, andn_sse2_op, andn>; \
-Processor *xor_##name  = &logic_t_sse2<simd_loadu_epi128, simd_storeu_epi128, xor_sse2_op, xor>;
+Processor *and_##name  = &logic_t_sse2<load, store, and_sse2_op, and>; \
+Processor *or_##name   = &logic_t_sse2<load, store, or_sse2_op, or>; \
+Processor *andn_##name = &logic_t_sse2<load, store, andn_sse2_op, andn>; \
+Processor *xor_##name  = &logic_t_sse2<load, store, xor_sse2_op, xor>;
 
 DEFINE_SSE2_VERSIONS(sse2, simd_loadu_epi128, simd_storeu_epi128)
 DEFINE_SSE2_VERSIONS(asse2, simd_load_epi128, simd_store_epi128)

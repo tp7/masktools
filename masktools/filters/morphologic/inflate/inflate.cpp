@@ -29,8 +29,8 @@ Processor *inflate_sse2 = &generic_sse2<
 >;
 Processor *inflate_asse2 = &generic_sse2<
     process_line_xxflate<Border::Left, limit_up_sse2, simd_load_epi128, simd_store_epi128>,
-    process_line_xxflate<Border::Left, limit_up_sse2, simd_load_epi128, simd_store_epi128>,
-    process_line_xxflate<Border::Left, limit_up_sse2, simd_load_epi128, simd_store_epi128>
+    process_line_xxflate<Border::None, limit_up_sse2, simd_load_epi128, simd_store_epi128>,
+    process_line_xxflate<Border::Right, limit_up_sse2, simd_load_epi128, simd_store_epi128>
 >;
 
 } } } } }
