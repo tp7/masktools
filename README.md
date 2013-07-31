@@ -1,12 +1,13 @@
 ### MaskTools 2 ###
 
-This is a repo for my games with MaskTools 2. I'll list all important changes later but for now it just compiles with ICL/MSVC in VS2012 (yes this means I'm going to go full C++11).
+This is a repo for my games with MaskTools 2. Most important changes are listed in the [wiki](https://github.com/tp7/masktools/wiki/Difference-to-masktools2-a48).
 
-Also while original masktools code is quite exceptional, mine isn't as good. Sorry about that.
+Current roadmap is pretty simple:
+* Add AVX2 support to most filters. It might speedup luts quite a lot and luts are important.
+* Consider adding multithreading support. All commonly used filters are optimized to the extend where multithreading might not help at all, so this feature might not get implemented.
+* Consider adding high bitdepth support. This is complex and time-consuming, but might simplify dither package a lot.
 
-Oh and I'm not much into asm so don't expect anything great on that front. Actually, don't expect anything at all.
+Feel free to create an issue here or contact me on irc (tp7 on _freenode_ or _rizon_) if you want anything implemented or have some interesting ideas.
 
 ### License ###
-Everything is  [GPL v2][gpl_v2]. Not because I want it this way or anything.
-
-[gpl_v2]: http://www.gnu.org/licenses/gpl-2.0.html
+Everything is  [GPL v2](http://www.gnu.org/licenses/gpl-2.0.html). Not because I want it this way or anything.
