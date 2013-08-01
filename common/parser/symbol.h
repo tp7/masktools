@@ -116,6 +116,7 @@ public:
    double compute(double x, double y = -1.0f, double z = -1.0f);
    String infix();
    Byte compute_byte(double x, double y = -1.0f, double z = -1.0f) { return clip<Byte, double>( compute(x, y, z) ); }
+   Word compute_word(double x, double y = -1.0f, double z = -1.0f) { return clip<Word, double>( compute(x, y, z) ); }
 };
 
 } } // namespace Parser, Filtering

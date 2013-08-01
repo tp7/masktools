@@ -121,6 +121,9 @@
     <Filter Include="helpers\parser">
       <UniqueIdentifier>{c622ffc9-36b4-4cbc-a381-9e9782d5a271}</UniqueIdentifier>
     </Filter>
+    <Filter Include="filters\lut\lut16">
+      <UniqueIdentifier>{94b6ff7d-0ed7-47ba-9017-b8f00bf9023f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\filters\morphologic\functions.h">
@@ -234,6 +237,9 @@
     <ClInclude Include="..\common\simd.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\lut\lut16\lut16.h">
+      <Filter>filters\lut\lut16</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -325,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="..\filters\support\adddiff\adddiff.cpp">
       <Filter>filters\support\adddiff</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\lut\lut16\lut16.cpp">
+      <Filter>filters\lut\lut16</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

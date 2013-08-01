@@ -557,6 +557,7 @@
     <ClInclude Include="..\filters\blur\mappedblur.h" />
     <ClInclude Include="..\filters\invert\invert.h" />
     <ClInclude Include="..\filters\binarize\binarize.h" />
+    <ClInclude Include="..\filters\lut\lut16\lut16.h" />
     <ClInclude Include="..\filters\morphologic\morphologic.h" />
     <ClInclude Include="..\filters\morphologic\functions.h" />
     <ClInclude Include="..\filters\morphologic\expand\expand.h" />
@@ -595,6 +596,7 @@
     <ClCompile Include="..\filters\blur\mappedblur.cpp" />
     <ClCompile Include="..\filters\invert\invert.cpp" />
     <ClCompile Include="..\filters\binarize\binarize.cpp" />
+    <ClCompile Include="..\filters\lut\lut16\lut16.cpp" />
     <ClCompile Include="..\filters\morphologic\expand\expand.cpp" />
     <ClCompile Include="..\filters\morphologic\inpand\inpand.cpp" />
     <ClCompile Include="..\filters\morphologic\inflate\inflate.cpp" />

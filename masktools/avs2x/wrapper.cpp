@@ -6,6 +6,7 @@
 #include "../filters/merge/merge.h"
 #include "../filters/convolution/convolution.h"
 #include "../filters/lut/lut/lut.h"
+#include "../filters/lut/lut16/lut16.h"
 #include "../filters/lut/luts/luts.h"
 #include "../filters/lut/lutf/lutf.h"
 #include "../filters/lut/lutxy/lutxy.h"
@@ -49,6 +50,7 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScri
    Avisynth2x::Filter<Morphologic::Inpand::Inpand>::create( env );
    Avisynth2x::Filter<Morphologic::Expand::Expand>::create( env );
    Avisynth2x::Filter<Lut::Single::Lut>::create( env );
+   Avisynth2x::Filter<Lut::Single16bit::Lut16>::create( env );
    Avisynth2x::Filter<Lut::Dual::Lutxy>::create( env );
    Avisynth2x::Filter<Lut::Trial::Lutxyz>::create( env );
    Avisynth2x::Filter<Lut::Spatial::Luts>::create( env );
