@@ -3,10 +3,61 @@
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge16 {
 
+/* Common */
+
 enum MaskMode {
     MASK420,
     MASK444
 };
+
+MT_FORCEINLINE static Word merge_core_c(Word dst, Word src, Word mask) {
+    if (mask == 0) {
+        return dst;
+    } else if (mask == 65535) {
+        return src;
+    } else {
+        return dst +(((src - dst) * (mask >> 1)) >> 15);
+    }
+}
+
+template<CpuFlags flags>
+MT_FORCEINLINE static __m128i merge_core_simd(const __m128i &dst, const __m128i &src, const __m128i &mask, const __m128i &ffff, const __m128i &zero) {
+    auto dst_lo = _mm_unpacklo_epi16(dst, zero);
+    auto dst_hi = _mm_unpackhi_epi16(dst, zero);
+
+    auto src_lo = _mm_unpacklo_epi16(src, zero);
+    auto src_hi = _mm_unpackhi_epi16(src, zero);
+
+    auto mask_lo = _mm_unpacklo_epi16(mask, zero);
+    auto mask_hi = _mm_unpackhi_epi16(mask, zero);
+
+    auto diff_lo = _mm_sub_epi32(src_lo, dst_lo);
+    auto diff_hi = _mm_sub_epi32(src_hi, dst_hi);
+
+    auto smask_lo = _mm_srai_epi32(mask_lo, 1);
+    auto smask_hi = _mm_srai_epi32(mask_hi, 1);
+
+    auto lerp_lo = simd_mullo_epi32<flags>(diff_lo, smask_lo);
+    auto lerp_hi = simd_mullo_epi32<flags>(diff_hi, smask_hi);
+
+    lerp_lo = _mm_srai_epi32(lerp_lo, 15);
+    lerp_hi = _mm_srai_epi32(lerp_hi, 15);
+
+    auto result_lo = _mm_add_epi32(dst_lo, lerp_lo);
+    auto result_hi = _mm_add_epi32(dst_hi, lerp_hi);
+
+    auto result = _mm_packus_epi32(result_lo, result_hi);
+
+    auto mask_FFFF = _mm_cmpeq_epi16(mask, ffff);
+    auto mask_zero = _mm_cmpeq_epi16(mask, zero);
+
+    result = simd_blend_epi8<flags>(mask_FFFF, src, result);
+    result = simd_blend_epi8<flags>(mask_zero, dst, result);
+
+    return result;
+}
+
+/* Stacked */
 
 MT_FORCEINLINE static Word get_value_stacked_c(const Byte *pMsb, const Byte *pLsb, int x) {
     return (Word(pMsb[x]) << 8) + pLsb[x];
@@ -44,15 +95,7 @@ void merge16_t_stacked_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptr
                 mask = get_mask_stacked_c(pMask, pMaskLsb, nMaskPitch, x);
             }
 
-            Word output = 0;
-
-            if (mask == 0) {
-                output = dst;
-            } else if (mask == 65535) {
-                output = src;
-            } else {
-                output = dst +(((src - dst) * (mask >> 1)) >> 15);
-            }
+            Word output = merge_core_c(dst, src, mask);
 
             pDst[x] = output >> 8;
             pDstLsb[x] = output & 0xFF;
@@ -148,37 +191,7 @@ void merge16_t_stacked_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, 
                 mask = get_mask_stacked_sse2(pMask, pMaskLsb, nMaskPitch, i);
             }
 
-            auto dst_lo = _mm_unpacklo_epi16(dst, zero);
-            auto dst_hi = _mm_unpackhi_epi16(dst, zero);
-
-            auto src_lo = _mm_unpacklo_epi16(src, zero);
-            auto src_hi = _mm_unpackhi_epi16(src, zero);
-
-            auto mask_lo = _mm_unpacklo_epi16(mask, zero);
-            auto mask_hi = _mm_unpackhi_epi16(mask, zero);
-
-            auto diff_lo = _mm_sub_epi32(src_lo, dst_lo);
-            auto diff_hi = _mm_sub_epi32(src_hi, dst_hi);
-
-            auto smask_lo = _mm_srai_epi32(mask_lo, 1);
-            auto smask_hi = _mm_srai_epi32(mask_hi, 1);
-
-            auto lerp_lo = simd_mullo_epi32<flags>(diff_lo, smask_lo);
-            auto lerp_hi = simd_mullo_epi32<flags>(diff_hi, smask_hi);
-
-            lerp_lo = _mm_srai_epi32(lerp_lo, 15);
-            lerp_hi = _mm_srai_epi32(lerp_hi, 15);
-
-            auto result_lo = _mm_add_epi32(dst_lo, lerp_lo);
-            auto result_hi = _mm_add_epi32(dst_hi, lerp_hi);
-
-            auto result = _mm_packus_epi32(result_lo, result_hi);
-
-            auto mask_FFFF = _mm_cmpeq_epi16(mask, ffff);
-            auto mask_zero = _mm_cmpeq_epi16(mask, zero);
-
-            result = simd_blend_epi8<flags>(mask_FFFF, src, result);
-            result = simd_blend_epi8<flags>(mask_zero, dst, result);
+            auto result = merge_core_simd<flags>(dst, src, mask, ffff, zero);
 
             auto result_lsb = _mm_and_si128(result, ff);
             auto result_msb = _mm_srli_epi16(result, 8);
@@ -209,9 +222,7 @@ void merge16_t_stacked_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, 
     }
 }
 
-/*
- * Interleaved
- */
+/* Interleaved */
 
 MT_FORCEINLINE static Word get_mask_420_interleaved_c(const Byte *ptr, int pitch, int x) {
     x = x*2;
@@ -238,15 +249,7 @@ void merge16_t_interleaved_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1,
                 mask = reinterpret_cast<const Word*>(pMask)[x];
             }
 
-            Word output = 0;
-
-            if (mask == 0) {
-                output = dst;
-            } else if (mask == 65535) {
-                output = src;
-            } else {
-                output = dst +(((src - dst) * (mask >> 1)) >> 15);
-            }
+            Word output = merge_core_c(dst, src, mask);
 
             reinterpret_cast<Word*>(pDst)[x] = output;
         }
