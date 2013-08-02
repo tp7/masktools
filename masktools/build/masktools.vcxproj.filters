@@ -198,9 +198,6 @@
     <ClInclude Include="..\filters\morphologic\deflate\deflate.h">
       <Filter>filters\morphologic\deflate</Filter>
     </ClInclude>
-    <ClInclude Include="..\filters\merge\merge.h">
-      <Filter>filters\merge</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\mask\motion\motionmask.h">
       <Filter>filters\mask\motion</Filter>
     </ClInclude>
@@ -239,6 +236,12 @@
     </ClInclude>
     <ClInclude Include="..\filters\lut\lut16\lut16.h">
       <Filter>filters\lut\lut16</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\merge\merge16.h">
+      <Filter>filters\merge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\merge\merge8.h">
+      <Filter>filters\merge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -293,9 +296,6 @@
     <ClCompile Include="..\filters\morphologic\deflate\deflate.cpp">
       <Filter>filters\morphologic\deflate</Filter>
     </ClCompile>
-    <ClCompile Include="..\filters\merge\merge.cpp">
-      <Filter>filters\merge</Filter>
-    </ClCompile>
     <ClCompile Include="..\filters\mask\motion\motionmask.cpp">
       <Filter>filters\mask\motion</Filter>
     </ClCompile>
@@ -334,6 +334,12 @@
     </ClCompile>
     <ClCompile Include="..\filters\lut\lut16\lut16.cpp">
       <Filter>filters\lut\lut16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\merge\merge16.cpp">
+      <Filter>filters\merge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\merge\merge8.cpp">
+      <Filter>filters\merge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

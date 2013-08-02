@@ -1,9 +1,9 @@
-#ifndef __Mt_Merge_H__
-#define __Mt_Merge_H__
+#ifndef __Mt_Merge8_H__
+#define __Mt_Merge8_H__
 
 #include "../../common/base/filter.h"
 
-namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge {
+namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge8 {
 
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                         const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight);

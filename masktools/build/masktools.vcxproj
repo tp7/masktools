@@ -558,6 +558,8 @@
     <ClInclude Include="..\filters\invert\invert.h" />
     <ClInclude Include="..\filters\binarize\binarize.h" />
     <ClInclude Include="..\filters\lut\lut16\lut16.h" />
+    <ClInclude Include="..\filters\merge\merge8.h" />
+    <ClInclude Include="..\filters\merge\merge16.h" />
     <ClInclude Include="..\filters\morphologic\morphologic.h" />
     <ClInclude Include="..\filters\morphologic\functions.h" />
     <ClInclude Include="..\filters\morphologic\expand\expand.h" />
@@ -572,7 +574,6 @@
     <ClInclude Include="..\filters\lut\lutxyz\lutxyz.h" />
     <ClInclude Include="..\filters\lut\lutsx\lutsx.h" />
     <ClInclude Include="..\filters\lut\lutspa\lutspa.h" />
-    <ClInclude Include="..\filters\merge\merge.h" />
     <ClInclude Include="..\filters\logic\logic.h" />
     <ClInclude Include="..\filters\convolution\convolution.h" />
     <ClInclude Include="..\filters\support\makediff\makediff.h" />
@@ -597,6 +598,8 @@
     <ClCompile Include="..\filters\invert\invert.cpp" />
     <ClCompile Include="..\filters\binarize\binarize.cpp" />
     <ClCompile Include="..\filters\lut\lut16\lut16.cpp" />
+    <ClCompile Include="..\filters\merge\merge8.cpp" />
+    <ClCompile Include="..\filters\merge\merge16.cpp" />
     <ClCompile Include="..\filters\morphologic\expand\expand.cpp" />
     <ClCompile Include="..\filters\morphologic\inpand\inpand.cpp" />
     <ClCompile Include="..\filters\morphologic\inflate\inflate.cpp" />
@@ -608,7 +611,6 @@
     <ClCompile Include="..\filters\lut\lutxyz\lutxyz.cpp" />
     <ClCompile Include="..\filters\lut\lutsx\lutsx.cpp" />
     <ClCompile Include="..\filters\lut\lutspa\lutspa.cpp" />
-    <ClCompile Include="..\filters\merge\merge.cpp" />
     <ClCompile Include="..\filters\logic\logic.cpp" />
     <ClCompile Include="..\filters\convolution\convolution.cpp" />
     <ClCompile Include="..\filters\support\makediff\makediff.cpp" />

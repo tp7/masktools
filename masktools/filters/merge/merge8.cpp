@@ -1,10 +1,10 @@
-#include "merge.h"
+#include "merge8.h"
 #include "../../common/simd.h"
 
-namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge {
+namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge8 {
 
 void merge_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
-                                                   const Byte *pMask, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
+                                                   const Byte *pMask, ptrdiff_t nMaskPitch, int nWidth, int nHeight)
 {
    for ( int y = 0; y < nHeight; ++y )
    {
@@ -12,23 +12,23 @@ void merge_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1
          pDst[x] = ((256 - int(pMask[x])) * pDst[x] + int(pMask[x]) * pSrc1[x] + 128) >> 8;
       pDst += nDstPitch;
       pSrc1 += nSrc1Pitch;
-      pMask += nSrc2Pitch;
+      pMask += nMaskPitch;
    }
 }
 
 void merge_luma_420_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
-                                                        const Byte *pMask, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
+                                                        const Byte *pMask, ptrdiff_t nMaskPitch, int nWidth, int nHeight)
 {
    for ( int y = 0; y < nHeight; ++y )
    {
       for ( int x = 0; x < nWidth; ++x )
       {
-         const int nMask = (((pMask[x*2] + pMask[x*2+nSrc2Pitch] + 1) >> 1) + ((pMask[x*2+1] + pMask[x*2+nSrc2Pitch+1] + 1) >> 1) + 1) >> 1;
+         const int nMask = (((pMask[x*2] + pMask[x*2+nMaskPitch] + 1) >> 1) + ((pMask[x*2+1] + pMask[x*2+nMaskPitch+1] + 1) >> 1) + 1) >> 1;
          pDst[x] = static_cast<Byte>(((256 - int(nMask)) * pDst[x] + int(nMask) * pSrc1[x] + 128) >> 8);
       }
       pDst += nDstPitch;
       pSrc1 += nSrc1Pitch;
-      pMask += nSrc2Pitch * 2;
+      pMask += nMaskPitch * 2;
    }
 }
 
@@ -96,7 +96,7 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
 
 template <decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
-                  const Byte *pMask, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
+                  const Byte *pMask, ptrdiff_t nMaskPitch, int nWidth, int nHeight)
 {
     int wMod16 = (nWidth / 16) * 16;
     auto pDst_s = pDst;
@@ -109,12 +109,12 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {
             _mm_prefetch(reinterpret_cast<const char*>(pMask)+ i*2 + 64, _MM_HINT_T0);
-            _mm_prefetch(reinterpret_cast<const char*>(pMask)+ nSrc2Pitch + i*2 + 64, _MM_HINT_T0);
+            _mm_prefetch(reinterpret_cast<const char*>(pMask)+ nMaskPitch + i*2 + 64, _MM_HINT_T0);
             // preparing mask
             auto src2_row1_t1 = load(reinterpret_cast<const __m128i*>(pMask + i*2));
             auto src2_row1_t2 = load(reinterpret_cast<const __m128i*>(pMask + i*2 + 16));
-            auto src2_row2_t1 = load(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2));
-            auto src2_row2_t2 = load(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2 + 16));
+            auto src2_row2_t1 = load(reinterpret_cast<const __m128i*>(pMask + nMaskPitch + i*2));
+            auto src2_row2_t2 = load(reinterpret_cast<const __m128i*>(pMask + nMaskPitch + i*2 + 16));
             auto avg_t1 = _mm_avg_epu8(src2_row1_t1,src2_row2_t1);
             auto avg_t2 = _mm_avg_epu8(src2_row1_t2,src2_row2_t2);
             auto shifted_t1 = _mm_srli_si128(avg_t1, 1);
@@ -130,10 +130,10 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
         }
         pDst += nDstPitch;
         pSrc1 += nSrc1Pitch;
-        pMask += nSrc2Pitch * 2;
+        pMask += nMaskPitch * 2;
     }
     if (nWidth > wMod16) {
-        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, mPask_s + wMod16*2, nSrc2Pitch, nWidth-wMod16, nHeight);
+        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, mPask_s + wMod16*2, nMaskPitch, nWidth-wMod16, nHeight);
     }
 }
 

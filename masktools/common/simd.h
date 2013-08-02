@@ -91,6 +91,12 @@ static MT_FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
     }
 }
 
+#pragma warning(default: 4309)
+
+static MT_FORCEINLINE __m128i simd_movehl_si128(const __m128i &a, const __m128i &b) {
+    return _mm_castps_si128(_mm_movehl_ps(_mm_castsi128_ps(a), _mm_castsi128_ps(b)));
+}
+
 static MT_FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i &lowThresh, const __m128i &highThresh, const __m128i &v128) {
     auto sat = _mm_sub_epi8(value, v128);
     auto low = _mm_cmpgt_epi8(sat, lowThresh);
@@ -99,7 +105,28 @@ static MT_FORCEINLINE __m128i threshold_sse2(const __m128i &value, const __m128i
     return _mm_or_si128(result, high);
 }
 
+template<CpuFlags flags>
+static MT_FORCEINLINE __m128i simd_blend_epi8(__m128i const &selector, __m128i const &a, __m128i const &b) {
+    if (flags >= CPU_SSE4_1) {
+        return _mm_blendv_epi8 (b, a, selector);
+    } else {
+        return _mm_or_si128(_mm_and_si128(selector, a), _mm_andnot_si128(selector, b));
+    }
+}
 
-#pragma warning(default: 4309)
+template<CpuFlags flags>
+static MT_FORCEINLINE __m128i simd_mullo_epi32(__m128i &a, __m128i &b) {
+    if (flags >= CPU_SSE4_1) {
+        return _mm_mullo_epi32(a, b);
+    } else {
+        auto a13    = _mm_shuffle_epi32(a, 0xF5);          // (-,a3,-,a1)
+        auto b13    = _mm_shuffle_epi32(b, 0xF5);          // (-,b3,-,b1)
+        auto prod02 = _mm_mul_epu32(a, b);                 // (-,a2*b2,-,a0*b0)
+        auto prod13 = _mm_mul_epu32(a13, b13);             // (-,a3*b3,-,a1*b1)
+        auto prod01 = _mm_unpacklo_epi32(prod02,prod13);   // (-,-,a1*b1,a0*b0) 
+        auto prod23 = _mm_unpackhi_epi32(prod02,prod13);   // (-,-,a3*b3,a2*b2) 
+        return _mm_unpacklo_epi64(prod01,prod23);   // (ab3,ab2,ab1,ab0)
+    }
+}
 
 #endif __Mt_SIMD_H__
