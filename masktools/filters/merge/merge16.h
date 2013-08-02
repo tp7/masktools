@@ -18,6 +18,9 @@ extern Processor *merge16_luma_420_sse2_stacked;
 extern Processor *merge16_luma_420_ssse3_stacked; 
 extern Processor *merge16_luma_420_sse4_1_stacked;
 
+extern Processor *merge16_c_interleaved;
+extern Processor *merge16_luma_420_c_interleaved;
+
 class Merge16 : public MaskTools::Filter
 {
 
@@ -75,8 +78,11 @@ public:
           chroma_processors.push_back( Filtering::Processor<Processor>( merge16_luma_420_ssse3_stacked, Constraint( CPU_SSSE3, 1, 1, 1, 1 ), 2 ) );
           chroma_processors.push_back( Filtering::Processor<Processor>( merge16_luma_420_sse4_1_stacked, Constraint( CPU_SSE4_1, 1, 1, 1, 1 ), 3 ) );
       } else {
-          error = "mt_merge does not support interleaved mode yet";
-          return;
+          /* add the processors */
+          processors.push_back( Filtering::Processor<Processor>( merge16_c_interleaved, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
+
+          /* add the chroma processors */
+          chroma_processors.push_back( Filtering::Processor<Processor>( merge16_luma_420_c_interleaved, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
       }
    }
 

@@ -8,15 +8,15 @@ enum MaskMode {
     MASK444
 };
 
-__forceinline static Word get_value_stacked_c(const Byte *pMsb, const Byte *pLsb, int x) {
+MT_FORCEINLINE static Word get_value_stacked_c(const Byte *pMsb, const Byte *pLsb, int x) {
     return (Word(pMsb[x]) << 8) + pLsb[x];
 }
 
-__forceinline static Word get_mask_stacked_c(const Byte *pMsb, const Byte *pLsb, int, int x) {
+MT_FORCEINLINE static Word get_mask_stacked_c(const Byte *pMsb, const Byte *pLsb, int, int x) {
     return get_value_stacked_c(pMsb, pLsb, x);
 }
 
-__forceinline static Word get_mask_420_stacked_c(const Byte *pMsb, const Byte *pLsb, int pitch, int x) {
+MT_FORCEINLINE static Word get_mask_420_stacked_c(const Byte *pMsb, const Byte *pLsb, int pitch, int x) {
     x = x*2;
     return ((int((get_value_stacked_c(pMsb, pLsb, x)) + get_value_stacked_c(pMsb + pitch, pLsb + pitch, x) + 1) >> 1) +
         ((int(get_value_stacked_c(pMsb, pLsb, x+1)) + get_value_stacked_c(pMsb + pitch, pLsb + pitch, x+1) + 1) >> 1) + 1) >> 1;
@@ -209,6 +209,60 @@ void merge16_t_stacked_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, 
     }
 }
 
+/*
+ * Interleaved
+ */
+
+MT_FORCEINLINE static Word get_mask_420_interleaved_c(const Byte *ptr, int pitch, int x) {
+    x = x*2;
+
+    return (((reinterpret_cast<const Word*>(ptr)[x] + reinterpret_cast<const Word*>(ptr+pitch)[x] + 1) >> 1) + 
+        ((reinterpret_cast<const Word*>(ptr)[x+1] +  reinterpret_cast<const Word*>(ptr+pitch)[x+1] + 1) >> 1) + 1) >> 1;
+}
+
+
+template<MaskMode mode>
+void merge16_t_interleaved_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
+                         const Byte *pMask, ptrdiff_t nMaskPitch, int nWidth, int nHeight)
+{
+    for ( int y = 0; y < nHeight; ++y )
+    {
+        for ( int x = 0; x < nWidth / 2; ++x ) {
+            Word dst = reinterpret_cast<const Word*>(pDst)[x];
+            Word src = reinterpret_cast<const Word*>(pSrc1)[x];
+            Word mask;
+
+            if (mode == MASK420) {
+                mask = get_mask_420_interleaved_c(pMask, nMaskPitch, x);
+            } else {
+                mask = reinterpret_cast<const Word*>(pMask)[x];
+            }
+
+            Word output = 0;
+
+            if (mask == 0) {
+                output = dst;
+            } else if (mask == 65535) {
+                output = src;
+            } else {
+                output = dst +(((src - dst) * (mask >> 1)) >> 15);
+            }
+
+            reinterpret_cast<Word*>(pDst)[x] = output;
+        }
+        pDst += nDstPitch;
+        pSrc1 += nSrc1Pitch;
+
+        if (mode == MASK420) {
+            pMask += nMaskPitch * 2;
+        } else {
+            pMask += nMaskPitch;
+        }
+    }
+}
+
+
+
 Processor *merge16_c_stacked = &merge16_t_stacked_c<MASK444>;
 Processor *merge16_luma_420_c_stacked = &merge16_t_stacked_c<MASK420>;
 
@@ -218,5 +272,9 @@ Processor *merge16_sse4_1_stacked = merge16_t_stacked_sse2<CPU_SSE4_1, MASK444, 
 Processor *merge16_luma_420_sse2_stacked = merge16_t_stacked_sse2<CPU_SSE2, MASK420, merge16_t_stacked_c<MASK420>>;
 Processor *merge16_luma_420_ssse3_stacked = merge16_t_stacked_sse2<CPU_SSSE3, MASK420, merge16_t_stacked_c<MASK420>>;
 Processor *merge16_luma_420_sse4_1_stacked = merge16_t_stacked_sse2<CPU_SSE4_1, MASK420, merge16_t_stacked_c<MASK420>>;
+
+
+Processor *merge16_c_interleaved = &merge16_t_interleaved_c<MASK444>;
+Processor *merge16_luma_420_c_interleaved = &merge16_t_interleaved_c<MASK420>;
 
 } } } }
