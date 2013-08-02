@@ -265,6 +265,86 @@ void merge16_t_interleaved_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1,
 }
 
 
+template <CpuFlags flags>
+MT_FORCEINLINE static __m128i get_mask_420_interleaved_sse2(const Byte *ptr, int pitch, int x) {
+    x = x*2;
+
+    auto row1_lo = simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr+x));
+    auto row1_hi = simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr+x+16));
+    auto row2_lo = simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr+pitch+x));
+    auto row2_hi = simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr+pitch+x+16));
+
+    auto avg_lo = _mm_avg_epu16(row1_lo, row2_lo);
+    auto avg_hi = _mm_avg_epu16(row1_hi, row2_hi);
+
+    auto avg_lo_sh = _mm_srli_si128(avg_lo, 2);
+    auto avg_hi_sh = _mm_srli_si128(avg_hi, 2);
+
+    avg_lo = _mm_avg_epu16(avg_lo, avg_lo_sh);
+    avg_hi = _mm_avg_epu16(avg_hi, avg_hi_sh);
+
+    if (flags >= CPU_SSSE3) {
+        avg_lo = _mm_shuffle_epi8(avg_lo, _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 13, 12, 9, 8, 5, 4, 1, 0));
+        avg_hi = _mm_shuffle_epi8(avg_hi, _mm_set_epi8(13, 12, 9, 8, 5, 4, 1, 0, 0, 0, 0, 0, 0, 0 ,0 ,0));
+    } else {
+        avg_lo = _mm_shufflelo_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_lo = _mm_shufflehi_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_lo = _mm_shuffle_epi32(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
+
+        avg_hi = _mm_shufflelo_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_hi = _mm_shufflehi_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_hi = _mm_shuffle_epi32(avg_hi, _MM_SHUFFLE(2, 0, 3, 3));
+    }
+
+    return simd_blend_epi8<flags>(_mm_set_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0, 0), avg_hi, avg_lo);
+}
+
+
+template <CpuFlags flags, MaskMode mode, Processor merge_c>
+void merge16_t_interleaved_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
+                            const Byte *pMask, ptrdiff_t nMaskPitch, int nWidth, int nHeight)
+{
+    int wMod16 = (nWidth / 16) * 16;
+    auto pDst_s = pDst;
+    auto pSrc1_s = pSrc1;
+    auto pMask_s = pMask;
+
+    auto zero = _mm_setzero_si128();
+#pragma warning(disable: 4309)
+    auto ffff = _mm_set1_epi16(0xFFFF);
+#pragma warning(default: 4309)
+
+    for ( int j = 0; j < nHeight; ++j ) {
+        for ( int i = 0; i < wMod16; i+=16 ) {
+            auto dst = simd_loadu_epi128(reinterpret_cast<const __m128i*>(pDst+i));
+            auto src = simd_loadu_epi128(reinterpret_cast<const __m128i*>(pSrc1+i));
+            __m128i mask;
+
+            if (mode == MASK420) {
+                mask = get_mask_420_interleaved_sse2<flags>(pMask, nMaskPitch, i);
+            } else {
+                mask = simd_loadu_epi128(reinterpret_cast<const __m128i*>(pMask+i));
+            }
+
+            auto result = merge_core_simd<flags>(dst, src, mask, ffff, zero);
+
+            simd_storeu_epi128(reinterpret_cast<__m128i*>(pDst+i), result);
+        }
+
+        pDst += nDstPitch;
+        pSrc1 += nSrc1Pitch;
+
+        if (mode == MASK420) {
+            pMask += nMaskPitch * 2;
+        } else {
+            pMask += nMaskPitch;
+        }
+    }
+
+    if (nWidth > wMod16) {
+        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pMask_s + wMod16, nMaskPitch, nWidth-wMod16, nHeight);
+    }
+}
 
 Processor *merge16_c_stacked = &merge16_t_stacked_c<MASK444>;
 Processor *merge16_luma_420_c_stacked = &merge16_t_stacked_c<MASK420>;
@@ -279,5 +359,12 @@ Processor *merge16_luma_420_sse4_1_stacked = merge16_t_stacked_sse2<CPU_SSE4_1, 
 
 Processor *merge16_c_interleaved = &merge16_t_interleaved_c<MASK444>;
 Processor *merge16_luma_420_c_interleaved = &merge16_t_interleaved_c<MASK420>;
+
+Processor *merge16_sse2_interleaved = merge16_t_interleaved_sse2<CPU_SSE2, MASK444, merge16_t_interleaved_c<MASK444>>;
+Processor *merge16_sse4_1_interleaved = merge16_t_interleaved_sse2<CPU_SSE4_1, MASK444, merge16_t_interleaved_c<MASK444>>;
+
+Processor *merge16_luma_420_sse2_interleaved = merge16_t_interleaved_sse2<CPU_SSE2, MASK420, merge16_t_interleaved_c<MASK420>>;
+Processor *merge16_luma_420_ssse3_interleaved = merge16_t_interleaved_sse2<CPU_SSSE3, MASK420, merge16_t_interleaved_c<MASK420>>;
+Processor *merge16_luma_420_sse4_1_interleaved = merge16_t_interleaved_sse2<CPU_SSE4_1, MASK420, merge16_t_interleaved_c<MASK420>>;
 
 } } } }

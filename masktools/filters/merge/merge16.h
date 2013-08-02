@@ -21,6 +21,13 @@ extern Processor *merge16_luma_420_sse4_1_stacked;
 extern Processor *merge16_c_interleaved;
 extern Processor *merge16_luma_420_c_interleaved;
 
+extern Processor *merge16_sse2_interleaved;
+extern Processor *merge16_sse4_1_interleaved;
+
+extern Processor *merge16_luma_420_sse2_interleaved;
+extern Processor *merge16_luma_420_ssse3_interleaved; 
+extern Processor *merge16_luma_420_sse4_1_interleaved;
+
 class Merge16 : public MaskTools::Filter
 {
 
@@ -80,9 +87,14 @@ public:
       } else {
           /* add the processors */
           processors.push_back( Filtering::Processor<Processor>( merge16_c_interleaved, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
+          processors.push_back( Filtering::Processor<Processor>( merge16_sse2_interleaved, Constraint( CPU_SSE2, 1, 1, 1, 1 ), 1 ) );
+          processors.push_back( Filtering::Processor<Processor>( merge16_sse4_1_interleaved, Constraint( CPU_SSE4_1, 1, 1, 1, 1 ), 2 ) );
 
           /* add the chroma processors */
           chroma_processors.push_back( Filtering::Processor<Processor>( merge16_luma_420_c_interleaved, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) );
+          chroma_processors.push_back( Filtering::Processor<Processor>( merge16_luma_420_sse2_interleaved, Constraint( CPU_SSE2, 1, 1, 1, 1 ), 1 ) );
+          chroma_processors.push_back( Filtering::Processor<Processor>( merge16_luma_420_ssse3_interleaved, Constraint( CPU_SSSE3, 1, 1, 1, 1 ), 2 ) );
+          chroma_processors.push_back( Filtering::Processor<Processor>( merge16_luma_420_sse4_1_interleaved, Constraint( CPU_SSE4_1, 1, 1, 1, 1 ), 3 ) );
       }
    }
 
