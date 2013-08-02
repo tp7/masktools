@@ -20,6 +20,33 @@ MT_FORCEINLINE static Word merge_core_c(Word dst, Word src, Word mask) {
     }
 }
 
+template <CpuFlags flags>
+MT_FORCEINLINE static __m128i get_single_mask_value(const __m128i &row1_lo, const __m128i &row1_hi, const __m128i &row2_lo, const __m128i &row2_hi) {
+    auto avg_lo = _mm_avg_epu16(row1_lo, row2_lo);
+    auto avg_hi = _mm_avg_epu16(row1_hi, row2_hi);
+
+    auto avg_lo_sh = _mm_srli_si128(avg_lo, 2);
+    auto avg_hi_sh = _mm_srli_si128(avg_hi, 2);
+
+    avg_lo = _mm_avg_epu16(avg_lo, avg_lo_sh);
+    avg_hi = _mm_avg_epu16(avg_hi, avg_hi_sh);
+
+    if (flags >= CPU_SSSE3) {
+        avg_lo = _mm_shuffle_epi8(avg_lo, _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 13, 12, 9, 8, 5, 4, 1, 0));
+        avg_hi = _mm_shuffle_epi8(avg_hi, _mm_set_epi8(13, 12, 9, 8, 5, 4, 1, 0, 0, 0, 0, 0, 0, 0 ,0 ,0));
+    } else {
+        avg_lo = _mm_shufflelo_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_lo = _mm_shufflehi_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_lo = _mm_shuffle_epi32(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
+
+        avg_hi = _mm_shufflelo_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_hi = _mm_shufflehi_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
+        avg_hi = _mm_shuffle_epi32(avg_hi, _MM_SHUFFLE(2, 0, 3, 3));
+    }
+
+    return simd_blend_epi8<flags>(_mm_set_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0, 0), avg_hi, avg_lo);
+}
+
 template<CpuFlags flags>
 MT_FORCEINLINE static __m128i merge_core_simd(const __m128i &dst, const __m128i &src, const __m128i &mask, const __m128i &ffff, const __m128i &zero) {
     auto dst_lo = _mm_unpacklo_epi16(dst, zero);
@@ -134,29 +161,7 @@ MT_FORCEINLINE static __m128i get_mask_420_stacked_simd(const Byte *pMsb, const 
     auto row2_lo = get_value_stacked_simd(pMsb+pitch, pLsb+pitch, x);
     auto row2_hi = get_value_stacked_simd(pMsb+pitch, pLsb+pitch, x+8);
 
-    auto avg_lo = _mm_avg_epu16(row1_lo, row2_lo);
-    auto avg_hi = _mm_avg_epu16(row1_hi, row2_hi);
-
-    auto avg_lo_sh = _mm_srli_si128(avg_lo, 2);
-    auto avg_hi_sh = _mm_srli_si128(avg_hi, 2);
-
-    avg_lo = _mm_avg_epu16(avg_lo, avg_lo_sh);
-    avg_hi = _mm_avg_epu16(avg_hi, avg_hi_sh);
-
-    if (flags >= CPU_SSSE3) {
-        avg_lo = _mm_shuffle_epi8(avg_lo, _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 13, 12, 9, 8, 5, 4, 1, 0));
-        avg_hi = _mm_shuffle_epi8(avg_hi, _mm_set_epi8(13, 12, 9, 8, 5, 4, 1, 0, 0, 0, 0, 0, 0, 0 ,0 ,0));
-    } else {
-        avg_lo = _mm_shufflelo_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_lo = _mm_shufflehi_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_lo = _mm_shuffle_epi32(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
-
-        avg_hi = _mm_shufflelo_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_hi = _mm_shufflehi_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_hi = _mm_shuffle_epi32(avg_hi, _MM_SHUFFLE(2, 0, 3, 3));
-    }
-
-    return simd_blend_epi8<flags>(_mm_set_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0, 0), avg_hi, avg_lo);
+    return get_single_mask_value<flags>(row1_lo, row1_hi, row2_lo, row2_hi);
 }
 
 
@@ -274,29 +279,7 @@ MT_FORCEINLINE static __m128i get_mask_420_interleaved_simd(const Byte *ptr, int
     auto row2_lo = simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr+pitch+x));
     auto row2_hi = simd_loadu_epi128(reinterpret_cast<const __m128i*>(ptr+pitch+x+16));
 
-    auto avg_lo = _mm_avg_epu16(row1_lo, row2_lo);
-    auto avg_hi = _mm_avg_epu16(row1_hi, row2_hi);
-
-    auto avg_lo_sh = _mm_srli_si128(avg_lo, 2);
-    auto avg_hi_sh = _mm_srli_si128(avg_hi, 2);
-
-    avg_lo = _mm_avg_epu16(avg_lo, avg_lo_sh);
-    avg_hi = _mm_avg_epu16(avg_hi, avg_hi_sh);
-
-    if (flags >= CPU_SSSE3) {
-        avg_lo = _mm_shuffle_epi8(avg_lo, _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 13, 12, 9, 8, 5, 4, 1, 0));
-        avg_hi = _mm_shuffle_epi8(avg_hi, _mm_set_epi8(13, 12, 9, 8, 5, 4, 1, 0, 0, 0, 0, 0, 0, 0 ,0 ,0));
-    } else {
-        avg_lo = _mm_shufflelo_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_lo = _mm_shufflehi_epi16(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_lo = _mm_shuffle_epi32(avg_lo, _MM_SHUFFLE(3, 3, 2, 0));
-
-        avg_hi = _mm_shufflelo_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_hi = _mm_shufflehi_epi16(avg_hi, _MM_SHUFFLE(3, 3, 2, 0));
-        avg_hi = _mm_shuffle_epi32(avg_hi, _MM_SHUFFLE(2, 0, 3, 3));
-    }
-
-    return simd_blend_epi8<flags>(_mm_set_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0, 0), avg_hi, avg_lo);
+    return get_single_mask_value<flags>(row1_lo, row1_hi, row2_lo, row2_hi);
 }
 
 
@@ -321,7 +304,7 @@ void merge16_t_interleaved_simd(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSr
             __m128i mask;
 
             if (mode == MASK420) {
-                mask = get_mask_420_interleaved_sse2<flags>(pMask, nMaskPitch, i);
+                mask = get_mask_420_interleaved_simd<flags>(pMask, nMaskPitch, i);
             } else {
                 mask = simd_loadu_epi128(reinterpret_cast<const __m128i*>(pMask+i));
             }
