@@ -553,6 +553,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\16bit.h" />
+    <ClInclude Include="..\common\common.h" />
     <ClInclude Include="..\common\simd.h" />
     <ClInclude Include="..\filters\blur\mappedblur.h" />
     <ClInclude Include="..\filters\invert\invert.h" />
@@ -576,6 +578,7 @@
     <ClInclude Include="..\filters\lut\lutspa\lutspa.h" />
     <ClInclude Include="..\filters\logic\logic.h" />
     <ClInclude Include="..\filters\convolution\convolution.h" />
+    <ClInclude Include="..\filters\support\average16\average16.h" />
     <ClInclude Include="..\filters\support\makediff\makediff.h" />
     <ClInclude Include="..\filters\support\average\average.h" />
     <ClInclude Include="..\filters\support\adddiff\adddiff.h" />
@@ -613,6 +616,7 @@
     <ClCompile Include="..\filters\lut\lutspa\lutspa.cpp" />
     <ClCompile Include="..\filters\logic\logic.cpp" />
     <ClCompile Include="..\filters\convolution\convolution.cpp" />
+    <ClCompile Include="..\filters\support\average16\average16.cpp" />
     <ClCompile Include="..\filters\support\makediff\makediff.cpp" />
     <ClCompile Include="..\filters\support\average\average.cpp" />
     <ClCompile Include="..\filters\support\adddiff\adddiff.cpp" />

@@ -124,6 +124,9 @@
     <Filter Include="filters\lut\lut16">
       <UniqueIdentifier>{94b6ff7d-0ed7-47ba-9017-b8f00bf9023f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="filters\support\average16">
+      <UniqueIdentifier>{32d55ae6-e05e-492a-915e-5cd76d3818f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\filters\morphologic\functions.h">
@@ -243,6 +246,15 @@
     <ClInclude Include="..\filters\merge\merge8.h">
       <Filter>filters\merge</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\support\average16\average16.h">
+      <Filter>filters\support\average16</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\16bit.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\common.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -340,6 +352,9 @@
     </ClCompile>
     <ClCompile Include="..\filters\merge\merge8.cpp">
       <Filter>filters\merge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\average16\average16.cpp">
+      <Filter>filters\support\average16</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

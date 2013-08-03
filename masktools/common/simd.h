@@ -2,9 +2,9 @@
 #define __Mt_SIMD_H__
 
 #include <emmintrin.h>
-#include "../../common/utils/utils.h"
+#include "common.h"
 
-using namespace Filtering;
+namespace Filtering {
 
 //because ICC is smart enough on its own and force inlining actually makes it slower
 #ifdef __INTEL_COMPILER
@@ -127,6 +127,25 @@ static MT_FORCEINLINE __m128i simd_mullo_epi32(__m128i &a, __m128i &b) {
         auto prod23 = _mm_unpackhi_epi32(prod02,prod13);   // (-,-,a3*b3,a2*b2) 
         return _mm_unpacklo_epi64(prod01,prod23);   // (ab3,ab2,ab1,ab0)
     }
+}
+
+static MT_FORCEINLINE __m128i read_word_stacked_simd(const Byte *pMsb, const Byte *pLsb, int x) {
+    auto msb = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pMsb+x));
+    auto lsb = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pLsb+x));
+    return _mm_unpacklo_epi8(lsb, msb);
+}
+
+static MT_FORCEINLINE void write_word_stacked_simd(Byte *pMsb, Byte *pLsb, int x, const __m128i &value, const __m128i &ff, const __m128i &zero) {
+    auto result_lsb = _mm_and_si128(value, ff);
+    auto result_msb = _mm_srli_epi16(value, 8);
+
+    result_lsb = _mm_packus_epi16(result_lsb, zero);
+    result_msb = _mm_packus_epi16(result_msb, zero);
+
+    _mm_storel_epi64(reinterpret_cast<__m128i*>(pMsb+x), result_msb);
+    _mm_storel_epi64(reinterpret_cast<__m128i*>(pLsb+x), result_lsb);
+}
+
 }
 
 #endif __Mt_SIMD_H__

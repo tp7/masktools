@@ -90,10 +90,6 @@ MT_FORCEINLINE static Word get_value_stacked_c(const Byte *pMsb, const Byte *pLs
     return (Word(pMsb[x]) << 8) + pLsb[x];
 }
 
-MT_FORCEINLINE static Word get_mask_stacked_c(const Byte *pMsb, const Byte *pLsb, int, int x) {
-    return get_value_stacked_c(pMsb, pLsb, x);
-}
-
 MT_FORCEINLINE static Word get_mask_420_stacked_c(const Byte *pMsb, const Byte *pLsb, int pitch, int x) {
     x = x*2;
     return ((int((get_value_stacked_c(pMsb, pLsb, x)) + get_value_stacked_c(pMsb + pitch, pLsb + pitch, x) + 1) >> 1) +
@@ -119,7 +115,7 @@ void merge16_t_stacked_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptr
             if (mode == MASK420) {
                 mask = get_mask_420_stacked_c(pMask, pMaskLsb, nMaskPitch, x);
             } else {
-                mask = get_mask_stacked_c(pMask, pMaskLsb, nMaskPitch, x);
+                mask = get_value_stacked_c(pMask, pMaskLsb, x);
             }
 
             Word output = merge_core_c(dst, src, mask);
@@ -142,24 +138,14 @@ void merge16_t_stacked_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptr
     }
 }
 
-MT_FORCEINLINE static __m128i get_value_stacked_simd(const Byte *pMsb, const Byte *pLsb, int x) {
-    auto msb = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pMsb+x));
-    auto lsb = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pLsb+x));
-    return _mm_unpacklo_epi8(lsb, msb);
-}
-
-MT_FORCEINLINE static __m128i get_mask_stacked_simd(const Byte *pMsb, const Byte *pLsb, int, int x) {
-    return get_value_stacked_simd(pMsb, pLsb, x);
-}
-
 template <CpuFlags flags>
 MT_FORCEINLINE static __m128i get_mask_420_stacked_simd(const Byte *pMsb, const Byte *pLsb, int pitch, int x) {
     x = x*2;
 
-    auto row1_lo = get_value_stacked_simd(pMsb, pLsb, x);
-    auto row1_hi = get_value_stacked_simd(pMsb, pLsb, x+8);
-    auto row2_lo = get_value_stacked_simd(pMsb+pitch, pLsb+pitch, x);
-    auto row2_hi = get_value_stacked_simd(pMsb+pitch, pLsb+pitch, x+8);
+    auto row1_lo = read_word_stacked_simd(pMsb, pLsb, x);
+    auto row1_hi = read_word_stacked_simd(pMsb, pLsb, x+8);
+    auto row2_lo = read_word_stacked_simd(pMsb+pitch, pLsb+pitch, x);
+    auto row2_hi = read_word_stacked_simd(pMsb+pitch, pLsb+pitch, x+8);
 
     return get_single_mask_value<flags>(row1_lo, row1_hi, row2_lo, row2_hi);
 }
@@ -186,26 +172,19 @@ void merge16_t_stacked_simd(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, 
 
     for ( int j = 0; j < nHeight / 2; ++j ) {
         for ( int i = 0; i < wMod8; i+=8 ) {
-            auto dst = get_value_stacked_simd(pDst, pDstLsb, i);
-            auto src = get_value_stacked_simd(pSrc1, pSrc1Lsb, i);
+            auto dst = read_word_stacked_simd(pDst, pDstLsb, i);
+            auto src = read_word_stacked_simd(pSrc1, pSrc1Lsb, i);
             __m128i mask;
 
             if (mode == MASK420) {
                 mask = get_mask_420_stacked_simd<flags>(pMask, pMaskLsb, nMaskPitch, i);
             } else {
-                mask = get_mask_stacked_simd(pMask, pMaskLsb, nMaskPitch, i);
+                mask = read_word_stacked_simd(pMask, pMaskLsb, i);
             }
 
             auto result = merge_core_simd<flags>(dst, src, mask, ffff, zero);
 
-            auto result_lsb = _mm_and_si128(result, ff);
-            auto result_msb = _mm_srli_epi16(result, 8);
-
-            result_lsb = _mm_packus_epi16(result_lsb, zero);
-            result_msb = _mm_packus_epi16(result_msb, zero);
-
-            _mm_storel_epi64(reinterpret_cast<__m128i*>(pDst+i), result_msb);
-            _mm_storel_epi64(reinterpret_cast<__m128i*>(pDstLsb+i), result_lsb);
+            write_word_stacked_simd(pDst, pDstLsb, i, result, ff, zero);
         }
 
         pDst += nDstPitch;
