@@ -127,6 +127,12 @@
     <Filter Include="filters\support\average16">
       <UniqueIdentifier>{32d55ae6-e05e-492a-915e-5cd76d3818f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="filters\support\adddiff16">
+      <UniqueIdentifier>{9b85fdf7-f182-41b3-bf24-253e26644db2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filters\support\makediff16">
+      <UniqueIdentifier>{4ecbda29-8749-4ef4-9ac6-6cb6cc41d147}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\filters\morphologic\functions.h">
@@ -255,6 +261,12 @@
     <ClInclude Include="..\common\common.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\support\adddiff16\adddiff16.h">
+      <Filter>filters\support\adddiff16</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\support\makediff16\makediff16.h">
+      <Filter>filters\support\makediff16</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -355,6 +367,12 @@
     </ClCompile>
     <ClCompile Include="..\filters\support\average16\average16.cpp">
       <Filter>filters\support\average16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\adddiff16\adddiff16.cpp">
+      <Filter>filters\support\adddiff16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\makediff16\makediff16.cpp">
+      <Filter>filters\support\makediff16</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

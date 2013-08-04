@@ -25,7 +25,9 @@
 #include "../filters/gradient/gradient.h"
 //
 #include "../filters/support/adddiff/adddiff.h"
+#include "../filters/support/adddiff16/adddiff16.h"
 #include "../filters/support/makediff/makediff.h"
+#include "../filters/support/makediff16/makediff16.h"
 #include "../filters/support/average/average.h"
 #include "../filters/support/average16/average16.h"
 #include "../filters/support/clamp/clamp.h"
@@ -66,9 +68,11 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScri
    Avisynth2x::Filter<Blur::MappedBlur>::create( env );
    Avisynth2x::Filter<Gradient::Gradient>::create( env );
    Avisynth2x::Filter<Support::MakeDiff::MakeDiff>::create( env );
+   Avisynth2x::Filter<Support::MakeDiff16::MakeDiff16>::create( env );
    Avisynth2x::Filter<Support::Average::Average>::create( env );
    Avisynth2x::Filter<Support::Average16::Average16>::create( env );
    Avisynth2x::Filter<Support::AddDiff::AddDiff>::create( env );
+   Avisynth2x::Filter<Support::AddDiff16::AddDiff16>::create( env );
    Avisynth2x::Filter<Support::Clamp::Clamp>::create( env );
    Avisynth2x::Filter<Mask::Motion::MotionMask>::create( env );
    Avisynth2x::Filter<Mask::Edge::EdgeMask>::create( env );
