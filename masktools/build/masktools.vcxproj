@@ -560,6 +560,7 @@
     <ClInclude Include="..\filters\blur\mappedblur.h" />
     <ClInclude Include="..\filters\invert\invert.h" />
     <ClInclude Include="..\filters\binarize\binarize8.h" />
+    <ClInclude Include="..\filters\logic\logic16.h" />
     <ClInclude Include="..\filters\lut\lut16\lut16.h" />
     <ClInclude Include="..\filters\merge\merge8.h" />
     <ClInclude Include="..\filters\merge\merge16.h" />
@@ -577,7 +578,7 @@
     <ClInclude Include="..\filters\lut\lutxyz\lutxyz.h" />
     <ClInclude Include="..\filters\lut\lutsx\lutsx.h" />
     <ClInclude Include="..\filters\lut\lutspa\lutspa.h" />
-    <ClInclude Include="..\filters\logic\logic.h" />
+    <ClInclude Include="..\filters\logic\logic8.h" />
     <ClInclude Include="..\filters\convolution\convolution.h" />
     <ClInclude Include="..\filters\support\adddiff16\adddiff16.h" />
     <ClInclude Include="..\filters\support\average16\average16.h" />
@@ -605,6 +606,7 @@
     <ClCompile Include="..\filters\blur\mappedblur.cpp" />
     <ClCompile Include="..\filters\invert\invert.cpp" />
     <ClCompile Include="..\filters\binarize\binarize8.cpp" />
+    <ClCompile Include="..\filters\logic\logic16.cpp" />
     <ClCompile Include="..\filters\lut\lut16\lut16.cpp" />
     <ClCompile Include="..\filters\merge\merge8.cpp" />
     <ClCompile Include="..\filters\merge\merge16.cpp" />
@@ -619,7 +621,7 @@
     <ClCompile Include="..\filters\lut\lutxyz\lutxyz.cpp" />
     <ClCompile Include="..\filters\lut\lutsx\lutsx.cpp" />
     <ClCompile Include="..\filters\lut\lutspa\lutspa.cpp" />
-    <ClCompile Include="..\filters\logic\logic.cpp" />
+    <ClCompile Include="..\filters\logic\logic8.cpp" />
     <ClCompile Include="..\filters\convolution\convolution.cpp" />
     <ClCompile Include="..\filters\support\adddiff16\adddiff16.cpp" />
     <ClCompile Include="..\filters\support\average16\average16.cpp" />

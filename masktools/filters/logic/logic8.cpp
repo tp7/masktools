@@ -1,24 +1,24 @@
-#include "logic.h"
+#include "logic8.h"
 #include "../../common/simd.h"
 
 using namespace Filtering;
 
-inline Byte add(Byte a, Byte b) { return clip<Byte, int>(a + (int)b); }
-inline Byte sub(Byte a, Byte b) { return clip<Byte, int>(a - (int)b); }
-inline Byte nop(Byte a, Byte b) { UNUSED(b); return a; }
+static MT_FORCEINLINE Byte add(Byte a, Byte b) { return clip<Byte, int>(a + (int)b); }
+static MT_FORCEINLINE Byte sub(Byte a, Byte b) { return clip<Byte, int>(a - (int)b); }
+static MT_FORCEINLINE Byte nop(Byte a, Byte b) { UNUSED(b); return a; }
 
-inline Byte and(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a & b; }
-inline Byte or(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a | b; }
-inline Byte andn(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a & ~b; }
-inline Byte xor(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a ^ b; }
+static MT_FORCEINLINE Byte and(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a & b; }
+static MT_FORCEINLINE Byte or(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a | b; }
+static MT_FORCEINLINE Byte andn(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a & ~b; }
+static MT_FORCEINLINE Byte xor(Byte a, Byte b, Byte th1, Byte th2) { UNUSED(th1); UNUSED(th2); return a ^ b; }
 
 template <decltype(add) opa, decltype(add) opb>
-inline Byte min_t(Byte a, Byte b, Byte th1, Byte th2) { 
+static MT_FORCEINLINE Byte min_t(Byte a, Byte b, Byte th1, Byte th2) { 
     return min<Byte>(opa(a, th1), opb(b, th2)); 
 }
 
 template <decltype(add) opa, decltype(add) opb>
-inline Byte max_t(Byte a, Byte b, Byte th1, Byte th2) { 
+static MT_FORCEINLINE Byte max_t(Byte a, Byte b, Byte th1, Byte th2) { 
     return max<Byte>(opa(a, th1), opb(b, th2)); 
 }
 
@@ -36,33 +36,33 @@ void logic_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPi
 
 /* sse2 */
 
-static inline __m128i add_sse2(__m128i a, __m128i b) { return _mm_adds_epu8(a, b); }
-static inline __m128i sub_sse2(__m128i a, __m128i b) { return _mm_subs_epu8(a, b); }
-static inline __m128i nop_sse2(__m128i a, __m128i) { return a; }
+static MT_FORCEINLINE __m128i add_sse2(__m128i a, __m128i b) { return _mm_adds_epu8(a, b); }
+static MT_FORCEINLINE __m128i sub_sse2(__m128i a, __m128i b) { return _mm_subs_epu8(a, b); }
+static MT_FORCEINLINE __m128i nop_sse2(__m128i a, __m128i) { return a; }
 
-static inline __m128i and_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
+static MT_FORCEINLINE __m128i and_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
     return _mm_and_si128(a, b); 
 }
 
-static inline __m128i or_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
+static MT_FORCEINLINE __m128i or_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
     return _mm_or_si128(a, b); 
 }
 
-static inline __m128i andn_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
+static MT_FORCEINLINE __m128i andn_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
     return _mm_andnot_si128(a, b); 
 }
 
-static inline __m128i xor_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
+static MT_FORCEINLINE __m128i xor_sse2_op(const __m128i &a, const __m128i &b, const __m128i&, const __m128i&) { 
     return _mm_xor_si128(a, b); 
 }
 
 template <decltype(add_sse2) opa, decltype(add_sse2) opb>
-static inline __m128i min_t_sse2(const __m128i &a, const __m128i &b, const __m128i& th1, const __m128i& th2) { 
+static MT_FORCEINLINE __m128i min_t_sse2(const __m128i &a, const __m128i &b, const __m128i& th1, const __m128i& th2) { 
     return _mm_min_epu8(opa(a, th1), opb(b, th2));
 }
 
 template <decltype(add_sse2) opa, decltype(add_sse2) opb>
-static inline __m128i max_t_sse2(const __m128i &a, const __m128i &b, const __m128i& th1, const __m128i& th2) { 
+static MT_FORCEINLINE __m128i max_t_sse2(const __m128i &a, const __m128i &b, const __m128i& th1, const __m128i& th2) { 
     return _mm_max_epu8(opa(a, th1), opb(b, th2));
 }
 

@@ -3,7 +3,8 @@
 #include "../filters/binarize/binarize8.h"
 #include "../filters/binarize/binarize16.h"
 #include "../filters/invert/invert.h"
-#include "../filters/logic/logic.h"
+#include "../filters/logic/logic8.h"
+#include "../filters/logic/logic16.h"
 #include "../filters/merge/merge8.h"
 #include "../filters/merge/merge16.h"
 #include "../filters/convolution/convolution.h"
@@ -67,6 +68,7 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScri
    Avisynth2x::Filter<Merge8::Merge>::create( env );
    Avisynth2x::Filter<Merge16::Merge16>::create( env );
    Avisynth2x::Filter<Logic::Logic>::create( env );
+   Avisynth2x::Filter<Logic16::Logic16>::create( env );
    Avisynth2x::Filter<Convolution::Convolution>::create( env );
    Avisynth2x::Filter<Blur::MappedBlur>::create( env );
    Avisynth2x::Filter<Gradient::Gradient>::create( env );

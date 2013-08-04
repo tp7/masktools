@@ -177,9 +177,6 @@
     <ClInclude Include="..\filters\invert\invert.h">
       <Filter>filters\invert</Filter>
     </ClInclude>
-    <ClInclude Include="..\filters\logic\logic.h">
-      <Filter>filters\logic</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\support\adddiff\adddiff.h">
       <Filter>filters\support\adddiff</Filter>
     </ClInclude>
@@ -276,6 +273,12 @@
     <ClInclude Include="..\filters\binarize\binarize16.h">
       <Filter>filters\binarize</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\logic\logic8.h">
+      <Filter>filters\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\logic\logic16.h">
+      <Filter>filters\logic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -301,9 +304,6 @@
     </ClCompile>
     <ClCompile Include="..\filters\invert\invert.cpp">
       <Filter>filters\invert</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\logic\logic.cpp">
-      <Filter>filters\logic</Filter>
     </ClCompile>
     <ClCompile Include="..\filters\support\average\average.cpp">
       <Filter>filters\support\average</Filter>
@@ -388,6 +388,12 @@
     </ClCompile>
     <ClCompile Include="..\filters\binarize\binarize16.cpp">
       <Filter>filters\binarize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\logic\logic8.cpp">
+      <Filter>filters\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\logic\logic16.cpp">
+      <Filter>filters\logic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
