@@ -1,6 +1,7 @@
 //#include "wrapper.h"
 
-#include "../filters/binarize/binarize.h"
+#include "../filters/binarize/binarize8.h"
+#include "../filters/binarize/binarize16.h"
 #include "../filters/invert/invert.h"
 #include "../filters/logic/logic.h"
 #include "../filters/merge/merge8.h"
@@ -50,6 +51,7 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScri
 
    Avisynth2x::Filter<Invert::Invert>::create( env );
    Avisynth2x::Filter<Binarize::Binarize>::create( env );
+   Avisynth2x::Filter<Binarize16::Binarize16>::create( env );
    Avisynth2x::Filter<Morphologic::Inflate::Inflate>::create( env );
    Avisynth2x::Filter<Morphologic::Deflate::Deflate>::create( env );
    Avisynth2x::Filter<Morphologic::Inpand::Inpand>::create( env );

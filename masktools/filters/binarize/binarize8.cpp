@@ -1,4 +1,4 @@
-#include "binarize.h"
+#include "binarize8.h"
 #include "../../common/simd.h"
 
 using namespace Filtering;
@@ -36,8 +36,8 @@ static inline __m128i binarize_upper_sse2_op(__m128i x, __m128i t, __m128i) {
     return _mm_cmpeq_epi8(r, _mm_setzero_si128());
 }
 
-static inline __m128i binarize_lower_sse2_op(__m128i x, __m128i, __m128i t128) {
-    auto r = _mm_add_epi8(x, t128);
+static inline __m128i binarize_lower_sse2_op(__m128i x, __m128i t, __m128i t128) {
+    auto r = _mm_add_epi8(x, t);
     return _mm_cmpgt_epi8(r, t128);
 }
 

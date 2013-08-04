@@ -556,9 +556,10 @@
     <ClInclude Include="..\common\16bit.h" />
     <ClInclude Include="..\common\common.h" />
     <ClInclude Include="..\common\simd.h" />
+    <ClInclude Include="..\filters\binarize\binarize16.h" />
     <ClInclude Include="..\filters\blur\mappedblur.h" />
     <ClInclude Include="..\filters\invert\invert.h" />
-    <ClInclude Include="..\filters\binarize\binarize.h" />
+    <ClInclude Include="..\filters\binarize\binarize8.h" />
     <ClInclude Include="..\filters\lut\lut16\lut16.h" />
     <ClInclude Include="..\filters\merge\merge8.h" />
     <ClInclude Include="..\filters\merge\merge16.h" />
@@ -600,9 +601,10 @@
     <ClInclude Include="..\helpers\parser\spirit.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\filters\binarize\binarize16.cpp" />
     <ClCompile Include="..\filters\blur\mappedblur.cpp" />
     <ClCompile Include="..\filters\invert\invert.cpp" />
-    <ClCompile Include="..\filters\binarize\binarize.cpp" />
+    <ClCompile Include="..\filters\binarize\binarize8.cpp" />
     <ClCompile Include="..\filters\lut\lut16\lut16.cpp" />
     <ClCompile Include="..\filters\merge\merge8.cpp" />
     <ClCompile Include="..\filters\merge\merge16.cpp" />

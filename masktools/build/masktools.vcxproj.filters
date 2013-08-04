@@ -168,9 +168,6 @@
     <ClInclude Include="..\common\clip\inputconfig.h">
       <Filter>common\clip</Filter>
     </ClInclude>
-    <ClInclude Include="..\filters\binarize\binarize.h">
-      <Filter>filters\binarize</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\convolution\convolution.h">
       <Filter>filters\convolution</Filter>
     </ClInclude>
@@ -273,6 +270,12 @@
     <ClInclude Include="..\filters\support\clamp16\clamp16.h">
       <Filter>filters\support\clamp16</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\binarize\binarize8.h">
+      <Filter>filters\binarize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\binarize\binarize16.h">
+      <Filter>filters\binarize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -289,9 +292,6 @@
     </ClCompile>
     <ClCompile Include="..\common\clip\inputconfig.cpp">
       <Filter>common\clip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\filters\binarize\binarize.cpp">
-      <Filter>filters\binarize</Filter>
     </ClCompile>
     <ClCompile Include="..\filters\convolution\convolution.cpp">
       <Filter>filters\convolution</Filter>
@@ -382,6 +382,12 @@
     </ClCompile>
     <ClCompile Include="..\filters\support\clamp16\clamp16.cpp">
       <Filter>filters\support\clamp16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\binarize\binarize8.cpp">
+      <Filter>filters\binarize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\binarize\binarize16.cpp">
+      <Filter>filters\binarize</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
