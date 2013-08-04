@@ -31,6 +31,7 @@
 #include "../filters/support/average/average.h"
 #include "../filters/support/average16/average16.h"
 #include "../filters/support/clamp/clamp.h"
+#include "../filters/support/clamp16/clamp16.h"
 
 #include "../../avs2x/avs2x.h"
 #include "../helpers/avs2x/helpers_avs2x.h"
@@ -74,6 +75,7 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScri
    Avisynth2x::Filter<Support::AddDiff::AddDiff>::create( env );
    Avisynth2x::Filter<Support::AddDiff16::AddDiff16>::create( env );
    Avisynth2x::Filter<Support::Clamp::Clamp>::create( env );
+   Avisynth2x::Filter<Support::Clamp16::Clamp16>::create( env );
    Avisynth2x::Filter<Mask::Motion::MotionMask>::create( env );
    Avisynth2x::Filter<Mask::Edge::EdgeMask>::create( env );
    Avisynth2x::Filter<Mask::Hysteresis::Hysteresis>::create( env );

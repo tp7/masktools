@@ -580,6 +580,7 @@
     <ClInclude Include="..\filters\convolution\convolution.h" />
     <ClInclude Include="..\filters\support\adddiff16\adddiff16.h" />
     <ClInclude Include="..\filters\support\average16\average16.h" />
+    <ClInclude Include="..\filters\support\clamp16\clamp16.h" />
     <ClInclude Include="..\filters\support\makediff16\makediff16.h" />
     <ClInclude Include="..\filters\support\makediff\makediff.h" />
     <ClInclude Include="..\filters\support\average\average.h" />
@@ -620,6 +621,7 @@
     <ClCompile Include="..\filters\convolution\convolution.cpp" />
     <ClCompile Include="..\filters\support\adddiff16\adddiff16.cpp" />
     <ClCompile Include="..\filters\support\average16\average16.cpp" />
+    <ClCompile Include="..\filters\support\clamp16\clamp16.cpp" />
     <ClCompile Include="..\filters\support\makediff16\makediff16.cpp" />
     <ClCompile Include="..\filters\support\makediff\makediff.cpp" />
     <ClCompile Include="..\filters\support\average\average.cpp" />

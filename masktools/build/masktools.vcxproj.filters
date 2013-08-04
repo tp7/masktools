@@ -133,6 +133,9 @@
     <Filter Include="filters\support\makediff16">
       <UniqueIdentifier>{4ecbda29-8749-4ef4-9ac6-6cb6cc41d147}</UniqueIdentifier>
     </Filter>
+    <Filter Include="filters\support\clamp16">
+      <UniqueIdentifier>{514c8348-941b-466e-b57a-ff11408b6dfe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\filters\morphologic\functions.h">
@@ -267,6 +270,9 @@
     <ClInclude Include="..\filters\support\makediff16\makediff16.h">
       <Filter>filters\support\makediff16</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\support\clamp16\clamp16.h">
+      <Filter>filters\support\clamp16</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -373,6 +379,9 @@
     </ClCompile>
     <ClCompile Include="..\filters\support\makediff16\makediff16.cpp">
       <Filter>filters\support\makediff16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\support\clamp16\clamp16.cpp">
+      <Filter>filters\support\clamp16</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
