@@ -5,8 +5,8 @@ using namespace Filtering;
 
 typedef Byte (Operator)(Byte, Byte);
 
-inline Byte upper(Byte x, Byte t) { return x > t ? 0 : 255; }
-inline Byte lower(Byte x, Byte t) { return x > t ? 255 : 0; }
+inline Byte binarize_upper(Byte x, Byte t) { return x > t ? 0 : 255; }
+inline Byte binarize_lower(Byte x, Byte t) { return x > t ? 255 : 0; }
 
 inline Byte binarize_0_x(Byte x, Byte t) { return x > t ? 0 : x; }
 inline Byte binarize_t_x(Byte x, Byte t) { return x > t ? t : x; }
@@ -31,18 +31,18 @@ void binarize_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidth, in
 }
 
 /* SSE2 functions */
-static inline __m128i upper_sse2_op(__m128i x, __m128i t, __m128i) {
+static inline __m128i binarize_upper_sse2_op(__m128i x, __m128i t, __m128i) {
     auto r = _mm_subs_epu8(x, t);
     return _mm_cmpeq_epi8(r, _mm_setzero_si128());
 }
 
-static inline __m128i lower_sse2_op(__m128i x, __m128i, __m128i t128) {
+static inline __m128i binarize_lower_sse2_op(__m128i x, __m128i, __m128i t128) {
     auto r = _mm_add_epi8(x, t128);
     return _mm_cmpgt_epi8(r, t128);
 }
 
 static inline __m128i binarize_0_x_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto upper = upper_sse2_op(x, t, t128);
+    auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_and_si128(upper, x);
 }
 
@@ -51,7 +51,7 @@ static inline __m128i binarize_t_x_sse2_op(__m128i x, __m128i t, __m128i) {
 }
 
 static inline __m128i binarize_x_0_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto lower = lower_sse2_op(x, t, t128);
+    auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_and_si128(lower, x);
 }
 
@@ -60,37 +60,37 @@ static inline __m128i binarize_x_t_sse2_op(__m128i x, __m128i t, __m128i) {
 }
 
 static inline __m128i binarize_t_0_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto lower = lower_sse2_op(x, t, t128);
+    auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_and_si128(lower, t);
 }
 
 static inline __m128i binarize_0_t_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto upper = upper_sse2_op(x, t, t128);
+    auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_and_si128(upper, t);
 }
 
 static inline __m128i binarize_x_255_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto upper = upper_sse2_op(x, t, t128);
+    auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_or_si128(upper, x);
 }
 
 static inline __m128i binarize_255_x_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto lower = lower_sse2_op(x, t, t128);
+    auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_or_si128(lower, x);
 }
 
 static inline __m128i binarize_t_255_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto upper = upper_sse2_op(x, t, t128);
+    auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_or_si128(upper, t);
 }
 
 static inline __m128i binarize_255_t_sse2_op(__m128i x, __m128i t, __m128i t128) {
-    auto lower = lower_sse2_op(x, t, t128);
+    auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_or_si128(lower, t);
 }
 
 template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store, 
-    decltype(upper_sse2_op) op, decltype(upper) op_c>
+    decltype(binarize_upper_sse2_op) op, decltype(binarize_upper) op_c>
 void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidth, int nHeight)
 {
     auto t = _mm_set1_epi8(Byte(nThreshold));
@@ -118,8 +118,8 @@ void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidt
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Binarize {
 
-Processor *upper_c          = &binarize_t<upper>;
-Processor *lower_c          = &binarize_t<lower>;
+Processor *binarize_upper_c = &binarize_t<binarize_upper>;
+Processor *binarize_lower_c = &binarize_t<binarize_lower>;
 Processor *binarize_0_x_c   = &binarize_t<binarize_0_x>;
 Processor *binarize_t_x_c   = &binarize_t<binarize_t_x>;
 Processor *binarize_x_0_c   = &binarize_t<binarize_x_0>;
@@ -132,8 +132,8 @@ Processor *binarize_255_x_c = &binarize_t<binarize_255_x>;
 Processor *binarize_255_t_c = &binarize_t<binarize_255_t>;
 
 #define DEFINE_SSE2_VERSIONS(name, load, store) \
-Processor *upper_##name          = &binarize_sse2_t<load, store, upper_sse2_op, upper>; \
-Processor *lower_##name          = &binarize_sse2_t<load, store, lower_sse2_op, lower>; \
+Processor *binarize_upper_##name = &binarize_sse2_t<load, store, binarize_upper_sse2_op, binarize_upper>; \
+Processor *binarize_lower_##name = &binarize_sse2_t<load, store, binarize_lower_sse2_op, binarize_lower>; \
 Processor *binarize_0_x_##name   = &binarize_sse2_t<load, store, binarize_0_x_sse2_op, binarize_0_x>; \
 Processor *binarize_t_x_##name   = &binarize_sse2_t<load, store, binarize_t_x_sse2_op, binarize_t_x>; \
 Processor *binarize_x_0_##name   = &binarize_sse2_t<load, store, binarize_x_0_sse2_op, binarize_x_0>; \

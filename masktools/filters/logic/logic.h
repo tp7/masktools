@@ -32,7 +32,6 @@ DEFINE_NINE(max);
 
 #undef DEFINE_TRIPLE
 #undef DEFINE_NINE
-#undef DEFINE_PROCESSOR_NO_MMX
 #undef DEFINE_PROCESSOR
 
 class Logic : public MaskTools::Filter
@@ -111,7 +110,6 @@ public:
    }
 
 #undef SET_MODE
-#undef SET_MODE_NO_MMX
 
    InputConfiguration &input_configuration() const { return InPlaceTwoFrame(); }
 
