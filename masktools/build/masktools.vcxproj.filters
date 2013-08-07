@@ -279,6 +279,24 @@
     <ClInclude Include="..\filters\binarize\binarize.h">
       <Filter>filters\binarize</Filter>
     </ClInclude>
+    <ClInclude Include="..\filters\morphologic\morphologic16.h">
+      <Filter>filters\morphologic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\functions16.h">
+      <Filter>filters\morphologic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\inpand\inpand16.h">
+      <Filter>filters\morphologic\inpand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\inflate\inflate16.h">
+      <Filter>filters\morphologic\inflate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\expand\expand16.h">
+      <Filter>filters\morphologic\expand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\morphologic\deflate\deflate16.h">
+      <Filter>filters\morphologic\deflate</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\avs2x\wrapper.cpp">
@@ -394,6 +412,18 @@
     </ClCompile>
     <ClCompile Include="..\filters\binarize\binarize.cpp">
       <Filter>filters\binarize</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\inpand\inpand16.cpp">
+      <Filter>filters\morphologic\inpand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\inflate\inflate16.cpp">
+      <Filter>filters\morphologic\inflate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\expand\expand16.cpp">
+      <Filter>filters\morphologic\expand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\morphologic\deflate\deflate16.cpp">
+      <Filter>filters\morphologic\deflate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

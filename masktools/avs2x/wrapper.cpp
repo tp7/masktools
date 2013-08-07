@@ -35,6 +35,10 @@
 #include "../filters/support/average16/average16.h"
 #include "../filters/support/adddiff16/adddiff16.h"
 #include "../filters/support/makediff16/makediff16.h"
+#include "../filters/morphologic/expand/expand16.h"
+#include "../filters/morphologic/inpand/inpand16.h"
+#include "../filters/morphologic/inflate/inflate16.h"
+#include "../filters/morphologic/deflate/deflate16.h"
 #endif
 
 #include "../../avs2x/avs2x.h"
@@ -88,6 +92,10 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScri
    Avisynth2x::Filter<Support::MakeDiff16::MakeDiff16>::create( env );
    Avisynth2x::Filter<Support::AddDiff16::AddDiff16>::create( env );
    Avisynth2x::Filter<Support::Clamp16::Clamp16>::create( env );
+   Avisynth2x::Filter<Morphologic16::Inflate16::Inflate16>::create( env );
+   Avisynth2x::Filter<Morphologic16::Deflate16::Deflate16>::create( env );
+   Avisynth2x::Filter<Morphologic16::Inpand16::Inpand16>::create( env );
+   Avisynth2x::Filter<Morphologic16::Expand16::Expand16>::create( env );
 #endif
    return("MaskTools: a set of tools to work with masks");
 }

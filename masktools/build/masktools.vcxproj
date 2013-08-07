@@ -687,6 +687,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\filters\morphologic\deflate\deflate16.h" />
+    <ClInclude Include="..\filters\morphologic\expand\expand16.h" />
+    <ClInclude Include="..\filters\morphologic\functions16.h" />
+    <ClInclude Include="..\filters\morphologic\inflate\inflate16.h" />
+    <ClInclude Include="..\filters\morphologic\inpand\inpand16.h" />
     <ClInclude Include="..\filters\morphologic\morphologic.h" />
     <ClInclude Include="..\filters\morphologic\functions.h" />
     <ClInclude Include="..\filters\morphologic\expand\expand.h" />
@@ -703,6 +708,7 @@
     <ClInclude Include="..\filters\lut\lutspa\lutspa.h" />
     <ClInclude Include="..\filters\logic\logic.h" />
     <ClInclude Include="..\filters\convolution\convolution.h" />
+    <ClInclude Include="..\filters\morphologic\morphologic16.h" />
     <ClInclude Include="..\filters\support\adddiff16\adddiff16.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs26|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">true</ExcludedFromBuild>
@@ -781,7 +787,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs25|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release-avs26|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\filters\morphologic\deflate\deflate16.cpp" />
     <ClCompile Include="..\filters\morphologic\expand\expand.cpp" />
+    <ClCompile Include="..\filters\morphologic\expand\expand16.cpp" />
+    <ClCompile Include="..\filters\morphologic\inflate\inflate16.cpp" />
     <ClCompile Include="..\filters\morphologic\inpand\inpand.cpp" />
     <ClCompile Include="..\filters\morphologic\inflate\inflate.cpp" />
     <ClCompile Include="..\filters\morphologic\deflate\deflate.cpp" />
@@ -794,6 +803,7 @@
     <ClCompile Include="..\filters\lut\lutspa\lutspa.cpp" />
     <ClCompile Include="..\filters\logic\logic.cpp" />
     <ClCompile Include="..\filters\convolution\convolution.cpp" />
+    <ClCompile Include="..\filters\morphologic\inpand\inpand16.cpp" />
     <ClCompile Include="..\filters\support\adddiff16\adddiff16.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs26|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug-avs25|Win32'">true</ExcludedFromBuild>
