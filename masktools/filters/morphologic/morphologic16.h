@@ -6,7 +6,8 @@
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic16 {
 
-typedef void (Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight);
+typedef void (StackedProcessor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight);
+typedef void (InterleavedProcessor)(Word *pDst, ptrdiff_t nDstPitch, const Word *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight);
 
 class MorphologicFilter16 : public MaskTools::Filter
 {
@@ -17,13 +18,17 @@ class MorphologicFilter16 : public MaskTools::Filter
 
 protected:
 
-   ProcessorList<Processor> processors;
+   ProcessorList<StackedProcessor> stackedProcessors;
+   ProcessorList<InterleavedProcessor> interleavedProcessors;
 
    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
    {
       UNUSED(n);
-      int height = parameters["stacked"].toBool() ? dst.height() / 2 : dst.height();
-      processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), nMaxDeviations[nPlane], pCoordinates, nCoordinates, dst.width(), height );
+      if (parameters["stacked"].toBool()) {
+          stackedProcessors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), nMaxDeviations[nPlane], pCoordinates, nCoordinates, dst.width(), dst.height() / 2 );
+      } else {
+          interleavedProcessors.best_processor( constraints[nPlane] )( reinterpret_cast<Word*>((Byte*)dst), dst.pitch() / 2, reinterpret_cast<const Word*>((const Byte*)(frames[0].plane(nPlane))), frames[0].plane(nPlane).pitch() / 2, nMaxDeviations[nPlane], pCoordinates, nCoordinates, dst.width() / 2, dst.height() );
+      }
    }
 
    void FillCoordinates(const String &coordinates)

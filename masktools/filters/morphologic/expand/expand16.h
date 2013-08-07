@@ -6,11 +6,17 @@
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic16 { namespace Expand16 {
 
 
-extern Processor *expand_square_stacked_c;
-extern Processor *expand_horizontal_stacked_c;
-extern Processor *expand_vertical_stacked_c;
-extern Processor *expand_both_stacked_c;
-extern Processor *expand_custom_stacked_c;
+extern StackedProcessor *expand_square_stacked_c;
+extern StackedProcessor *expand_horizontal_stacked_c;
+extern StackedProcessor *expand_vertical_stacked_c;
+extern StackedProcessor *expand_both_stacked_c;
+extern StackedProcessor *expand_custom_stacked_c;
+
+extern InterleavedProcessor *expand_square_interleaved_c;
+extern InterleavedProcessor *expand_horizontal_interleaved_c;
+extern InterleavedProcessor *expand_vertical_interleaved_c;
+extern InterleavedProcessor *expand_both_interleaved_c;
+extern InterleavedProcessor *expand_custom_interleaved_c;
 
 class Expand16 : public Morphologic16::MorphologicFilter16
 {
@@ -21,27 +27,47 @@ public:
             /* add the processors */
             if ( parameters["mode"].toString() == "square" )
             {
-                processors.push_back(Filtering::Processor<Processor>(expand_square_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+                stackedProcessors.push_back(Filtering::Processor<StackedProcessor>(expand_square_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
             }
             else if ( parameters["mode"].toString() == "horizontal" )
             {
-                processors.push_back(Filtering::Processor<Processor>(expand_horizontal_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+                stackedProcessors.push_back(Filtering::Processor<StackedProcessor>(expand_horizontal_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
             }
             else if ( parameters["mode"].toString() == "vertical" )
             {
-                processors.push_back(Filtering::Processor<Processor>(expand_vertical_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+                stackedProcessors.push_back(Filtering::Processor<StackedProcessor>(expand_vertical_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
             }
             else if ( parameters["mode"].toString() == "both" )
             {
-                processors.push_back(Filtering::Processor<Processor>(expand_both_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+                stackedProcessors.push_back(Filtering::Processor<StackedProcessor>(expand_both_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
             }
             else
             {
-                processors.push_back(Filtering::Processor<Processor>(expand_custom_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+                stackedProcessors.push_back(Filtering::Processor<StackedProcessor>(expand_custom_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
                 FillCoordinates( parameters["mode"].toString() );
             }
         } else {
-            error = "mt_expand16 doesn't support interleaved input yet";
+            if ( parameters["mode"].toString() == "square" )
+            {
+                interleavedProcessors.push_back(Filtering::Processor<InterleavedProcessor>(expand_square_interleaved_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+            }
+            else if ( parameters["mode"].toString() == "horizontal" )
+            {
+                interleavedProcessors.push_back(Filtering::Processor<InterleavedProcessor>(expand_horizontal_interleaved_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+            }
+            else if ( parameters["mode"].toString() == "vertical" )
+            {
+                interleavedProcessors.push_back(Filtering::Processor<InterleavedProcessor>(expand_vertical_interleaved_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+            }
+            else if ( parameters["mode"].toString() == "both" )
+            {
+                interleavedProcessors.push_back(Filtering::Processor<InterleavedProcessor>(expand_both_interleaved_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+            }
+            else
+            {
+                interleavedProcessors.push_back(Filtering::Processor<InterleavedProcessor>(expand_custom_interleaved_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+                FillCoordinates( parameters["mode"].toString() );
+            }
         }
     }
 

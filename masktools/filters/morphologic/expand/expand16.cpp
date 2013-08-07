@@ -75,31 +75,56 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Morpho
     };
 
 
-Processor *expand_square_stacked_c = &generic_c<Byte,
+StackedProcessor *expand_square_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, maximumThresholded<::maximum_square>>,
     process_line_morpho_stacked_c<Border::None, maximumThresholded<::maximum_square>>,
     process_line_morpho_stacked_c<Border::Right, maximumThresholded<::maximum_square>>
     >;
 
-Processor *expand_horizontal_stacked_c = &generic_c<Byte,
+StackedProcessor *expand_horizontal_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, maximumThresholded<::maximum_horizontal>>,
     process_line_morpho_stacked_c<Border::None, maximumThresholded<::maximum_horizontal>>,
     process_line_morpho_stacked_c<Border::Right, maximumThresholded<::maximum_horizontal>>
     >;
 
-Processor *expand_vertical_stacked_c = &generic_c<Byte,
+StackedProcessor *expand_vertical_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, maximumThresholded<::maximum_vertical>>,
     process_line_morpho_stacked_c<Border::None, maximumThresholded<::maximum_vertical>>,
     process_line_morpho_stacked_c<Border::Right, maximumThresholded<::maximum_vertical>>
     >;
 
-Processor *expand_both_stacked_c = &generic_c<Byte,
+StackedProcessor *expand_both_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, maximumThresholded<::maximum_both>>,
     process_line_morpho_stacked_c<Border::None, maximumThresholded<::maximum_both>>,
     process_line_morpho_stacked_c<Border::Right, maximumThresholded<::maximum_both>>
     >;
 
+InterleavedProcessor *expand_square_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, maximumThresholded<::maximum_square>>,
+    process_line_morpho_interleaved_c<Border::None, maximumThresholded<::maximum_square>>,
+    process_line_morpho_interleaved_c<Border::Right, maximumThresholded<::maximum_square>>
+    >;
 
-Processor *expand_custom_stacked_c       = &generic_custom_stacked_c<NewValue>;
+InterleavedProcessor *expand_horizontal_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, maximumThresholded<::maximum_horizontal>>,
+    process_line_morpho_interleaved_c<Border::None, maximumThresholded<::maximum_horizontal>>,
+    process_line_morpho_interleaved_c<Border::Right, maximumThresholded<::maximum_horizontal>>
+    >;
+
+InterleavedProcessor *expand_vertical_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, maximumThresholded<::maximum_vertical>>,
+    process_line_morpho_interleaved_c<Border::None, maximumThresholded<::maximum_vertical>>,
+    process_line_morpho_interleaved_c<Border::Right, maximumThresholded<::maximum_vertical>>
+    >;
+
+InterleavedProcessor *expand_both_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, maximumThresholded<::maximum_both>>,
+    process_line_morpho_interleaved_c<Border::None, maximumThresholded<::maximum_both>>,
+    process_line_morpho_interleaved_c<Border::Right, maximumThresholded<::maximum_both>>
+    >;
+
+
+StackedProcessor *expand_custom_stacked_c       = &generic_custom_stacked_c<NewValue>;
+InterleavedProcessor *expand_custom_interleaved_c   = &generic_custom_interleaved_c<NewValue>;
 
 } } } } }

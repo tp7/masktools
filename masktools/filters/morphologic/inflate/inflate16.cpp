@@ -21,11 +21,16 @@ static inline Word meanMaxThresholded(Word a1, Word a2, Word a3, Word a4, Word a
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic16 { namespace Inflate16 {
 
-Processor *inflate_stacked_c = &generic_c<
-    Byte,
+StackedProcessor *inflate_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, meanMaxThresholded>,
     process_line_morpho_stacked_c<Border::None, meanMaxThresholded>,
     process_line_morpho_stacked_c<Border::Right, meanMaxThresholded>
+>;
+
+InterleavedProcessor *inflate_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, meanMaxThresholded>,
+    process_line_morpho_interleaved_c<Border::None, meanMaxThresholded>,
+    process_line_morpho_interleaved_c<Border::Right, meanMaxThresholded>
 >;
 
 } } } } }

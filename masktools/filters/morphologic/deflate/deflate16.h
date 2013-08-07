@@ -5,7 +5,8 @@
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic16 { namespace Deflate16 {
 
-extern Processor *deflate_stacked_c;
+extern StackedProcessor *deflate_stacked_c;
+extern InterleavedProcessor *deflate_interleaved_c;
 
 class Deflate16 : public Morphologic16::MorphologicFilter16
 {
@@ -14,9 +15,9 @@ public:
     {      
         if (parameters["stacked"].toBool()) {
             /* add the processors */
-            processors.push_back(Filtering::Processor<Processor>(deflate_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
+            stackedProcessors.push_back(Filtering::Processor<StackedProcessor>(deflate_stacked_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
         } else {
-            error = "mt_deflate16 doesn't support interleaved input yet";
+            interleavedProcessors.push_back(Filtering::Processor<InterleavedProcessor>(deflate_interleaved_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
         }
     }
 

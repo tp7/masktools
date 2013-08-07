@@ -21,12 +21,16 @@ static inline Word meanMinThresholded(Word a1, Word a2, Word a3, Word a4, Word a
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic16 { namespace Deflate16 {
 
-Processor *deflate_stacked_c = &generic_c<
-    Byte,
+StackedProcessor *deflate_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, meanMinThresholded>,
     process_line_morpho_stacked_c<Border::None, meanMinThresholded>,
     process_line_morpho_stacked_c<Border::Right, meanMinThresholded>
 >;
 
+InterleavedProcessor *deflate_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, meanMinThresholded>,
+    process_line_morpho_interleaved_c<Border::None, meanMinThresholded>,
+    process_line_morpho_interleaved_c<Border::Right, meanMinThresholded>
+>;
 
 } } } } }

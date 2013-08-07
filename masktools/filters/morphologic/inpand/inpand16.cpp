@@ -74,30 +74,56 @@ namespace Filtering { namespace MaskTools { namespace Filters { namespace Morpho
         Word finalize() const { return static_cast<Word>(nMin > 65535 ? nValue : (nValue - nMin > nMaxDeviation ? nValue - nMaxDeviation : nMin)); }
     };
 
-Processor *inpand_square_stacked_c = &generic_c<Byte,
+StackedProcessor *inpand_square_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, minimumThresholded<::minimum_square>>,
     process_line_morpho_stacked_c<Border::None, minimumThresholded<::minimum_square>>,
     process_line_morpho_stacked_c<Border::Right, minimumThresholded<::minimum_square>>
->;
+    >;
 
-Processor *inpand_horizontal_stacked_c = &generic_c<Byte,
+StackedProcessor *inpand_horizontal_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, minimumThresholded<::minimum_horizontal>>,
     process_line_morpho_stacked_c<Border::None, minimumThresholded<::minimum_horizontal>>,
     process_line_morpho_stacked_c<Border::Right, minimumThresholded<::minimum_horizontal>>
     >;
 
-Processor *inpand_vertical_stacked_c = &generic_c<Byte,
+StackedProcessor *inpand_vertical_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, minimumThresholded<::minimum_vertical>>,
     process_line_morpho_stacked_c<Border::None, minimumThresholded<::minimum_vertical>>,
     process_line_morpho_stacked_c<Border::Right, minimumThresholded<::minimum_vertical>>
     >;
 
-Processor *inpand_both_stacked_c = &generic_c<Byte,
+StackedProcessor *inpand_both_stacked_c = &MorphologicProcessor<Byte>::generic_c<
     process_line_morpho_stacked_c<Border::Left, minimumThresholded<::minimum_both>>,
     process_line_morpho_stacked_c<Border::None, minimumThresholded<::minimum_both>>,
     process_line_morpho_stacked_c<Border::Right, minimumThresholded<::minimum_both>>
     >;
 
-Processor *inpand_custom_stacked_c       = &generic_custom_stacked_c<NewValue>;
+InterleavedProcessor *inpand_square_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, minimumThresholded<::minimum_square>>,
+    process_line_morpho_interleaved_c<Border::None, minimumThresholded<::minimum_square>>,
+    process_line_morpho_interleaved_c<Border::Right, minimumThresholded<::minimum_square>>
+    >;
+
+InterleavedProcessor *inpand_horizontal_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, minimumThresholded<::minimum_horizontal>>,
+    process_line_morpho_interleaved_c<Border::None, minimumThresholded<::minimum_horizontal>>,
+    process_line_morpho_interleaved_c<Border::Right, minimumThresholded<::minimum_horizontal>>
+    >;
+
+InterleavedProcessor *inpand_vertical_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, minimumThresholded<::minimum_vertical>>,
+    process_line_morpho_interleaved_c<Border::None, minimumThresholded<::minimum_vertical>>,
+    process_line_morpho_interleaved_c<Border::Right, minimumThresholded<::minimum_vertical>>
+    >;
+
+InterleavedProcessor *inpand_both_interleaved_c = &MorphologicProcessor<Word>::generic_c<
+    process_line_morpho_interleaved_c<Border::Left, minimumThresholded<::minimum_both>>,
+    process_line_morpho_interleaved_c<Border::None, minimumThresholded<::minimum_both>>,
+    process_line_morpho_interleaved_c<Border::Right, minimumThresholded<::minimum_both>>
+    >;
+
+
+StackedProcessor *inpand_custom_stacked_c       = &generic_custom_stacked_c<NewValue>;
+InterleavedProcessor *inpand_custom_interleaved_c   = &generic_custom_interleaved_c<NewValue>;
 
 } } } } }
