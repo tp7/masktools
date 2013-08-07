@@ -1,7 +1,7 @@
-#include "merge8.h"
+#include "merge.h"
 #include "../../common/simd.h"
 
-namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge8 {
+namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge {
 
 void merge_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                                                    const Byte *pMask, ptrdiff_t nMaskPitch, int nWidth, int nHeight)

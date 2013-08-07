@@ -10,6 +10,8 @@ Global
 		debug-avs25|x64 = debug-avs25|x64
 		debug-avs26|Win32 = debug-avs26|Win32
 		debug-avs26|x64 = debug-avs26|x64
+		debug-avs26-16bit|Win32 = debug-avs26-16bit|Win32
+		debug-avs26-16bit|x64 = debug-avs26-16bit|x64
 		profile-avs26|Win32 = profile-avs26|Win32
 		profile-avs26|x64 = profile-avs26|x64
 		release-avs25|Win32 = release-avs25|Win32
@@ -26,6 +28,10 @@ Global
 		{DBFBE277-5B8D-4258-B522-13146FD1E722}.debug-avs26|Win32.Build.0 = debug-avs26|Win32
 		{DBFBE277-5B8D-4258-B522-13146FD1E722}.debug-avs26|x64.ActiveCfg = debug-avs26|x64
 		{DBFBE277-5B8D-4258-B522-13146FD1E722}.debug-avs26|x64.Build.0 = debug-avs26|x64
+		{DBFBE277-5B8D-4258-B522-13146FD1E722}.debug-avs26-16bit|Win32.ActiveCfg = debug-avs26-16bit|Win32
+		{DBFBE277-5B8D-4258-B522-13146FD1E722}.debug-avs26-16bit|Win32.Build.0 = debug-avs26-16bit|Win32
+		{DBFBE277-5B8D-4258-B522-13146FD1E722}.debug-avs26-16bit|x64.ActiveCfg = debug-avs26-16bit|x64
+		{DBFBE277-5B8D-4258-B522-13146FD1E722}.debug-avs26-16bit|x64.Build.0 = debug-avs26-16bit|x64
 		{DBFBE277-5B8D-4258-B522-13146FD1E722}.profile-avs26|Win32.ActiveCfg = profile-avs26|Win32
 		{DBFBE277-5B8D-4258-B522-13146FD1E722}.profile-avs26|Win32.Build.0 = profile-avs26|Win32
 		{DBFBE277-5B8D-4258-B522-13146FD1E722}.profile-avs26|x64.ActiveCfg = profile-avs26|x64
@@ -46,6 +52,10 @@ Global
 		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.debug-avs26|Win32.Build.0 = debug-avs26|Win32
 		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.debug-avs26|x64.ActiveCfg = debug-avs26|x64
 		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.debug-avs26|x64.Build.0 = debug-avs26|x64
+		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.debug-avs26-16bit|Win32.ActiveCfg = debug-avs26-16bit|Win32
+		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.debug-avs26-16bit|Win32.Build.0 = debug-avs26-16bit|Win32
+		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.debug-avs26-16bit|x64.ActiveCfg = debug-avs26-16bit|x64
+		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.debug-avs26-16bit|x64.Build.0 = debug-avs26-16bit|x64
 		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.profile-avs26|Win32.ActiveCfg = profile-avs26|Win32
 		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.profile-avs26|Win32.Build.0 = profile-avs26|Win32
 		{185396D8-57BD-4DDF-8CD3-26035EA50DB9}.profile-avs26|x64.ActiveCfg = profile-avs26|x64

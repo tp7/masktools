@@ -1,4 +1,4 @@
-#include "binarize8.h"
+#include "binarize.h"
 #include "../../common/simd.h"
 
 using namespace Filtering;

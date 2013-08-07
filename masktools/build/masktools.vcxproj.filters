@@ -246,9 +246,6 @@
     <ClInclude Include="..\filters\merge\merge16.h">
       <Filter>filters\merge</Filter>
     </ClInclude>
-    <ClInclude Include="..\filters\merge\merge8.h">
-      <Filter>filters\merge</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\support\average16\average16.h">
       <Filter>filters\support\average16</Filter>
     </ClInclude>
@@ -267,17 +264,20 @@
     <ClInclude Include="..\filters\support\clamp16\clamp16.h">
       <Filter>filters\support\clamp16</Filter>
     </ClInclude>
-    <ClInclude Include="..\filters\binarize\binarize8.h">
-      <Filter>filters\binarize</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\binarize\binarize16.h">
       <Filter>filters\binarize</Filter>
     </ClInclude>
-    <ClInclude Include="..\filters\logic\logic8.h">
-      <Filter>filters\logic</Filter>
-    </ClInclude>
     <ClInclude Include="..\filters\logic\logic16.h">
       <Filter>filters\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\logic\logic.h">
+      <Filter>filters\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\merge\merge.h">
+      <Filter>filters\merge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filters\binarize\binarize.h">
+      <Filter>filters\binarize</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -368,9 +368,6 @@
     <ClCompile Include="..\filters\merge\merge16.cpp">
       <Filter>filters\merge</Filter>
     </ClCompile>
-    <ClCompile Include="..\filters\merge\merge8.cpp">
-      <Filter>filters\merge</Filter>
-    </ClCompile>
     <ClCompile Include="..\filters\support\average16\average16.cpp">
       <Filter>filters\support\average16</Filter>
     </ClCompile>
@@ -383,17 +380,20 @@
     <ClCompile Include="..\filters\support\clamp16\clamp16.cpp">
       <Filter>filters\support\clamp16</Filter>
     </ClCompile>
-    <ClCompile Include="..\filters\binarize\binarize8.cpp">
-      <Filter>filters\binarize</Filter>
-    </ClCompile>
     <ClCompile Include="..\filters\binarize\binarize16.cpp">
       <Filter>filters\binarize</Filter>
     </ClCompile>
-    <ClCompile Include="..\filters\logic\logic8.cpp">
-      <Filter>filters\logic</Filter>
-    </ClCompile>
     <ClCompile Include="..\filters\logic\logic16.cpp">
       <Filter>filters\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\logic\logic.cpp">
+      <Filter>filters\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\merge\merge.cpp">
+      <Filter>filters\merge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filters\binarize\binarize.cpp">
+      <Filter>filters\binarize</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

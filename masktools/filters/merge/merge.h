@@ -3,7 +3,7 @@
 
 #include "../../common/base/filter.h"
 
-namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge8 {
+namespace Filtering { namespace MaskTools { namespace Filters { namespace Merge {
 
 typedef void(Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                         const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight);

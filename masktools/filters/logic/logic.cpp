@@ -1,4 +1,4 @@
-#include "logic8.h"
+#include "logic.h"
 #include "../../common/simd.h"
 
 using namespace Filtering;
