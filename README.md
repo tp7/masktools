@@ -4,7 +4,7 @@ This is a repo for my games with MaskTools 2. Most important changes are listed 
 
 Current roadmap is pretty simple:
 * Add AVX2 support to most filters. It might speedup luts quite a lot and luts are important.
-* Consider adding multithreading support. All commonly used filters are optimized to the extend where multithreading might not help at all, so this feature might not get implemented.
+* Consider adding multithreading support. All commonly used filters are optimized to the extent where multithreading might not help at all, so this feature might not get implemented.
 * Consider adding high bitdepth support. This is complex and time-consuming, but might simplify dither package a lot.
 
 Feel free to create an issue here or contact me on irc (tp7 on _freenode_ or _rizon_) if you want anything implemented or have some interesting ideas.
