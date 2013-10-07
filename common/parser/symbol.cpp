@@ -205,29 +205,40 @@ double Context::compute(double x, double y, double z)
 
 String Context::rec_infix()
 {
-   const Symbol &s = pSymbols[--nPos];
+    const Symbol &s = pSymbols[--nPos];
 
-   switch ( s.type )
-   {
-   case Symbol::VARIABLE_X: 
-   case Symbol::VARIABLE_Y: 
-   case Symbol::VARIABLE_Z: 
-   case Symbol::NUMBER: return s.value;
-   case Symbol::FUNCTION:
-      if (s.nParameter == 1)
-         return s.value + "(" + rec_infix() + ")";
-      else if (s.nParameter == 2)
-         return s.value + "(" + rec_infix() + "," + rec_infix() + ")";
-      else
-         return s.value + "(" + rec_infix() + "," + rec_infix() + "," + rec_infix() + ")";
-   case Symbol::OPERATOR:
-      return "(" + rec_infix() + s.value + rec_infix() + ")";
-   case Symbol::TERNARY:
-      return "((" + rec_infix() + ") ? " + rec_infix() + " : " + rec_infix() + ")";
-   default:
-      assert(0);
-      return "";
-   }
+    switch ( s.type )
+    {
+    case Symbol::VARIABLE_X: 
+    case Symbol::VARIABLE_Y: 
+    case Symbol::VARIABLE_Z: 
+    case Symbol::NUMBER: return s.value;
+    case Symbol::FUNCTION:
+        if (s.nParameter == 1) {
+            return s.value + "(" + rec_infix() + ")";
+        } else if (s.nParameter == 2) {
+            auto op2 = rec_infix();
+            return s.value + "(" + rec_infix() + "," + op2 + ")";
+        } else {
+            auto op3 = rec_infix();
+            auto op2 = rec_infix();
+            return s.value + "(" + rec_infix() + "," + op2 + "," + op3 + ")";
+        }
+    case Symbol::OPERATOR:
+        {
+            auto op2 = rec_infix();
+            return "(" + rec_infix() + s.value + op2 + ")";
+        }
+    case Symbol::TERNARY:
+        {
+            auto op3 = rec_infix();
+            auto op2 = rec_infix();
+            return "((" + rec_infix() + ") ? " + op2 + " : " + op3 + ")";
+        }
+    default:
+        assert(0);
+        return "";
+    }
 }
 
 String Context::infix()
