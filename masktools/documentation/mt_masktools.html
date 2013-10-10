@@ -8,7 +8,7 @@ $Id: masktools.htm,v 1.1.1.1 2004/02/18 20:54:58 warpenterprises Exp $
 <h1>MaskTools v2</h1>
 <h2>Abstract</h2>
 <b>Authors : </b>Kurosu, Manao, mg262<br>
-<b>Version : </b>2.0 alpha 43<br>
+<b>Version : </b>2.0 alpha 48<br>
 <b>Download : </b><a href="http://manao4.free.fr/">http://manao4.free.fr/</a><br>
 <b>Category : </b>Misc Plugins<br>
 <b>Requirements : </b>YV12 Colorspace
@@ -235,7 +235,7 @@ defined by the expressions to all the pixels of <var>clip2</var> ( which are map
 <li><b>"range"</b> : computes "max" - "min".</li>
 <li><b>"med"</b> or <b>"median"</b> : computes the median of the values.</li>
 </ul></li>
-<li>A possible use is to allow increase the dynamic adaptively : <code>mt_lutf(c, c, mode = "range", expr = "y 128 - 256 * range / 128 +")</code></li>
+<li>A possible use is to allow increase the dynamic adaptively : <code>mt_lutf(c, c, mode = "range", expr = "y 128 - 256 * x / 128 +")</code></li>
 </ul></p>
 <h3><a name="mt_luts"></a>mt_luts</h3>
 <p><code>mt_luts</code> : <var>clip clip1, clip clip2, string mode("avg"), string pixels(""), string expr("x"), string yexpr("x"), string uexpr("x"), string vexpr("x")</var></p>
