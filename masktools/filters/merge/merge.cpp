@@ -133,7 +133,7 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
         pMask += nSrc2Pitch * 2;
     }
     if (nWidth > wMod16) {
-        merge_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, mPask_s + wMod16*2, nSrc2Pitch, nWidth-wMod16, nHeight);
+        merge_luma_420_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, mPask_s + wMod16*2, nSrc2Pitch, nWidth-wMod16, nHeight);
     }
 }
 
