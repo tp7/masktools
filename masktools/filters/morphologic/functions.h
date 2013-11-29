@@ -150,67 +150,52 @@ static MT_FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, c
 
 
 template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
-static MT_FORCEINLINE void process_block_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation) {
-    __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
-
-    if (directions == Directions::Square) {
-        up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp);
-        up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp);
-        down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn);
-        down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn);
-    }
-
-    if (directions & Directions::Vertical) {
-        up_center = load(reinterpret_cast<const __m128i*>(pSrcp));
-        down_center = load(reinterpret_cast<const __m128i*>(pSrcn));
-    }
-
-    if (directions & Directions::Horizontal) {
-        middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc);
-        middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc);
-    }
-
-    __m128i acc;
-    if (directions == Directions::Square) {
-        acc = op(up_left, up_center);
-        acc = op(acc, up_right);
-        acc = op(acc, middle_left);
-        acc = op(acc, middle_right);
-        acc = op(acc, down_left);
-        acc = op(acc, down_center);
-        acc = op(acc, down_right);
-    } else if (directions == Directions::Horizontal) {
-        acc = op(middle_left, middle_right);
-    } else if (directions == Directions::Vertical) {
-        acc = op(up_center, down_center); 
-    } else  if (directions == Directions::Both) {
-        acc = op(up_center, middle_left);
-        acc = op(acc, middle_right); 
-        acc = op(acc, down_center); 
-    }
-
-    auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc));
-
-    auto result = limit(middle_center, acc, maxDeviation);
-    store(reinterpret_cast<__m128i*>(pDst), result);
-}
-
-
-template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limit, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
 static MT_FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
-    if (width <= 16) {
-        process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst, pSrcp, pSrc, pSrcn, maxDeviation);
-        return;
-    }
-    int x;
-    for (x = 0; x < width; x+=16) {
-        process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst+x, pSrcp+x, pSrc+x, pSrcn+x, maxDeviation);
-    }
-    if ((x - 16) < width) {
-        process_block_xxpand<directions, borderMode, op, limit, load, store>(pDst+x-16, pSrcp+x-16, pSrc+x-16, pSrcn+x-16, maxDeviation);
+    for (int x = 0; x < width; x += 16) {
+        __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
+
+        if (directions == Directions::Square) {
+            up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+            up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+            down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+            down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        }
+
+        if (directions & Directions::Vertical) {
+            up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+            down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        }
+
+        if (directions & Directions::Horizontal) {
+            middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+            middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        }
+
+        __m128i acc;
+        if (directions == Directions::Square) {
+            acc = op(up_left, up_center);
+            acc = op(acc, up_right);
+            acc = op(acc, middle_left);
+            acc = op(acc, middle_right);
+            acc = op(acc, down_left);
+            acc = op(acc, down_center);
+            acc = op(acc, down_right);
+        } else if (directions == Directions::Horizontal) {
+            acc = op(middle_left, middle_right);
+        } else if (directions == Directions::Vertical) {
+            acc = op(up_center, down_center);
+        } else  if (directions == Directions::Both) {
+            acc = op(up_center, middle_left);
+            acc = op(acc, middle_right);
+            acc = op(acc, down_center);
+        }
+
+        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
+
+        auto result = limit(middle_center, acc, maxDeviation);
+        store(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
-
 
 template<ProcessLineSse2 process_line_left, ProcessLineSse2 process_line, ProcessLineSse2 process_line_right>
 static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight) {
@@ -219,11 +204,11 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
 
     UNUSED(nCoordinates); UNUSED(pCoordinates);
     auto max_dev_v = _mm_set1_epi8(Byte(nMaxDeviation));
-    int sse2_width = (nWidth - 1 - 16) / 16 * 16 + 16;
+    int mod16_width = (nWidth - 1 - 16) / 16 * 16 + 16;
     /* top-left */
     process_line_left(pDst, pSrc, pSrc, pSrcn, max_dev_v, 16);
     /* top */
-    process_line(pDst + 16, pSrc+16, pSrc+16, pSrcn+16, max_dev_v, sse2_width - 16);
+    process_line(pDst + 16, pSrc+16, pSrc+16, pSrcn+16, max_dev_v, mod16_width - 16);
 
     /* top-right */
     process_line_right(pDst + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, max_dev_v, 16);
@@ -238,7 +223,7 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
         /* left */
         process_line_left(pDst, pSrcp, pSrc, pSrcn, max_dev_v, 16);
         /* center */
-        process_line(pDst + 16, pSrcp+16, pSrc+16, pSrcn+16, max_dev_v, sse2_width - 16);
+        process_line(pDst + 16, pSrcp+16, pSrc+16, pSrcn+16, max_dev_v, mod16_width - 16);
         /* right */
         process_line_right(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrcn + nWidth - 16, max_dev_v, 16);
 
@@ -251,7 +236,7 @@ static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
     /* bottom-left */
     process_line_left(pDst, pSrcp, pSrc, pSrc, max_dev_v, 16);
     /* bottom */
-    process_line(pDst + 16, pSrcp+16, pSrc+16, pSrc+16, max_dev_v, sse2_width - 16);
+    process_line(pDst + 16, pSrcp+16, pSrc+16, pSrc+16, max_dev_v, mod16_width - 16);
     /* bottom-right */
     process_line_right(pDst + nWidth - 16, pSrcp + nWidth - 16, pSrc + nWidth - 16, pSrc + nWidth - 16, max_dev_v, 16);
 }
