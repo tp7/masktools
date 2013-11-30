@@ -84,16 +84,16 @@ template<Border borderMode, Limit limit, decltype(simd_load_epi128) load, declty
 static MT_FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     auto zero = _mm_setzero_si128();
     for ( int x = 0; x < width; x+=16 ) {
-        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp + x));
-        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
         
-        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
         
-        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn + x));
-        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -155,10 +155,10 @@ static MT_FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, co
         __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
 
         if (directions == Directions::Square) {
-            up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
-            up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
-            down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
-            down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+            up_left = load_one_to_left<borderMode, load>(pSrcp+x);
+            up_right = load_one_to_right<borderMode, load>(pSrcp+x);
+            down_left = load_one_to_left<borderMode, load>(pSrcn+x);
+            down_right = load_one_to_right<borderMode, load>(pSrcn+x);
         }
 
         if (directions & Directions::Vertical) {
@@ -167,8 +167,8 @@ static MT_FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, co
         }
 
         if (directions & Directions::Horizontal) {
-            middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
-            middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+            middle_left = load_one_to_left<borderMode, load>(pSrc+x);
+            middle_right = load_one_to_right<borderMode, load>(pSrc+x);
         }
 
         __m128i acc;

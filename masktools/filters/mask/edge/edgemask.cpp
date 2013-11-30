@@ -161,17 +161,17 @@ static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte 
     auto divisor = _mm_set_epi32(0, 0, 0, simd_bit_scan_forward(matrix[9]));
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
         auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -248,8 +248,8 @@ static MT_FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp
     for (int x = 0; x < width; x+=16) {
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
 
-        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
 
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
 
@@ -293,7 +293,7 @@ static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSr
 
     for (int x = 0; x < width; x+=16) {
         auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
 
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
 
@@ -333,17 +333,17 @@ static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSr
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
         auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -410,17 +410,17 @@ static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrc
     auto v128 = _mm_set1_epi8(Byte(0x80));
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
         auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
 
         auto maxv = _mm_max_epu8(middle_right, up_right);
         maxv = _mm_max_epu8(maxv, down_center);
@@ -455,7 +455,7 @@ static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSr
 
     for (int x = 0; x < width; x+=16) {
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
         auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
         
         auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
@@ -490,16 +490,16 @@ static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSr
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -578,16 +578,16 @@ static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode == Border::Left, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
         auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode == Border::Right, load>(pSrcp+x);
+        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode == Border::Left, load>(pSrc+x);
-        auto middle_right = load_one_to_right<borderMode == Border::Right, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode == Border::Left, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
         auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode == Border::Right, load>(pSrcn+x);
+        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);

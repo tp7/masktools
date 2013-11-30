@@ -69,9 +69,9 @@ enum class Border {
 
 #pragma warning(disable: 4309)
 
-template<bool isBorder, decltype(simd_load_epi128) load>
+template<Border border_mode, decltype(simd_load_epi128) load>
 static MT_FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
-    if (isBorder) {
+    if (border_mode == Border::Left) {
         auto mask_left = _mm_setr_epi8(0xFF, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00);
         auto val = load(reinterpret_cast<const __m128i*>(ptr));
         return _mm_or_si128(_mm_slli_si128(val, 1), _mm_and_si128(val, mask_left));
@@ -80,9 +80,9 @@ static MT_FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
     }
 }
 
-template<bool isBorder, decltype(simd_load_epi128) load>
+template<Border border_mode, decltype(simd_load_epi128) load>
 static MT_FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
-    if (isBorder) {
+    if (border_mode == Border::Right) {
         auto mask_right = _mm_setr_epi8(00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0xFF);
         auto val = load(reinterpret_cast<const __m128i*>(ptr));
         return _mm_or_si128(_mm_srli_si128(val, 1), _mm_and_si128(val, mask_right));
