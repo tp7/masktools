@@ -81,16 +81,16 @@ template<MemoryMode mem_mode, decltype(and_sse2_op) op, decltype(and) op_c>
             _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+384, _MM_HINT_T0);
             _mm_prefetch(reinterpret_cast<const char*>(pSrc)+i+384, _MM_HINT_T0);
 
-            auto dst  = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
-            auto dst2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i+16));
-            auto src  = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i));
-            auto src2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i+16));
+            auto dst = simd_load_epi128<mem_mode>(pDst+i);
+            auto dst2 = simd_load_epi128<mem_mode>(pDst+i+16);
+            auto src = simd_load_epi128<mem_mode>(pSrc+i);
+            auto src2 = simd_load_epi128<mem_mode>(pSrc+i+16);
 
             auto result = op(dst, src, tDest, tSource);
             auto result2 = op(dst2, src2, tDest, tSource);
 
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i+16), result2);
+            simd_store_epi128<mem_mode>(pDst+i, result);
+            simd_store_epi128<mem_mode>(pDst+i+16, result2);
         }
         pDst += nDstPitch;
         pSrc += nSrcPitch;

@@ -100,12 +100,12 @@ void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidt
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod32; i+=32 ) {
             _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+320, _MM_HINT_T0);
-            auto src = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
-            auto src2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i+16));
+            auto src = simd_load_epi128<mem_mode>(pDst+i);
+            auto src2 = simd_load_epi128<mem_mode>(pDst+i+16);
             auto result = op(src, t, t128);
             auto result2 = op(src2, t, t128);
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i+16), result2);
+            simd_store_epi128<mem_mode>(pDst+i, result);
+            simd_store_epi128<mem_mode>(pDst+i+16, result2);
         }
         pDst += nDstPitch;
     }

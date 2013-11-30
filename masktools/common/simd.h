@@ -21,8 +21,8 @@ enum class MemoryMode {
 };
 
 
-template<MemoryMode mem_mode>
-static MT_FORCEINLINE __m128i simd_load_epi128(const __m128i* ptr) {
+template<MemoryMode mem_mode, typename T>
+static MT_FORCEINLINE __m128i simd_load_epi128(const T* ptr) {
 #ifdef USE_MOVPS
     if (mem_mode == MemoryMode::SSE2_ALIGNED) {
         return _mm_castps_si128(_mm_load_ps(reinterpret_cast<const float*>(ptr)));
@@ -31,16 +31,16 @@ static MT_FORCEINLINE __m128i simd_load_epi128(const __m128i* ptr) {
     }
 #else
     if (mem_mode == MemoryMode::SSE2_ALIGNED) {
-        return _mm_load_si128(ptr);
+        return _mm_load_si128(reinterpret_cast<__m128i*>(ptr));
     } else {
-        return _mm_loadu_si128(ptr);
+        return _mm_loadu_si128(reinterpret_cast<__m128i*>(ptr));
     }
 #endif
 }
 
 
-template<MemoryMode mem_mode>
-static MT_FORCEINLINE void simd_store_epi128(__m128i *ptr, __m128i value) {
+template<MemoryMode mem_mode, typename T>
+static MT_FORCEINLINE void simd_store_epi128(T *ptr, __m128i value) {
 #ifdef USE_MOVPS
     if (mem_mode == MemoryMode::SSE2_ALIGNED) {
         _mm_store_ps(reinterpret_cast<float*>(ptr), _mm_castsi128_ps(value));
@@ -49,9 +49,9 @@ static MT_FORCEINLINE void simd_store_epi128(__m128i *ptr, __m128i value) {
     }
 #else
     if (mem_mode == MemoryMode::SSE2_ALIGNED) {
-        _mm_store_si128(ptr, value);
+        _mm_store_si128(reinterpret_cast<__m128i*>(ptr), value);
     } else {   
-        _mm_storeu_si128(ptr, value);
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(ptr), value);
     }
 #endif
 }

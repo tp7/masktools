@@ -28,18 +28,18 @@ static void clamp_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptr
 
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {
-            auto upper_limit = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc1+i));
-            auto lower_limit = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc2+i));
+            auto upper_limit = simd_load_epi128<mem_mode>(pSrc1+i);
+            auto lower_limit = simd_load_epi128<mem_mode>(pSrc2+i);
 
             upper_limit = _mm_adds_epu8(upper_limit, overshoot_v);
             lower_limit = _mm_subs_epu8(lower_limit, undershoot_v);
 
-            auto limited = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
+            auto limited = simd_load_epi128<mem_mode>(pDst+i);
 
             limited = _mm_min_epu8(limited, upper_limit);
             limited = _mm_max_epu8(limited, lower_limit);
 
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), limited);
+            simd_store_epi128<mem_mode>(pDst+i, limited);
         }
         pDst += nDstPitch;
         pSrc1 += nSrc1Pitch;

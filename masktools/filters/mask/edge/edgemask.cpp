@@ -162,15 +162,15 @@ static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte 
 
     for (int x = 0; x < width; x+=16) {
         auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
-        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(pSrcp+x);
         auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
         auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
-        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_center = simd_load_epi128<mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
         auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
-        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(pSrcn+x);
         auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
@@ -235,7 +235,7 @@ static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte 
         auto acc = _mm_packus_epi16(acc_lo, acc_hi);
         auto result = threshold_sse2(acc, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -246,12 +246,12 @@ static MT_FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(pSrcp+x);
 
         auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(pSrcn+x);
 
         auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
         auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
@@ -280,7 +280,7 @@ static MT_FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp
         auto diff = _mm_packus_epi16(diff_lo, diff_hi);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -292,10 +292,10 @@ static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSr
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_center = simd_load_epi128<mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(pSrcn+x);
 
         auto middle_center_lo = _mm_unpacklo_epi8(middle_center, zero);
         auto middle_center_hi = _mm_unpackhi_epi8(middle_center, zero);
@@ -321,7 +321,7 @@ static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSr
         auto diff = _mm_packus_epi16(diff_lo, diff_hi);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -334,15 +334,15 @@ static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSr
 
     for (int x = 0; x < width; x+=16) {
         auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
-        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(pSrcp+x);
         auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
         auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
-        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_center = simd_load_epi128<mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
         auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
-        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(pSrcn+x);
         auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
@@ -400,7 +400,7 @@ static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSr
         auto diff = _mm_packus_epi16(diff_lo, diff_hi);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -411,15 +411,15 @@ static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrc
 
     for (int x = 0; x < width; x+=16) {
         auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
-        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(pSrcp+x);
         auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
         auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
-        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_center = simd_load_epi128<mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
         auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
-        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(pSrcn+x);
         auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto maxv = _mm_max_epu8(middle_right, up_right);
@@ -443,7 +443,7 @@ static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrc
         auto diff = _mm_sub_epi8(maxv, minv);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -454,9 +454,9 @@ static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSr
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(pSrcp+x);
         auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
-        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_center = simd_load_epi128<mem_mode>(pSrc+x);
         
         auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
         auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
@@ -479,7 +479,7 @@ static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSr
         auto acc = _mm_packus_epi16(acc_lo, acc_hi);
         auto result = threshold_sse2(acc, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -491,14 +491,14 @@ static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSr
 
     for (int x = 0; x < width; x+=16) {
         auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
-        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(pSrcp+x);
         auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
         auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
         auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
-        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(pSrcn+x);
         auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
@@ -567,7 +567,7 @@ static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSr
 
         result = threshold_sse2(result, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -579,14 +579,14 @@ static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte
 
     for (int x = 0; x < width; x+=16) {
         auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
-        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(pSrcp+x);
         auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
         auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
         auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
-        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(pSrcn+x);
         auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
@@ -656,7 +656,7 @@ static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte
 
         result = threshold_sse2(result, lowThresh, highThresh, v128);
 
-        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(pDst+x, result);
     }
 }
 

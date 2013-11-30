@@ -82,7 +82,7 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
 
             auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
 
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
+            simd_store_epi128<mem_mode>(pDst+i, result);
         }
         pDst += nDstPitch;
         pSrc1 += nSrc1Pitch;
@@ -111,10 +111,10 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
             _mm_prefetch(reinterpret_cast<const char*>(pMask)+ i*2 + 64, _MM_HINT_T0);
             _mm_prefetch(reinterpret_cast<const char*>(pMask)+ nSrc2Pitch + i*2 + 64, _MM_HINT_T0);
             // preparing mask
-            auto src2_row1_t1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + i*2));
-            auto src2_row1_t2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + i*2 + 16));
-            auto src2_row2_t1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2));
-            auto src2_row2_t2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2 + 16));
+            auto src2_row1_t1 = simd_load_epi128<mem_mode>(pMask + i*2);
+            auto src2_row1_t2 = simd_load_epi128<mem_mode>(pMask + i*2 + 16);
+            auto src2_row2_t1 = simd_load_epi128<mem_mode>(pMask + nSrc2Pitch + i*2);
+            auto src2_row2_t2 = simd_load_epi128<mem_mode>(pMask + nSrc2Pitch + i*2 + 16);
             auto avg_t1 = _mm_avg_epu8(src2_row1_t1,src2_row2_t1);
             auto avg_t2 = _mm_avg_epu8(src2_row1_t2,src2_row2_t2);
             auto shifted_t1 = _mm_srli_si128(avg_t1, 1);
@@ -126,7 +126,7 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
 
             auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
           
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
+            simd_store_epi128<mem_mode>(pDst+i, result);
         }
         pDst += nDstPitch;
         pSrc1 += nSrc1Pitch;

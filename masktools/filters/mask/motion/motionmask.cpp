@@ -38,8 +38,8 @@ static unsigned int sad_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSr
     __m128i acc = _mm_setzero_si128();
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {
-            auto dst1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
-            auto src1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i));
+            auto dst1 = simd_load_epi128<mem_mode>(pDst+i);
+            auto src1 = simd_load_epi128<mem_mode>(pSrc+i);
 
             auto sad1 = _mm_sad_epu8(dst1, src1);
 
@@ -73,8 +73,8 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
 
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {
-            auto dst1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
-            auto src1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i));
+            auto dst1 = simd_load_epi128<mem_mode>(pDst+i);
+            auto src1 = simd_load_epi128<mem_mode>(pSrc+i);
 
             auto greater = _mm_subs_epu8(dst1, src1);
             auto smaller = _mm_subs_epu8(src1, dst1);
@@ -82,7 +82,7 @@ static void mask_sse2_op(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
 
             auto mask = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst + i), mask);
+            simd_store_epi128<mem_mode>(pDst + i, mask);
         }
         pDst += nDstPitch;
         pSrc += nSrcPitch;
