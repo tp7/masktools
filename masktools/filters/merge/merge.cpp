@@ -62,7 +62,7 @@ MT_FORCEINLINE __m128i merge_sse2_core(Byte *pDst, const Byte *pSrc, const __m12
     return _mm_packus_epi16(result1, result2);
 }
 
-template <decltype(simd_store_epi128) store>
+template <MemoryMode mem_mode>
 void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                                                    const Byte *pMask, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
 {
@@ -82,7 +82,7 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
 
             auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
 
-            store(reinterpret_cast<__m128i*>(pDst+i), result);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
         }
         pDst += nDstPitch;
         pSrc1 += nSrc1Pitch;
@@ -94,7 +94,7 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
     }
 }
 
-template <decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template <MemoryMode mem_mode>
 void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
                   const Byte *pMask, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight)
 {
@@ -111,10 +111,10 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
             _mm_prefetch(reinterpret_cast<const char*>(pMask)+ i*2 + 64, _MM_HINT_T0);
             _mm_prefetch(reinterpret_cast<const char*>(pMask)+ nSrc2Pitch + i*2 + 64, _MM_HINT_T0);
             // preparing mask
-            auto src2_row1_t1 = load(reinterpret_cast<const __m128i*>(pMask + i*2));
-            auto src2_row1_t2 = load(reinterpret_cast<const __m128i*>(pMask + i*2 + 16));
-            auto src2_row2_t1 = load(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2));
-            auto src2_row2_t2 = load(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2 + 16));
+            auto src2_row1_t1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + i*2));
+            auto src2_row1_t2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + i*2 + 16));
+            auto src2_row2_t1 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2));
+            auto src2_row2_t2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pMask + nSrc2Pitch + i*2 + 16));
             auto avg_t1 = _mm_avg_epu8(src2_row1_t1,src2_row2_t1);
             auto avg_t2 = _mm_avg_epu8(src2_row1_t2,src2_row2_t2);
             auto shifted_t1 = _mm_srli_si128(avg_t1, 1);
@@ -126,7 +126,7 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
 
             auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
           
-            store(reinterpret_cast<__m128i*>(pDst+i), result);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
         }
         pDst += nDstPitch;
         pSrc1 += nSrc1Pitch;
@@ -137,9 +137,9 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
     }
 }
 
-Processor *merge_sse2 = merge_sse2_t<simd_storeu_epi128>;
-Processor *merge_asse2 = merge_sse2_t<simd_store_epi128>;
-Processor *merge_luma_420_sse2 = merge_luma_420_sse2_t<simd_loadu_epi128, simd_storeu_epi128>;
-Processor *merge_luma_420_asse2 = merge_luma_420_sse2_t<simd_load_epi128, simd_store_epi128>;
+Processor *merge_sse2 = merge_sse2_t<MemoryMode::SSE2_UNALIGNED>;
+Processor *merge_asse2 = merge_sse2_t<MemoryMode::SSE2_ALIGNED>;
+Processor *merge_luma_420_sse2 = merge_luma_420_sse2_t<MemoryMode::SSE2_UNALIGNED>;
+Processor *merge_luma_420_asse2 = merge_luma_420_sse2_t<MemoryMode::SSE2_ALIGNED>;
 
 } } } }

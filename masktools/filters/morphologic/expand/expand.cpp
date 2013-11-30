@@ -83,21 +83,21 @@ Processor *expand_both_c         = &generic_c<maximumThresholded<::maximum_both>
 Processor *expand_horizontal_c   = &generic_c<maximumThresholded<::maximum_horizontal> >;
 Processor *expand_vertical_c     = &generic_c<maximumThresholded<::maximum_vertical> >;
 
-#define DEFINE_SSE2_DIRECTION_VERSION(direction, enum_val, name, load, store) \
+#define DEFINE_SSE2_DIRECTION_VERSION(direction, enum_val, name, mem_mode) \
 Processor *expand_##direction##_##name       = &generic_sse2< \
-    process_line_xxpand<enum_val, Border::Left, expand_operator_sse2, limit_up_sse2, load, store>, \
-    process_line_xxpand<enum_val, Border::None, expand_operator_sse2, limit_up_sse2, load, store>, \
-    process_line_xxpand<enum_val, Border::Right, expand_operator_sse2, limit_up_sse2, simd_loadu_epi128, simd_storeu_epi128> \
+    process_line_xxpand<enum_val, Border::Left, expand_operator_sse2, limit_up_sse2, mem_mode>, \
+    process_line_xxpand<enum_val, Border::None, expand_operator_sse2, limit_up_sse2, mem_mode>, \
+    process_line_xxpand<enum_val, Border::Right, expand_operator_sse2, limit_up_sse2, MemoryMode::SSE2_UNALIGNED> \
 >; 
 
-#define DEFINE_SSE2_VERSIONS(name, load, store) \
-    DEFINE_SSE2_DIRECTION_VERSION(square, Directions::Square, name, load, store) \
-    DEFINE_SSE2_DIRECTION_VERSION(both, Directions::Both, name, load, store) \
-    DEFINE_SSE2_DIRECTION_VERSION(horizontal, Directions::Horizontal, name, load, store) \
-    DEFINE_SSE2_DIRECTION_VERSION(vertical, Directions::Vertical, name, load, store)
+#define DEFINE_SSE2_VERSIONS(name, mem_mode) \
+    DEFINE_SSE2_DIRECTION_VERSION(square, Directions::Square, name, mem_mode) \
+    DEFINE_SSE2_DIRECTION_VERSION(both, Directions::Both, name, mem_mode) \
+    DEFINE_SSE2_DIRECTION_VERSION(horizontal, Directions::Horizontal, name, mem_mode) \
+    DEFINE_SSE2_DIRECTION_VERSION(vertical, Directions::Vertical, name, mem_mode)
 
-DEFINE_SSE2_VERSIONS(sse2, simd_loadu_epi128, simd_storeu_epi128)
-DEFINE_SSE2_VERSIONS(asse2, simd_load_epi128, simd_store_epi128)
+DEFINE_SSE2_VERSIONS(sse2, MemoryMode::SSE2_UNALIGNED)
+DEFINE_SSE2_VERSIONS(asse2, MemoryMode::SSE2_ALIGNED)
 
 Processor *expand_custom_c       = &generic_custom_c<NewValue>;
 

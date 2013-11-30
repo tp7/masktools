@@ -11,7 +11,7 @@ void makediff_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSr
 }
 
 
-template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<MemoryMode mem_mode>
 static void makediff_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nWidth, int nHeight)
 {
     int wMod32 = (nWidth / 32) * 32;
@@ -24,10 +24,10 @@ static void makediff_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, p
             _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+128, _MM_HINT_T0);
             _mm_prefetch(reinterpret_cast<const char*>(pSrc)+i+128, _MM_HINT_T0);
 
-            auto dst = load(reinterpret_cast<const __m128i*>(pDst+i));
-            auto dst2 = load(reinterpret_cast<const __m128i*>(pDst+i+16));
-            auto src = load(reinterpret_cast<const __m128i*>(pSrc+i));
-            auto src2 = load(reinterpret_cast<const __m128i*>(pSrc+i+16));
+            auto dst = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
+            auto dst2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i+16));
+            auto src = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i));
+            auto src2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i+16));
 
             auto dstsub = _mm_sub_epi8(dst, v128);
             auto dstsub2 = _mm_sub_epi8(dst2, v128);
@@ -41,8 +41,8 @@ static void makediff_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, p
             auto result = _mm_add_epi8(subbed, v128);
             auto result2 = _mm_add_epi8(subbed2, v128);
 
-            store(reinterpret_cast<__m128i*>(pDst+i), result);
-            store(reinterpret_cast<__m128i*>(pDst+i+16), result2);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i+16), result2);
         }
         pDst += nDstPitch;
         pSrc += nSrcPitch;
@@ -53,7 +53,7 @@ static void makediff_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, p
     }
 }
 
-Processor *makediff_sse2 = &makediff_sse2_t<simd_loadu_epi128, simd_storeu_epi128>;
-Processor *makediff_asse2 = &makediff_sse2_t<simd_load_epi128, simd_store_epi128>;
+Processor *makediff_sse2 = &makediff_sse2_t<MemoryMode::SSE2_UNALIGNED>;
+Processor *makediff_asse2 = &makediff_sse2_t<MemoryMode::SSE2_ALIGNED>;
 
 } } } } }

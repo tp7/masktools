@@ -143,7 +143,7 @@ static MT_FORCEINLINE __m128i simd_abs_diff_epu16(__m128i a, __m128i b) {
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     auto v128 = _mm_set1_epi8(Byte(0x80));
@@ -161,17 +161,17 @@ static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte 
     auto divisor = _mm_set_epi32(0, 0, 0, simd_bit_scan_forward(matrix[9]));
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
-        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
+        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
-        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
+        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
-        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
+        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -235,23 +235,23 @@ static MT_FORCEINLINE void process_line_convolution_sse2(Byte *pDst, const Byte 
         auto acc = _mm_packus_epi16(acc_lo, acc_hi);
         auto result = threshold_sse2(acc, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
 
-        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
-        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
 
         auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
         auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
@@ -280,11 +280,11 @@ static MT_FORCEINLINE void process_line_sobel_sse2(Byte *pDst, const Byte *pSrcp
         auto diff = _mm_packus_epi16(diff_lo, diff_hi);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
@@ -292,10 +292,10 @@ static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSr
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
+        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
 
         auto middle_center_lo = _mm_unpacklo_epi8(middle_center, zero);
         auto middle_center_hi = _mm_unpackhi_epi8(middle_center, zero);
@@ -321,11 +321,11 @@ static MT_FORCEINLINE void process_line_roberts_sse2(Byte *pDst, const Byte *pSr
         auto diff = _mm_packus_epi16(diff_lo, diff_hi);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(pSrcp);
     UNUSED(matrix);
@@ -333,17 +333,17 @@ static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSr
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
-        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
+        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
-        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
+        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
-        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
+        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -400,27 +400,27 @@ static MT_FORCEINLINE void process_line_laplace_sse2(Byte *pDst, const Byte *pSr
         auto diff = _mm_packus_epi16(diff_lo, diff_hi);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = _mm_set1_epi8(Byte(0x80));
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
-        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
+        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
-        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
-        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
+        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
-        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
+        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto maxv = _mm_max_epu8(middle_right, up_right);
         maxv = _mm_max_epu8(maxv, down_center);
@@ -443,20 +443,20 @@ static MT_FORCEINLINE void process_line_morpho_sse2(Byte *pDst, const Byte *pSrc
         auto diff = _mm_sub_epi8(maxv, minv);
         auto result = threshold_sse2(diff, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix); UNUSED(pSrcn);
     auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
-        auto middle_center = load(reinterpret_cast<const __m128i*>(pSrc+x));
+        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
+        auto middle_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+x));
         
         auto up_center_lo = _mm_unpacklo_epi8(up_center, zero);
         auto up_center_hi = _mm_unpackhi_epi8(up_center, zero);
@@ -479,27 +479,27 @@ static MT_FORCEINLINE void process_line_cartoon_sse2(Byte *pDst, const Byte *pSr
         auto acc = _mm_packus_epi16(acc_lo, acc_hi);
         auto result = threshold_sse2(acc, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
-        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
+        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
-        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
-        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
+        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -567,27 +567,27 @@ static MT_FORCEINLINE void process_line_prewitt_sse2(Byte *pDst, const Byte *pSr
 
         result = threshold_sse2(result, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
-template<CpuFlags flags, Border borderMode, decltype(simd_load_epi128) load, decltype(simd_store_epi128) store>
+template<CpuFlags flags, Border borderMode, MemoryMode mem_mode>
 static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const Short matrix[10], const __m128i &lowThresh, const __m128i &highThresh, int width) {
     UNUSED(matrix);
     auto v128 = _mm_set1_epi8(Byte(0x80));
     auto zero = _mm_setzero_si128();
 
     for (int x = 0; x < width; x+=16) {
-        auto up_left = load_one_to_left<borderMode, load>(pSrcp+x);
-        auto up_center = load(reinterpret_cast<const __m128i*>(pSrcp+x));
-        auto up_right = load_one_to_right<borderMode, load>(pSrcp+x);
+        auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
+        auto up_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcp+x));
+        auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
 
-        auto middle_left = load_one_to_left<borderMode, load>(pSrc+x);
-        auto middle_right = load_one_to_right<borderMode, load>(pSrc+x);
+        auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
+        auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        auto down_left = load_one_to_left<borderMode, load>(pSrcn+x);
-        auto down_center = load(reinterpret_cast<const __m128i*>(pSrcn+x));
-        auto down_right = load_one_to_right<borderMode, load>(pSrcn+x);
+        auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
+        auto down_center = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrcn+x));
+        auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
         auto up_left_hi = _mm_unpackhi_epi8(up_left, zero);
@@ -656,7 +656,7 @@ static MT_FORCEINLINE void process_line_half_prewitt_sse2(Byte *pDst, const Byte
 
         result = threshold_sse2(result, lowThresh, highThresh, v128);
 
-        store(reinterpret_cast<__m128i*>(pDst+x), result);
+        simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+x), result);
     }
 }
 
@@ -666,18 +666,18 @@ using namespace Filters::Mask;
 #define DEFINE_C_AND_SSE2_VERSIONS(name) \
 Processor *name##_c          = &mask_t<name>; \
 Processor *name##_sse2 = &generic_sse2< \
-process_line_##name##_sse2<CPU_SSE2, Border::Left, simd_loadu_epi128, simd_storeu_epi128>, \
-process_line_##name##_sse2<CPU_SSE2, Border::None, simd_loadu_epi128, simd_storeu_epi128>, \
-process_line_##name##_sse2<CPU_SSE2, Border::Right, simd_loadu_epi128, simd_storeu_epi128> \
+    process_line_##name##_sse2<CPU_SSE2, Border::Left, MemoryMode::SSE2_UNALIGNED>, \
+    process_line_##name##_sse2<CPU_SSE2, Border::None, MemoryMode::SSE2_UNALIGNED>, \
+    process_line_##name##_sse2<CPU_SSE2, Border::Right, MemoryMode::SSE2_UNALIGNED> \
 >; 
 
 
 #define DEFINE_ALL_VERSIONS(name) \
 DEFINE_C_AND_SSE2_VERSIONS(name) \
 Processor *name##_ssse3 = &generic_sse2< \
-    process_line_##name##_sse2<CPU_SSSE3, Border::Left, simd_loadu_epi128, simd_storeu_epi128>, \
-    process_line_##name##_sse2<CPU_SSSE3, Border::None, simd_loadu_epi128, simd_storeu_epi128>, \
-    process_line_##name##_sse2<CPU_SSSE3, Border::Right, simd_loadu_epi128, simd_storeu_epi128> \
+    process_line_##name##_sse2<CPU_SSSE3, Border::Left, MemoryMode::SSE2_UNALIGNED>, \
+    process_line_##name##_sse2<CPU_SSSE3, Border::None, MemoryMode::SSE2_UNALIGNED>, \
+    process_line_##name##_sse2<CPU_SSSE3, Border::Right, MemoryMode::SSE2_UNALIGNED> \
 >;
 
 DEFINE_ALL_VERSIONS(sobel)

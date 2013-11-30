@@ -89,8 +89,7 @@ static inline __m128i binarize_255_t_sse2_op(__m128i x, __m128i t, __m128i t128)
     return _mm_or_si128(lower, t);
 }
 
-template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store, 
-    decltype(binarize_upper_sse2_op) op, decltype(binarize_upper) op_c>
+template<MemoryMode mem_mode, decltype(binarize_upper_sse2_op) op, decltype(binarize_upper) op_c>
 void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidth, int nHeight)
 {
     auto t = _mm_set1_epi8(Byte(nThreshold));
@@ -101,12 +100,12 @@ void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidt
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod32; i+=32 ) {
             _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+320, _MM_HINT_T0);
-            auto src = load(reinterpret_cast<const __m128i*>(pDst+i));
-            auto src2 = load(reinterpret_cast<const __m128i*>(pDst+i+16));
+            auto src = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
+            auto src2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i+16));
             auto result = op(src, t, t128);
             auto result2 = op(src2, t, t128);
-            store(reinterpret_cast<__m128i*>(pDst+i), result);
-            store(reinterpret_cast<__m128i*>(pDst+i+16), result2);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i+16), result2);
         }
         pDst += nDstPitch;
     }
@@ -131,23 +130,23 @@ Processor *binarize_t_255_c = &binarize_t<binarize_t_255>;
 Processor *binarize_255_x_c = &binarize_t<binarize_255_x>;
 Processor *binarize_255_t_c = &binarize_t<binarize_255_t>;
 
-#define DEFINE_SSE2_VERSIONS(name, load, store) \
-Processor *binarize_upper_##name = &binarize_sse2_t<load, store, binarize_upper_sse2_op, binarize_upper>; \
-Processor *binarize_lower_##name = &binarize_sse2_t<load, store, binarize_lower_sse2_op, binarize_lower>; \
-Processor *binarize_0_x_##name   = &binarize_sse2_t<load, store, binarize_0_x_sse2_op, binarize_0_x>; \
-Processor *binarize_t_x_##name   = &binarize_sse2_t<load, store, binarize_t_x_sse2_op, binarize_t_x>; \
-Processor *binarize_x_0_##name   = &binarize_sse2_t<load, store, binarize_x_0_sse2_op, binarize_x_0>; \
-Processor *binarize_x_t_##name   = &binarize_sse2_t<load, store, binarize_x_t_sse2_op, binarize_x_t>; \
-Processor *binarize_t_0_##name   = &binarize_sse2_t<load, store, binarize_t_0_sse2_op, binarize_t_0>; \
-Processor *binarize_0_t_##name   = &binarize_sse2_t<load, store, binarize_0_t_sse2_op, binarize_0_t>; \
-Processor *binarize_x_255_##name = &binarize_sse2_t<load, store, binarize_x_255_sse2_op, binarize_x_255>; \
-Processor *binarize_t_255_##name = &binarize_sse2_t<load, store, binarize_t_255_sse2_op, binarize_t_255>; \
-Processor *binarize_255_x_##name = &binarize_sse2_t<load, store, binarize_255_x_sse2_op, binarize_255_x>; \
-Processor *binarize_255_t_##name = &binarize_sse2_t<load, store, binarize_255_t_sse2_op, binarize_255_t>;
+#define DEFINE_SSE2_VERSIONS(name, mem_mode) \
+    Processor *binarize_upper_##name = &binarize_sse2_t<mem_mode, binarize_upper_sse2_op, binarize_upper>; \
+    Processor *binarize_lower_##name = &binarize_sse2_t<mem_mode, binarize_lower_sse2_op, binarize_lower>; \
+    Processor *binarize_0_x_##name   = &binarize_sse2_t<mem_mode, binarize_0_x_sse2_op, binarize_0_x>; \
+    Processor *binarize_t_x_##name   = &binarize_sse2_t<mem_mode, binarize_t_x_sse2_op, binarize_t_x>; \
+    Processor *binarize_x_0_##name   = &binarize_sse2_t<mem_mode, binarize_x_0_sse2_op, binarize_x_0>; \
+    Processor *binarize_x_t_##name   = &binarize_sse2_t<mem_mode, binarize_x_t_sse2_op, binarize_x_t>; \
+    Processor *binarize_t_0_##name   = &binarize_sse2_t<mem_mode, binarize_t_0_sse2_op, binarize_t_0>; \
+    Processor *binarize_0_t_##name   = &binarize_sse2_t<mem_mode, binarize_0_t_sse2_op, binarize_0_t>; \
+    Processor *binarize_x_255_##name = &binarize_sse2_t<mem_mode, binarize_x_255_sse2_op, binarize_x_255>; \
+    Processor *binarize_t_255_##name = &binarize_sse2_t<mem_mode, binarize_t_255_sse2_op, binarize_t_255>; \
+    Processor *binarize_255_x_##name = &binarize_sse2_t<mem_mode, binarize_255_x_sse2_op, binarize_255_x>; \
+    Processor *binarize_255_t_##name = &binarize_sse2_t<mem_mode, binarize_255_t_sse2_op, binarize_255_t>;
 
 
-DEFINE_SSE2_VERSIONS(sse2, simd_loadu_epi128, simd_storeu_epi128)
-DEFINE_SSE2_VERSIONS(asse2, simd_load_epi128, simd_store_epi128)
+DEFINE_SSE2_VERSIONS(sse2, MemoryMode::SSE2_UNALIGNED)
+DEFINE_SSE2_VERSIONS(asse2, MemoryMode::SSE2_ALIGNED)
 
 
 

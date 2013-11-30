@@ -67,8 +67,7 @@ static inline __m128i max_t_sse2(const __m128i &a, const __m128i &b, const __m12
 }
 
 
-template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store, 
-    decltype(and_sse2_op) op, decltype(and) op_c>
+template<MemoryMode mem_mode, decltype(and_sse2_op) op, decltype(and) op_c>
     void logic_t_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nWidth, int nHeight, Byte nThresholdDestination, Byte nThresholdSource)
 {
     int wMod32 = (nWidth / 32) * 32;
@@ -82,16 +81,16 @@ template<decltype(simd_load_epi128) load, decltype(simd_store_epi128) store,
             _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+384, _MM_HINT_T0);
             _mm_prefetch(reinterpret_cast<const char*>(pSrc)+i+384, _MM_HINT_T0);
 
-            auto dst = load(reinterpret_cast<const __m128i*>(pDst+i));
-            auto dst2 = load(reinterpret_cast<const __m128i*>(pDst+i+16));
-            auto src = load(reinterpret_cast<const __m128i*>(pSrc+i));
-            auto src2 = load(reinterpret_cast<const __m128i*>(pSrc+i+16));
+            auto dst  = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i));
+            auto dst2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pDst+i+16));
+            auto src  = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i));
+            auto src2 = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(pSrc+i+16));
 
             auto result = op(dst, src, tDest, tSource);
             auto result2 = op(dst2, src2, tDest, tSource);
 
-            store(reinterpret_cast<__m128i*>(pDst+i), result);
-            store(reinterpret_cast<__m128i*>(pDst+i+16), result2);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i), result);
+            simd_store_epi128<mem_mode>(reinterpret_cast<__m128i*>(pDst+i+16), result2);
         }
         pDst += nDstPitch;
         pSrc += nSrcPitch;
@@ -126,29 +125,29 @@ DEFINE_C_VERSIONS(min);
 DEFINE_C_VERSIONS(max);
 
 
-#define DEFINE_SSE2_VERSIONS(name, load, store) \
-Processor *and_##name  = &logic_t_sse2<load, store, and_sse2_op, and>; \
-Processor *or_##name   = &logic_t_sse2<load, store, or_sse2_op, or>; \
-Processor *andn_##name = &logic_t_sse2<load, store, andn_sse2_op, andn>; \
-Processor *xor_##name  = &logic_t_sse2<load, store, xor_sse2_op, xor>;
+#define DEFINE_SSE2_VERSIONS(name, mem_mode) \
+Processor *and_##name  = &logic_t_sse2<mem_mode, and_sse2_op, and>; \
+Processor *or_##name   = &logic_t_sse2<mem_mode, or_sse2_op, or>; \
+Processor *andn_##name = &logic_t_sse2<mem_mode, andn_sse2_op, andn>; \
+Processor *xor_##name  = &logic_t_sse2<mem_mode, xor_sse2_op, xor>;
 
-DEFINE_SSE2_VERSIONS(sse2, simd_loadu_epi128, simd_storeu_epi128)
-DEFINE_SSE2_VERSIONS(asse2, simd_load_epi128, simd_store_epi128)
+DEFINE_SSE2_VERSIONS(sse2, MemoryMode::SSE2_UNALIGNED)
+DEFINE_SSE2_VERSIONS(asse2, MemoryMode::SSE2_ALIGNED)
 
-#define DEFINE_SILLY_SSE2_VERSIONS(mode, name, load, store) \
-Processor *mode##_##name         = &logic_t_sse2<load, store, mode##_t_sse2<nop_sse2, nop_sse2>, mode##_t<nop, nop>>;   \
-Processor *mode##sub_##name      = &logic_t_sse2<load, store, mode##_t_sse2<nop_sse2, sub_sse2>, mode##_t<nop, sub>>;   \
-Processor *mode##add_##name      = &logic_t_sse2<load, store, mode##_t_sse2<nop_sse2, add_sse2>, mode##_t<nop, add>>;   \
-Processor *sub##mode##_##name    = &logic_t_sse2<load, store, mode##_t_sse2<sub_sse2, nop_sse2>, mode##_t<sub, nop>>;   \
-Processor *sub##mode##sub_##name = &logic_t_sse2<load, store, mode##_t_sse2<sub_sse2, sub_sse2>, mode##_t<sub, sub>>;   \
-Processor *sub##mode##add_##name = &logic_t_sse2<load, store, mode##_t_sse2<sub_sse2, add_sse2>, mode##_t<sub, add>>;   \
-Processor *add##mode##_##name    = &logic_t_sse2<load, store, mode##_t_sse2<add_sse2, nop_sse2>, mode##_t<add, nop>>;   \
-Processor *add##mode##sub_##name = &logic_t_sse2<load, store, mode##_t_sse2<add_sse2, sub_sse2>, mode##_t<add, sub>>;   \
-Processor *add##mode##add_##name = &logic_t_sse2<load, store, mode##_t_sse2<add_sse2, add_sse2>, mode##_t<add, add>>;
+#define DEFINE_SILLY_SSE2_VERSIONS(mode, name, mem_mode) \
+Processor *mode##_##name         = &logic_t_sse2<mem_mode, mode##_t_sse2<nop_sse2, nop_sse2>, mode##_t<nop, nop>>;   \
+Processor *mode##sub_##name      = &logic_t_sse2<mem_mode, mode##_t_sse2<nop_sse2, sub_sse2>, mode##_t<nop, sub>>;   \
+Processor *mode##add_##name      = &logic_t_sse2<mem_mode, mode##_t_sse2<nop_sse2, add_sse2>, mode##_t<nop, add>>;   \
+Processor *sub##mode##_##name    = &logic_t_sse2<mem_mode, mode##_t_sse2<sub_sse2, nop_sse2>, mode##_t<sub, nop>>;   \
+Processor *sub##mode##sub_##name = &logic_t_sse2<mem_mode, mode##_t_sse2<sub_sse2, sub_sse2>, mode##_t<sub, sub>>;   \
+Processor *sub##mode##add_##name = &logic_t_sse2<mem_mode, mode##_t_sse2<sub_sse2, add_sse2>, mode##_t<sub, add>>;   \
+Processor *add##mode##_##name    = &logic_t_sse2<mem_mode, mode##_t_sse2<add_sse2, nop_sse2>, mode##_t<add, nop>>;   \
+Processor *add##mode##sub_##name = &logic_t_sse2<mem_mode, mode##_t_sse2<add_sse2, sub_sse2>, mode##_t<add, sub>>;   \
+Processor *add##mode##add_##name = &logic_t_sse2<mem_mode, mode##_t_sse2<add_sse2, add_sse2>, mode##_t<add, add>>;
 
-DEFINE_SILLY_SSE2_VERSIONS(min, sse2, simd_loadu_epi128, simd_storeu_epi128)
-DEFINE_SILLY_SSE2_VERSIONS(max, sse2, simd_loadu_epi128, simd_storeu_epi128)
-DEFINE_SILLY_SSE2_VERSIONS(min, asse2, simd_load_epi128, simd_store_epi128)
-DEFINE_SILLY_SSE2_VERSIONS(max, asse2, simd_load_epi128, simd_store_epi128)
+DEFINE_SILLY_SSE2_VERSIONS(min, sse2, MemoryMode::SSE2_UNALIGNED)
+DEFINE_SILLY_SSE2_VERSIONS(max, sse2, MemoryMode::SSE2_UNALIGNED)
+DEFINE_SILLY_SSE2_VERSIONS(min, asse2, MemoryMode::SSE2_ALIGNED)
+DEFINE_SILLY_SSE2_VERSIONS(max, asse2, MemoryMode::SSE2_ALIGNED)
 
 } } } }
