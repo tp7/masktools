@@ -32,17 +32,16 @@ void merge_luma_420_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdif
    }
 }
 
+template <MemoryMode mem_mode>
 MT_FORCEINLINE __m128i merge_sse2_core(Byte *pDst, const Byte *pSrc, const __m128i& mask_lo, const __m128i& mask_hi, 
                                        const __m128i& v128, const __m128i& v256, const __m128i& zero) {
-    auto dst_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst));
-    auto dst_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pDst+8));
-    auto unpacked_dst_t1 = _mm_unpacklo_epi8(dst_t1, zero);
-    auto unpacked_dst_t2 = _mm_unpacklo_epi8(dst_t2, zero);
+    auto dst = simd_load_epi128<mem_mode>(pDst);
+    auto unpacked_dst_t1 = _mm_unpacklo_epi8(dst, zero);
+    auto unpacked_dst_t2 = _mm_unpackhi_epi8(dst, zero);
 
-    auto src_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc));
-    auto src_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pSrc+8));
-    auto unpacked_src1_t1 = _mm_unpacklo_epi8(src_t1, zero);
-    auto unpacked_src1_t2 = _mm_unpacklo_epi8(src_t2, zero);
+    auto src = simd_load_epi128<mem_mode>(pSrc);
+    auto unpacked_src1_t1 = _mm_unpacklo_epi8(src, zero);
+    auto unpacked_src1_t2 = _mm_unpackhi_epi8(src, zero);
 
     auto temp1_t1 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_lo), unpacked_dst_t1); //(256 - pSrc2[x]) * pDst[x]
     auto temp1_t2 = _mm_mullo_epi16(_mm_sub_epi16(v256, mask_hi), unpacked_dst_t2);
@@ -75,12 +74,11 @@ void merge_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t 
     auto zero = _mm_setzero_si128();
     for ( int j = 0; j < nHeight; ++j ) {
         for ( int i = 0; i < wMod16; i+=16 ) {
-            auto src2_t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pMask+i));
-            auto src2_t2 = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(pMask+8+i));
-            auto mask_t1 = _mm_unpacklo_epi8(src2_t1, zero);
-            auto mask_t2 = _mm_unpacklo_epi8(src2_t2, zero);
+            auto src2 = simd_load_epi128<mem_mode>(pMask+i);
+            auto mask_t1 = _mm_unpacklo_epi8(src2, zero);
+            auto mask_t2 = _mm_unpackhi_epi8(src2, zero);
 
-            auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
+            auto result = merge_sse2_core<mem_mode>(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
 
             simd_store_epi128<mem_mode>(pDst+i, result);
         }
@@ -124,7 +122,7 @@ void merge_luma_420_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, p
             auto mask_t1 = _mm_and_si128(avg_t1, v255);
             auto mask_t2 = _mm_and_si128(avg_t2, v255);
 
-            auto result = merge_sse2_core(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
+            auto result = merge_sse2_core<mem_mode>(pDst+i, pSrc1+i, mask_t1, mask_t2, v128, v256, zero);
           
             simd_store_epi128<mem_mode>(pDst+i, result);
         }
