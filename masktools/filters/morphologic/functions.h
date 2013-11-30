@@ -148,54 +148,177 @@ static MT_FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, c
     }
 }
 
-
-template<Directions directions, Border borderMode, decltype(_mm_max_epu8) op, Limit limit, MemoryMode mem_mode>
-static MT_FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+template<Border borderMode, decltype(_mm_max_epu8) op, Limit limit, MemoryMode mem_mode>
+static MT_FORCEINLINE void process_line_xxpand_both(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
     for (int x = 0; x < width; x += 16) {
-        __m128i up_left, up_center, up_right, middle_left, middle_right, down_left, down_center, down_right;
+        __m128i up_center = simd_load_si128<mem_mode>(pSrcp+x);
+        __m128i middle_center = simd_load_si128<mem_mode>(pSrc+x);
+        __m128i down_center = simd_load_si128<mem_mode>(pSrcn+x);
+        __m128i middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
+        __m128i middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
 
-        if (directions == Directions::Square) {
-            up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
-            up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
-            down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
-            down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
-        }
+        __m128i acc = op(up_center, middle_left);
+        acc = op(acc, middle_right);
+        acc = op(acc, down_center);
 
-        if (directions & Directions::Vertical) {
-            up_center = simd_load_si128<mem_mode>(pSrcp+x);
-            down_center = simd_load_si128<mem_mode>(pSrcn+x);
-        }
+        __m128i result = limit(middle_center, acc, maxDeviation);
+        simd_store_si128<mem_mode>(pDst+x, result);
+    }
+}
 
-        if (directions & Directions::Horizontal) {
-            middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
-            middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
-        }
+/* Vertical mt_xxpand */
 
-        __m128i acc;
-        if (directions == Directions::Square) {
-            acc = op(up_left, up_center);
-            acc = op(acc, up_right);
-            acc = op(acc, middle_left);
-            acc = op(acc, middle_right);
-            acc = op(acc, down_left);
-            acc = op(acc, down_center);
-            acc = op(acc, down_right);
-        } else if (directions == Directions::Horizontal) {
-            acc = op(middle_left, middle_right);
-        } else if (directions == Directions::Vertical) {
-            acc = op(up_center, down_center);
-        } else  if (directions == Directions::Both) {
-            acc = op(up_center, middle_left);
-            acc = op(acc, middle_right);
-            acc = op(acc, down_center);
-        }
-
+template<decltype(_mm_max_epu8) op, Limit limit, MemoryMode mem_mode>
+static MT_FORCEINLINE void process_line_xxpand_vertical(Byte *pDst, const Byte *pSrcp, const Byte *pSrc, const Byte *pSrcn, const __m128i &maxDeviation, int width) {
+    for (int x = 0; x < width; x += 16) {
+        auto up_center = simd_load_si128<mem_mode>(pSrcp+x);
+        auto down_center = simd_load_si128<mem_mode>(pSrcn+x);
         auto middle_center = simd_load_si128<mem_mode>(pSrc+x);
-
+        auto acc = op(up_center, down_center);
         auto result = limit(middle_center, acc, maxDeviation);
         simd_store_si128<mem_mode>(pDst+x, result);
     }
 }
+
+template<decltype(_mm_max_epu8) op, Limit limit, MemoryMode mem_mode>
+static void xxpand_sse2_vertical(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight) {
+    const Byte *pSrcp = pSrc - nSrcPitch;
+    const Byte *pSrcn = pSrc + nSrcPitch;
+
+    UNUSED(nCoordinates); UNUSED(pCoordinates);
+    auto max_dev_v = _mm_set1_epi8(Byte(nMaxDeviation));
+    int mod16_width = nWidth / 16 * 16;
+    int width_diff = nWidth - mod16_width;
+   
+    process_line_xxpand_vertical<op, limit, mem_mode>(pDst, pSrc, pSrc, pSrcn, max_dev_v, mod16_width);
+
+    if (width_diff) {
+        process_line_xxpand_vertical<op, limit, mem_mode>(pDst + mod16_width, pSrc+mod16_width, pSrc+mod16_width, pSrcn+mod16_width, max_dev_v, width_diff);
+    }
+
+    pDst += nDstPitch;
+    pSrcp += nSrcPitch;
+    pSrc += nSrcPitch;
+    pSrcn += nSrcPitch;
+
+    for (int y = 1; y < nHeight-1; y++)
+    {
+        process_line_xxpand_vertical<op, limit, mem_mode>(pDst, pSrcp, pSrc, pSrcn, max_dev_v, mod16_width);
+
+        if (width_diff) {
+            process_line_xxpand_vertical<op, limit, mem_mode>(pDst + mod16_width, pSrcp+mod16_width, pSrc+mod16_width, pSrcn+mod16_width, max_dev_v, width_diff);
+        }
+
+        pDst += nDstPitch;
+        pSrcp += nSrcPitch;
+        pSrc += nSrcPitch;
+        pSrcn += nSrcPitch;
+    }
+    
+    process_line_xxpand_vertical<op, limit, mem_mode>(pDst, pSrcp, pSrc, pSrc, max_dev_v, mod16_width);
+
+    if (width_diff) {
+        process_line_xxpand_vertical<op, limit, mem_mode>(pDst + mod16_width, pSrcp+mod16_width, pSrc+mod16_width, pSrc+mod16_width, max_dev_v, width_diff);
+    }
+}
+
+
+/* Horizontal mt_xxpand */
+
+extern "C" static MT_FORCEINLINE Byte expand_c_horizontal_core(Byte left, Byte center, Byte right, Byte max_dev) {
+    Byte ma = left;
+
+    if (center > ma) ma = center;
+    if (right > ma) ma = right;
+    
+    if (ma - center > max_dev) ma = center + max_dev;
+    return static_cast<Byte>(ma);
+}
+
+extern "C" static MT_FORCEINLINE Byte inpand_c_horizontal_core(Byte left, Byte center, Byte right, Byte max_dev) {
+    Byte mi = left;
+
+    if (center < mi) mi = center;
+    if (right < mi) mi = right;
+
+    if (center - mi > max_dev) mi = center - max_dev;
+    return static_cast<Byte>(mi);
+}
+
+//this implemented in a somewhat retarded way to allow pDst and pSrc be the same pointer (used in 3x3 expand)
+template<decltype(_mm_max_epu8) op, Limit limit, MemoryMode mem_mode, decltype(expand_c_horizontal_core) c_core>
+static void xxpand_sse2_horizontal(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight) {
+    UNUSED(nCoordinates); UNUSED(pCoordinates);
+
+    int mod16_width = (nWidth / 16) * 16;
+    int sse_loop_limit = nWidth == mod16_width ? mod16_width - 16 : mod16_width;
+    
+    __m128i max_dev_v = _mm_set1_epi8(Byte(nMaxDeviation));
+    __m128i left_mask = _mm_set_epi32(0, 0, 0, 0xFF);
+#pragma warning(disable: 4309)
+    __m128i right_mask = _mm_set_epi8(0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+#pragma warning(default: 4309)
+
+    __m128i left;
+
+    for (int y = 0; y < nHeight; ++y) {
+        //left border
+        __m128i center = simd_load_si128<mem_mode>(pSrc);
+        __m128i right = simd_load_si128<MemoryMode::SSE2_UNALIGNED>(pSrc+1);
+        left = _mm_or_si128(_mm_and_si128(center, left_mask), _mm_slli_si128(center, 1));
+
+        __m128i result = op(left, right);
+        result = limit(center, result, max_dev_v);
+
+        left = simd_load_si128<MemoryMode::SSE2_UNALIGNED>(pSrc+15);
+        simd_store_si128<mem_mode>(pDst, result);
+
+        //main processing loop
+        for (int x = 16; x < sse_loop_limit; x += 16) {
+            center = simd_load_si128<mem_mode>(pSrc+x);
+            right = simd_load_si128<MemoryMode::SSE2_UNALIGNED>(pSrc+x+1);
+
+            result = op(left, right);
+            result = limit(center, result, max_dev_v);
+
+            left = simd_load_si128<MemoryMode::SSE2_UNALIGNED>(pSrc+x+15);
+
+            simd_store_si128<mem_mode>(pDst+x, result);
+        }
+
+        //right border
+        if (mod16_width == nWidth) {
+            center = simd_load_si128<mem_mode>(pSrc+mod16_width-16);
+            right = _mm_or_si128(_mm_and_si128(center, right_mask), _mm_srli_si128(center, 1));
+
+            result = op(left, right);
+            result = limit(center, result, max_dev_v);
+
+            simd_store_si128<mem_mode>(pDst+mod16_width-16, result);
+        } else { //some stuff left
+             Byte l = _mm_cvtsi128_si32(left) & 0xFF;
+
+             int x;
+             for (x = mod16_width; x < nWidth-1; ++x) {
+                 Byte temp = c_core(l, pSrc[x], pSrc[x+1], nMaxDeviation);
+                 l = pSrc[x];
+                 pDst[x] = temp;
+             }
+             pDst[x] = c_core(l, pSrc[x], pSrc[x], nMaxDeviation);
+        }
+        pSrc += nSrcPitch;
+        pDst += nDstPitch;
+    }
+}
+
+/* Square mt_xxpand */
+
+template<decltype(_mm_max_epu8) op, Limit limit, MemoryMode mem_mode, decltype(expand_c_horizontal_core) c_core>
+static void xxpand_sse2_square(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight) {
+    xxpand_sse2_vertical<op, limit, mem_mode>(pDst, nDstPitch, pSrc, nSrcPitch, nMaxDeviation, pCoordinates, nCoordinates, nWidth, nHeight);
+    xxpand_sse2_horizontal<op, limit, mem_mode, c_core>(pDst, nDstPitch, pDst, nDstPitch, nMaxDeviation, pCoordinates, nCoordinates, nWidth, nHeight);
+}
+
 
 template<ProcessLineSse2 process_line_left, ProcessLineSse2 process_line, ProcessLineSse2 process_line_right>
 static void generic_sse2(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, int nMaxDeviation, const int *pCoordinates, int nCoordinates, int nWidth, int nHeight) {
