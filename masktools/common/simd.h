@@ -31,9 +31,9 @@ static MT_FORCEINLINE __m128i simd_load_si128(const T* ptr) {
     }
 #else
     if (mem_mode == MemoryMode::SSE2_ALIGNED) {
-        return _mm_load_si128(reinterpret_cast<__m128i*>(ptr));
+        return _mm_load_si128(reinterpret_cast<const __m128i*>(ptr));
     } else {
-        return _mm_loadu_si128(reinterpret_cast<__m128i*>(ptr));
+        return _mm_loadu_si128(reinterpret_cast<const __m128i*>(ptr));
     }
 #endif
 }
