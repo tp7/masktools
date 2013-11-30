@@ -85,14 +85,14 @@ static MT_FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, c
     auto zero = _mm_setzero_si128();
     for ( int x = 0; x < width; x+=16 ) {
         auto up_left = load_one_to_left<borderMode, mem_mode>(pSrcp+x);
-        auto up_center = simd_load_epi128<mem_mode>(pSrcp + x);
+        auto up_center = simd_load_si128<mem_mode>(pSrcp + x);
         auto up_right = load_one_to_right<borderMode, mem_mode>(pSrcp+x);
         
         auto middle_left = load_one_to_left<borderMode, mem_mode>(pSrc+x);
         auto middle_right = load_one_to_right<borderMode, mem_mode>(pSrc+x);
         
         auto down_left = load_one_to_left<borderMode, mem_mode>(pSrcn+x);
-        auto down_center = simd_load_epi128<mem_mode>(pSrcn + x);
+        auto down_center = simd_load_si128<mem_mode>(pSrcn + x);
         auto down_right = load_one_to_right<borderMode, mem_mode>(pSrcn+x);
 
         auto up_left_lo = _mm_unpacklo_epi8(up_left, zero);
@@ -140,11 +140,11 @@ static MT_FORCEINLINE void process_line_xxflate(Byte *pDst, const Byte *pSrcp, c
 
         auto result = _mm_packus_epi16(sum_lo, sum_hi);
 
-        auto middle_center = simd_load_epi128<mem_mode>(pSrc + x);
+        auto middle_center = simd_load_si128<mem_mode>(pSrc + x);
         
         result = limit(middle_center, result, maxDeviation);
 
-        simd_store_epi128<mem_mode>(pDst+x, result);
+        simd_store_si128<mem_mode>(pDst+x, result);
     }
 }
 
@@ -162,8 +162,8 @@ static MT_FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, co
         }
 
         if (directions & Directions::Vertical) {
-            up_center = simd_load_epi128<mem_mode>(pSrcp+x);
-            down_center = simd_load_epi128<mem_mode>(pSrcn+x);
+            up_center = simd_load_si128<mem_mode>(pSrcp+x);
+            down_center = simd_load_si128<mem_mode>(pSrcn+x);
         }
 
         if (directions & Directions::Horizontal) {
@@ -190,10 +190,10 @@ static MT_FORCEINLINE void process_line_xxpand(Byte *pDst, const Byte *pSrcp, co
             acc = op(acc, down_center);
         }
 
-        auto middle_center = simd_load_epi128<mem_mode>(pSrc+x);
+        auto middle_center = simd_load_si128<mem_mode>(pSrc+x);
 
         auto result = limit(middle_center, acc, maxDeviation);
-        simd_store_epi128<mem_mode>(pDst+x, result);
+        simd_store_si128<mem_mode>(pDst+x, result);
     }
 }
 

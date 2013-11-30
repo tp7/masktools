@@ -22,7 +22,7 @@ enum class MemoryMode {
 
 
 template<MemoryMode mem_mode, typename T>
-static MT_FORCEINLINE __m128i simd_load_epi128(const T* ptr) {
+static MT_FORCEINLINE __m128i simd_load_si128(const T* ptr) {
 #ifdef USE_MOVPS
     if (mem_mode == MemoryMode::SSE2_ALIGNED) {
         return _mm_castps_si128(_mm_load_ps(reinterpret_cast<const float*>(ptr)));
@@ -40,7 +40,7 @@ static MT_FORCEINLINE __m128i simd_load_epi128(const T* ptr) {
 
 
 template<MemoryMode mem_mode, typename T>
-static MT_FORCEINLINE void simd_store_epi128(T *ptr, __m128i value) {
+static MT_FORCEINLINE void simd_store_si128(T *ptr, __m128i value) {
 #ifdef USE_MOVPS
     if (mem_mode == MemoryMode::SSE2_ALIGNED) {
         _mm_store_ps(reinterpret_cast<float*>(ptr), _mm_castsi128_ps(value));
@@ -81,10 +81,10 @@ template<Border border_mode, MemoryMode mem_mode>
 static MT_FORCEINLINE __m128i load_one_to_left(const Byte *ptr) {
     if (border_mode == Border::Left) {
         auto mask_left = _mm_setr_epi8(0xFF, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00);
-        auto val = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(ptr));
+        auto val = simd_load_si128<mem_mode>(reinterpret_cast<const __m128i*>(ptr));
         return _mm_or_si128(_mm_slli_si128(val, 1), _mm_and_si128(val, mask_left));
     } else {
-        return simd_load_epi128<MemoryMode::SSE2_UNALIGNED>(reinterpret_cast<const __m128i*>(ptr - 1));
+        return simd_load_si128<MemoryMode::SSE2_UNALIGNED>(reinterpret_cast<const __m128i*>(ptr - 1));
     }
 }
 
@@ -92,10 +92,10 @@ template<Border border_mode, MemoryMode mem_mode>
 static MT_FORCEINLINE __m128i load_one_to_right(const Byte *ptr) {
     if (border_mode == Border::Right) {
         auto mask_right = _mm_setr_epi8(00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0xFF);
-        auto val = simd_load_epi128<mem_mode>(reinterpret_cast<const __m128i*>(ptr));
+        auto val = simd_load_si128<mem_mode>(reinterpret_cast<const __m128i*>(ptr));
         return _mm_or_si128(_mm_srli_si128(val, 1), _mm_and_si128(val, mask_right));
     } else {
-        return simd_load_epi128<MemoryMode::SSE2_UNALIGNED>(reinterpret_cast<const __m128i*>(ptr + 1));
+        return simd_load_si128<MemoryMode::SSE2_UNALIGNED>(reinterpret_cast<const __m128i*>(ptr + 1));
     }
 }
 

@@ -22,12 +22,12 @@ static void average_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, pt
             _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+256, _MM_HINT_T0);
             _mm_prefetch(reinterpret_cast<const char*>(pSrc)+i+256, _MM_HINT_T0);
 
-            auto dst = simd_load_epi128<mem_mode>(pDst+i);
-            auto src = simd_load_epi128<mem_mode>(pSrc+i);
+            auto dst = simd_load_si128<mem_mode>(pDst+i);
+            auto src = simd_load_si128<mem_mode>(pSrc+i);
 
             auto result  = _mm_avg_epu8(dst, src);
 
-            simd_store_epi128<mem_mode>(pDst+i, result);
+            simd_store_si128<mem_mode>(pDst+i, result);
         }
         pDst += nDstPitch;
         pSrc += nSrcPitch;
