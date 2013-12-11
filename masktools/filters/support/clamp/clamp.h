@@ -13,45 +13,45 @@ extern Processor *clamp_asse2;
 
 class Clamp : public MaskTools::Filter
 {
-
-   int nOvershoot, nUndershoot;
-   ProcessorList<Processor> processors;
+    int overshoot, undershoot;
+    ProcessorList<Processor> processors;
 
 protected:
-
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), dst.width(), dst.height(), nOvershoot, nUndershoot );
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
+    {
+        UNUSED(n);
+        processors.best_processor(constraints[nPlane])(dst, dst.pitch(), 
+            frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), 
+            frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), 
+            dst.width(), dst.height(), overshoot, undershoot);
+    }
 
 public:
-   Clamp(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )
-   {
-      nUndershoot = parameters["undershoot"];
-      nOvershoot = parameters["overshoot"];
+    Clamp(const Parameters &parameters) : MaskTools::Filter(parameters, FilterProcessingType::INPLACE)
+    {
+        undershoot = parameters["undershoot"];
+        overshoot = parameters["overshoot"];
 
-      /* add the processors */
-      processors.push_back(Filtering::Processor<Processor>(&clamp_c, Constraint(CPU_NONE, 1, 1, 1, 1), 0));
-      processors.push_back(Filtering::Processor<Processor>(clamp_sse2, Constraint(CPU_SSE2, 1, 1, 1, 1), 1));
-      processors.push_back(Filtering::Processor<Processor>(clamp_asse2, Constraint(CPU_SSE2, 1, 1, 16, 16), 2));
-   }
+        /* add the processors */
+        processors.push_back(Filtering::Processor<Processor>(&clamp_c, Constraint(CPU_NONE, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 1), 0));
+        processors.push_back(Filtering::Processor<Processor>(clamp_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 1), 1));
+        processors.push_back(Filtering::Processor<Processor>(clamp_asse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_16, 16), 2));
+    }
 
-   InputConfiguration &input_configuration() const { return InPlaceThreeFrame(); }
+    InputConfiguration &input_configuration() const { return InPlaceThreeFrame(); }
 
-   static Signature filter_signature()
-   {
-      Signature signature = "mt_clamp";
+    static Signature filter_signature()
+    {
+        Signature signature = "mt_clamp";
 
-      signature.add(Parameter(TYPE_CLIP, ""));
-      signature.add(Parameter(TYPE_CLIP, ""));
-      signature.add(Parameter(TYPE_CLIP, ""));
-      signature.add(Parameter(0, "overshoot"));
-      signature.add(Parameter(0, "undershoot"));
+        signature.add(Parameter(TYPE_CLIP, ""));
+        signature.add(Parameter(TYPE_CLIP, ""));
+        signature.add(Parameter(TYPE_CLIP, ""));
+        signature.add(Parameter(0, "overshoot"));
+        signature.add(Parameter(0, "undershoot"));
 
-      return add_defaults( signature );
-   }
-
+        return add_defaults(signature);
+    }
 };
 
 } } } } }

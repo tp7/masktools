@@ -3,31 +3,32 @@
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Support  { namespace Clamp {
 
-void clamp_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch, const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight, int nOvershoot, int nUndershoot)
+void clamp_c(Byte *pDst, ptrdiff_t dst_pitch, const Byte *pSrc1, ptrdiff_t src1_pitch, const Byte *pSrc2, ptrdiff_t src2_pitch, int width, int height, int overshoot, int undershoot)
 {
-   for ( int y = 0; y < nHeight; y++, pDst += nDstPitch, pSrc1 += nSrc1Pitch, pSrc2 += nSrc2Pitch )
-   {
-      for ( int x = 0; x < nWidth; x++ )
-      {
-         pDst[x] = static_cast<Byte>(pDst[x] > pSrc1[x] + nOvershoot ? pSrc1[x] + nOvershoot : pDst[x]);
-         pDst[x] = static_cast<Byte>(pDst[x] < pSrc2[x] - nUndershoot ? pSrc2[x] - nUndershoot : pDst[x]);
-      }
-   }
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            pDst[x] = static_cast<Byte>(pDst[x] > pSrc1[x] + overshoot ? pSrc1[x] + overshoot : pDst[x]);
+            pDst[x] = static_cast<Byte>(pDst[x] < pSrc2[x] - undershoot ? pSrc2[x] - undershoot : pDst[x]);
+        }
+        pDst += dst_pitch;
+        pSrc1 += src1_pitch;
+        pSrc2 += src2_pitch;
+    }
 }
 
 template<MemoryMode mem_mode>
-static void clamp_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch, const Byte *pSrc2, ptrdiff_t nSrc2Pitch, int nWidth, int nHeight, int nOvershoot, int nUndershoot)
+static void clamp_sse2_t(Byte *pDst, ptrdiff_t dst_pitch, const Byte *pSrc1, ptrdiff_t src1_pitch, const Byte *pSrc2, ptrdiff_t src2_pitch, int width, int height, int overshoot, int undershoot)
 {
-    int wMod16 = (nWidth / 16) * 16;
+    int mod16_width = (width / 16) * 16;
     auto pDst_s = pDst;
     auto pSrc1_s = pSrc1;
     auto pSrc2_s = pSrc2;
 
-    auto overshoot_v = _mm_set1_epi8(Byte(nOvershoot));
-    auto undershoot_v = _mm_set1_epi8(Byte(nUndershoot));
+    auto overshoot_v = _mm_set1_epi8(Byte(overshoot));
+    auto undershoot_v = _mm_set1_epi8(Byte(undershoot));
 
-    for ( int j = 0; j < nHeight; ++j ) {
-        for ( int i = 0; i < wMod16; i+=16 ) {
+    for ( int j = 0; j < height; ++j ) {
+        for ( int i = 0; i < mod16_width; i+=16 ) {
             auto upper_limit = simd_load_si128<mem_mode>(pSrc1+i);
             auto lower_limit = simd_load_si128<mem_mode>(pSrc2+i);
 
@@ -41,13 +42,13 @@ static void clamp_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptr
 
             simd_store_si128<mem_mode>(pDst+i, limited);
         }
-        pDst += nDstPitch;
-        pSrc1 += nSrc1Pitch;
-        pSrc2 += nSrc2Pitch;
+        pDst += dst_pitch;
+        pSrc1 += src1_pitch;
+        pSrc2 += src2_pitch;
     }
 
-    if (nWidth > wMod16) {
-        clamp_c(pDst_s + wMod16, nDstPitch, pSrc1_s + wMod16, nSrc1Pitch, pSrc2_s+wMod16, nSrc2Pitch, nWidth - wMod16, nHeight, nOvershoot, nUndershoot);
+    if (width > mod16_width) {
+        clamp_c(pDst_s + mod16_width, dst_pitch, pSrc1_s + mod16_width, src1_pitch, pSrc2_s+mod16_width, src2_pitch, width - mod16_width, height, overshoot, undershoot);
     }
 }
 
