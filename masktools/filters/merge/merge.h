@@ -29,15 +29,15 @@ protected:
     virtual void process(int n, const Plane<Byte> &dst, int nPlane)
     {
         UNUSED(n);
-        if ( use_luma && nPlane ) {
+        if (use_luma && (nPlane > 0)) {
             if (width_ratios[1][C] == 2) {
-                chroma_processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(0), frames[1].plane(0).pitch(), dst.width(), dst.height() );
+                chroma_processors.best_processor(constraints[nPlane])(dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(0), frames[1].plane(0).pitch(), dst.width(), dst.height());
             } else {
-                processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(0), frames[1].plane(0).pitch(), dst.width(), dst.height() );
+                processors.best_processor(constraints[nPlane])(dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(0), frames[1].plane(0).pitch(), dst.width(), dst.height());
             }
+        } else {
+            processors.best_processor(constraints[nPlane])(dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), dst.width(), dst.height());
         }
-        else
-            processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), dst.width(), dst.height() );
     }
 
 public:
@@ -60,6 +60,11 @@ public:
           /* if "luma" is set, we force the chroma processing. Much more handy */
           operators[1] = operators[2] = PROCESS;
           /* no need to change U/V default processing, because of in place filter */
+      } else if (operators[1] == PROCESS || operators[2] == PROCESS) {
+          auto mask_colorspace = childs[2]->colorspace();
+          if (mask_colorspace == COLORSPACE_Y8) {
+              error = "Mask should have Y and V planes when chroma mode is PROCESS";
+          }
       }
 
       /* add the processors */
