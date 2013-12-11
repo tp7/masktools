@@ -7,59 +7,61 @@ typedef Byte (local_minimum_f)(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byte
 
 static inline Byte minimum_square(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byte a6, Byte a7, Byte a8, Byte a9)
 {
-   Byte nMin = a1;
-   if ( a2 < nMin ) nMin = a2;
-   if ( a3 < nMin ) nMin = a3;
-   if ( a4 < nMin ) nMin = a4;
-   if ( a5 < nMin ) nMin = a5;
-   if ( a6 < nMin ) nMin = a6;
-   if ( a7 < nMin ) nMin = a7;
-   if ( a8 < nMin ) nMin = a8;
-   if ( a9 < nMin ) nMin = a9;
-   return nMin;
+    Byte nMin = a1;
+    if (a2 < nMin) nMin = a2;
+    if (a3 < nMin) nMin = a3;
+    if (a4 < nMin) nMin = a4;
+    if (a5 < nMin) nMin = a5;
+    if (a6 < nMin) nMin = a6;
+    if (a7 < nMin) nMin = a7;
+    if (a8 < nMin) nMin = a8;
+    if (a9 < nMin) nMin = a9;
+    return nMin;
 }
 
 static inline Byte minimum_horizontal(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byte a6, Byte a7, Byte a8, Byte a9)
 {
-   Byte nMin = a4;
+    Byte nMin = a4;
 
-   UNUSED(a1); UNUSED(a2); UNUSED(a3); UNUSED(a7); UNUSED(a8); UNUSED(a9); 
+    UNUSED(a1); UNUSED(a2); UNUSED(a3); UNUSED(a7); UNUSED(a8); UNUSED(a9);
 
-   if ( a5 < nMin ) nMin = a5;
-   if ( a6 < nMin ) nMin = a6;
-   return nMin;
+    if (a5 < nMin) nMin = a5;
+    if (a6 < nMin) nMin = a6;
+    return nMin;
 }
 
 static inline Byte minimum_vertical(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byte a6, Byte a7, Byte a8, Byte a9)
 {
-   Byte nMin = a2;
+    Byte nMin = a2;
 
-   UNUSED(a1); UNUSED(a3); UNUSED(a4); UNUSED(a6); UNUSED(a7); UNUSED(a9); 
+    UNUSED(a1); UNUSED(a3); UNUSED(a4); UNUSED(a6); UNUSED(a7); UNUSED(a9);
 
-   if ( a5 < nMin ) nMin = a5;
-   if ( a8 < nMin ) nMin = a8;
-   return nMin;
+    if (a5 < nMin) nMin = a5;
+    if (a8 < nMin) nMin = a8;
+    return nMin;
 }
 
 static inline Byte minimum_both(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byte a6, Byte a7, Byte a8, Byte a9)
 {
-   Byte nMin = a2;
+    Byte nMin = a2;
 
-   UNUSED(a1); UNUSED(a3); UNUSED(a7); UNUSED(a9); 
+    UNUSED(a1); UNUSED(a3); UNUSED(a7); UNUSED(a9);
 
-   if ( a4 < nMin ) nMin = a4;
-   if ( a5 < nMin ) nMin = a5;
-   if ( a6 < nMin ) nMin = a6;
-   if ( a8 < nMin ) nMin = a8;
-   return nMin;
+    if (a4 < nMin) nMin = a4;
+    if (a5 < nMin) nMin = a5;
+    if (a6 < nMin) nMin = a6;
+    if (a8 < nMin) nMin = a8;
+    return nMin;
 }
 
 template<local_minimum_f Minimum>
 static inline Byte minimumThresholded(Byte a1, Byte a2, Byte a3, Byte a4, Byte a5, Byte a6, Byte a7, Byte a8, Byte a9, int nMaxDeviation)
 {
-   int nMinimum = Minimum(a1, a2, a3, a4, a5, a6, a7, a8, a9);
-   if ( a5 - nMinimum > nMaxDeviation ) nMinimum = a5 - nMaxDeviation;
-   return static_cast<Byte>(nMinimum);
+    int minimum = Minimum(a1, a2, a3, a4, a5, a6, a7, a8, a9);
+    if (a5 - minimum > nMaxDeviation) {
+        minimum = a5 - nMaxDeviation;
+    }
+    return static_cast<Byte>(minimum);
 }
 
 extern "C" static MT_FORCEINLINE __m128i inpand_operator_sse2(__m128i a, __m128i b) {
@@ -69,13 +71,20 @@ extern "C" static MT_FORCEINLINE __m128i inpand_operator_sse2(__m128i a, __m128i
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Morphologic { namespace Inpand {
 
 class NewValue {
-   int nMin;
-   int nMaxDeviation;
-   Byte nValue;
+    int min;
+    int max_deviation;
+    Byte value;
 public:
-   NewValue(Byte nValue, int nMaxDeviation) : nMin(256), nMaxDeviation(nMaxDeviation), nValue(nValue) { }
-   void add(Byte nValue) { if ( nValue < nMin ) nMin = nValue; }
-   Byte finalize() const { return static_cast<Byte>(nMin > 255 ? nValue : (nValue - nMin > nMaxDeviation ? nValue - nMaxDeviation : nMin)); }
+    NewValue(Byte nValue, int nMaxDeviation) : min(256), max_deviation(nMaxDeviation), value(nValue) { }
+
+    void add(Byte nValue) {
+        if (nValue < min) {
+            min = nValue;
+        }
+    }
+    Byte finalize() const {
+        return static_cast<Byte>(min > 255 ? value : (value - min > max_deviation ? value - max_deviation : min));
+    }
 };
 
 Processor *inpand_square_c       = &generic_c<minimumThresholded<::minimum_square> >;

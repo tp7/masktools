@@ -10,51 +10,53 @@ typedef void (Processor)(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrd
 
 class MorphologicFilter : public MaskTools::Filter
 {
-   int nMaxDeviations[3];
-   int *pCoordinates, nCoordinates;
+    int max_deviations[3];
+    int *coorinates_list;
+    int coordinates_count;
 
-   MorphologicFilter(const MorphologicFilter &filter);
+    MorphologicFilter(const MorphologicFilter &filter);
 
 protected:
 
-   ProcessorList<Processor> processors;
+    ProcessorList<Processor> processors;
 
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), nMaxDeviations[nPlane], pCoordinates, nCoordinates, dst.width(), dst.height() );
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
+    {
+        UNUSED(n);
+        processors.best_processor(constraints[nPlane])(dst, dst.pitch(),
+            frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(),
+            max_deviations[nPlane], coorinates_list, coordinates_count, dst.width(), dst.height());
+    }
 
-   void FillCoordinates(const String &coordinates)
-   {
-      auto coeffs = Parser::getDefaultParser().parse( coordinates, " (),;." ).getExpression();
-      nCoordinates = coeffs.size();
-      pCoordinates = new int[nCoordinates];
-      int i = 0;
+    void FillCoordinates(const String &coordinates)
+    {
+        auto coeffs = Parser::getDefaultParser().parse(coordinates, " (),;.").getExpression();
+        coordinates_count = coeffs.size();
+        coorinates_list = new int[coordinates_count];
+        int i = 0;
 
-      while ( !coeffs.empty() )
-      {
-         pCoordinates[i++] = int( coeffs.front().getValue(0, 0, 0) );
-         coeffs.pop_front();
-      }
-   }
+        while (!coeffs.empty())
+        {
+            coorinates_list[i++] = int(coeffs.front().getValue(0, 0, 0));
+            coeffs.pop_front();
+        }
+    }
 
 public:
-   MorphologicFilter(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD ), pCoordinates( NULL ), nCoordinates( 0 )
-   {
-      nMaxDeviations[0] = clip<int, int>( parameters["thY"].toInt(), 0, 255 );
-      nMaxDeviations[1] = clip<int, int>( parameters["thC"].toInt(), 0, 255 );
-      nMaxDeviations[2] = clip<int, int>( parameters["thC"].toInt(), 0, 255 );
-   }
+    MorphologicFilter(const Parameters &parameters) : MaskTools::Filter(parameters, FilterProcessingType::CHILD), coorinates_list(NULL), coordinates_count(0)
+    {
+        max_deviations[0] = clip<int, int>(parameters["thY"].toInt(), 0, 255);
+        max_deviations[1] = clip<int, int>(parameters["thC"].toInt(), 0, 255);
+        max_deviations[2] = clip<int, int>(parameters["thC"].toInt(), 0, 255);
+    }
 
-   ~MorphologicFilter()
-   {
-      if ( pCoordinates )
-         delete[] pCoordinates;
-      pCoordinates = NULL;
-   }
+    ~MorphologicFilter()
+    {
+        delete[] coorinates_list;
+        coorinates_list = NULL;
+    }
 
-   InputConfiguration &input_configuration() const { return OneFrame(); }
+    InputConfiguration &input_configuration() const { return OneFrame(); }
 };
 
 } } } } // namespace Morphologic, Filters, MaskTools, Filtering
