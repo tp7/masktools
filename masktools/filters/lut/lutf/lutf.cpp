@@ -4,23 +4,30 @@
 using namespace Filtering;
 
 template<class T>
-static void frame_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch, const Byte *pLut, int nWidth, int nHeight)
+static void frame_c(Byte *dstp, ptrdiff_t dst_pitch, const Byte *srcp, ptrdiff_t src_pitch, const Byte *lutp, int width, int height)
 {
-   T new_value( "" );
+    T processor("");
 
-   new_value.reset();
+    processor.reset();
 
-   for ( int j = 0; j < nHeight; j++, pDst += nDstPitch )
-      for ( int i = 0; i < nWidth; i++ )
-         new_value.add( pDst[i] );
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            processor.add(dstp[i]);
+        }
+        dstp += dst_pitch;
+    }
 
-   const Byte *lut = &pLut[ ( new_value.finalize() << 8 ) ];
+    const Byte *lut = lutp + (processor.finalize() << 8);
 
-   pDst -= nDstPitch * nHeight;
+    dstp -= dst_pitch * height;
 
-   for ( int j = 0; j < nHeight; j++, pSrc += nSrcPitch, pDst += nDstPitch )
-      for ( int i = 0; i < nWidth; i++ )
-         pDst[i] = lut[ pSrc[i] ];
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            dstp[i] = lut[srcp[i]];
+        }
+        srcp += src_pitch;
+        dstp += dst_pitch;
+    }
 }
 
 namespace Filtering { namespace MaskTools { namespace Filters { namespace Lut { namespace Frame {

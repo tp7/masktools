@@ -2,66 +2,68 @@
 
 using namespace Filtering;
 
-typedef std::pair<int, int> Coordinates;
+
+struct Coordinates {
+    int x;
+    int y;
+
+    Coordinates(int x_, int y_) : x(x_), y(y_) {}
+};
+
 typedef std::vector<Coordinates> CoordinatesList;
 
-static void expandMask(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
-                       const Byte *pSrc2, ptrdiff_t nSrc2Pitch, Byte *pTemp, int x, int y, int nWidth, int nHeight)
+static void expand_mask(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc2, ptrdiff_t nSrc2Pitch, Byte *pTemp, int x, int y, int nWidth, int nHeight, CoordinatesList &coordinates)
 {
-   CoordinatesList coordinates;
+    //CoordinatesList coordinates;
+    coordinates.clear();
 
-   UNUSED(nSrc1Pitch);
-   UNUSED(pSrc1);
+    pTemp[0] = 255;
+    pDst[0] = 255;
 
-   pTemp[0] = 255;
-   pDst[0]  = 255;
+    coordinates.emplace_back(0, 0);
 
-   coordinates.emplace_back(0, 0);
+    while (!coordinates.empty())
+    {
+        /* pop last coordinates */
+        Coordinates current = coordinates.back();
+        coordinates.pop_back();
 
-   while ( !coordinates.empty() )
-   {
-      /* pop last coordinates */
-      Coordinates current = coordinates.back();
-      coordinates.pop_back();
+        /* check surrounding positions */
+        int x_min = current.x  == -x ? current.x : current.x - 1;
+        int x_max = current.x  == nWidth - x - 1 ? current.x + 1 : current.x + 2;
+        int y_min = current.y == -y ? current.y : current.y - 1;
+        int y_max = current.y == nHeight - y - 1 ? current.y + 1 : current.y + 2;
 
-      /* check surrounding positions */
-      int x_min = current.first  == -x ? current.first : current.first - 1;
-      int x_max = current.first  == nWidth - x - 1 ? current.first + 1 : current.first + 2;
-      int y_min = current.second == -y ? current.second : current.second - 1;
-      int y_max = current.second == nHeight - y - 1 ? current.second + 1 : current.second + 2;
-
-      for ( int j = y_min; j < y_max; j++ )
-      {
-         for ( int i = x_min; i < x_max; i++ )
-         {
-            if ( !pTemp[i + j * nWidth] && pSrc2[i + j * nSrc2Pitch] )
-            {
-               coordinates.emplace_back(i, j);
-               pTemp[i + j * nWidth] = 255;
-               pDst[i + j * nDstPitch] = 255;
+        for (int i = y_min; i < y_max; i++) {
+            for (int j = x_min; j < x_max; j++) {
+                if (!pTemp[j + i * nWidth] && pSrc2[j + i * nSrc2Pitch]) {
+                    coordinates.emplace_back(j, i);
+                    pTemp[j + i * nWidth] = 255;
+                    pDst[j + i * nDstPitch] = 255;
+                }
             }
-         }
-      }
-   }
+        }
+    }
 }
 
 void Filtering::MaskTools::Filters::Mask::Hysteresis::hysteresis_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc1, ptrdiff_t nSrc1Pitch,
-                                                                   const Byte *pSrc2, ptrdiff_t nSrc2Pitch, Byte *pTemp, int nWidth, int nHeight)
+    const Byte *pSrc2, ptrdiff_t nSrc2Pitch, Byte *pTemp, int width, int height)
 {
 
-   memset(pDst , 0, nDstPitch * nHeight * sizeof(Byte));
-   memset(pTemp, 0, nWidth    * nHeight * sizeof(Byte));
+    memset(pDst, 0, nDstPitch * height * sizeof(Byte));
+    memset(pTemp, 0, width   * height * sizeof(Byte));
+    CoordinatesList coordinates;
 
-   for ( int y = 0; y < nHeight; y++ )
-   {
-      for ( int x = 0; x < nWidth; x++ )
-      {
-         if ( !pTemp[x] && pSrc1[x] && pSrc2[x] )
-            expandMask(&pDst[x], nDstPitch, &pSrc1[x], nSrc1Pitch, &pSrc2[x], nSrc2Pitch, &pTemp[x], x, y, nWidth, nHeight);
-      }
-      pTemp += nWidth;
-      pSrc1 += nSrc1Pitch;
-      pSrc2 += nSrc2Pitch;
-      pDst  += nDstPitch;
-   }
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)  {
+            if (!pTemp[x] && pSrc1[x] && pSrc2[x]) {
+                expand_mask(pDst + x, nDstPitch, pSrc2 + x, nSrc2Pitch, pTemp + x, x, y, width, height, coordinates);
+            }
+        }
+        pTemp += width;
+        pSrc1 += nSrc1Pitch;
+        pSrc2 += nSrc2Pitch;
+        pDst += nDstPitch;
+    }
 }

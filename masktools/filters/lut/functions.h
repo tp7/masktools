@@ -110,7 +110,7 @@ class Minimizer {
 public:
 
    Minimizer(const String &mode) { UNUSED(mode); }
-   void reset(int nValue = 255) { nMin = nValue; }
+   void reset() { nMin = 255; }
    void add(int nValue) { nMin = min<int>( nMin, nValue ); }
    Byte finalize() const { return static_cast<Byte>(nMin); }
 
@@ -162,7 +162,7 @@ public:
    MedianizerBetter(const String &mode) { UNUSED(mode); }
    void reset() { nSize = 0; memset( elements, 0, sizeof( elements ) ); memset( elements2, 0, sizeof( elements2 ) ); }
    void add(int nValue) { elements[nValue]++; elements2[nValue>>n]++; nSize++; }
-   void reset(int nValue) { reset(); add(nValue); }
+
    Byte finalize() const
    {
       int nCount = 0;
@@ -202,7 +202,7 @@ class Maximizer {
 public:
 
    Maximizer(const String &mode) { UNUSED(mode); }
-   void reset(int nValue = 0) { nMax = nValue; }
+   void reset() { nMax = 0; }
    void add(int nValue) { nMax = max<int>( nMax, nValue ); }
    Byte finalize() const { return static_cast<Byte>(nMax); }
 
@@ -215,7 +215,6 @@ class Rangizer {
 public:
 
    Rangizer(const String &mode) { UNUSED(mode); }
-   void reset(int nValue) { nMin = nMax = nValue; }
    void reset() { nMin = 255; nMax = 0; }
    void add(int nValue) { nMin = min<int>( nMin, nValue ); nMax = max<int>( nMax, nValue ); }
    Byte finalize() const { return static_cast<Byte>(nMax - nMin); }
@@ -232,7 +231,6 @@ public:
 
    Averager(const String &mode) { UNUSED(mode); }
    void reset() { nSum = 0; nCount = 0; }
-   void reset(int nValue) { nSum = nValue; nCount = 1; }
    void add(int nValue) { nSum += nValue; nCount++; }
    Byte finalize() const { return static_cast<Byte>(rounded_division<T>( nSum, nCount )); }
 

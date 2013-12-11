@@ -12,44 +12,35 @@ Processor hysteresis_c;
 
 class Hysteresis : public MaskTools::Filter
 {
-
-   Byte *pbStack;
-
-   void initializeStack()
-   {
-      if ( !pbStack )
-         pbStack = new Byte[nWidth * nHeight];
-   }
+    Byte *stack;
 
 protected:
-
-
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      initializeStack();
-      hysteresis_c( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), pbStack, dst.width(), dst.height() );
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
+    {
+        UNUSED(n);
+        hysteresis_c(dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), stack, dst.width(), dst.height());
+    }
 
 public:
-   Hysteresis(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD ), pbStack(NULL) { }
-   ~Hysteresis()
-   {
-      if ( pbStack )
-         delete pbStack;
-   }
+    Hysteresis(const Parameters &parameters) : MaskTools::Filter(parameters, FilterProcessingType::CHILD), stack(nullptr) {
+        stack = reinterpret_cast<Byte*>(_aligned_malloc(nWidth*nHeight, 16));
+    }
 
-   InputConfiguration &input_configuration() const { return TwoFrame(); }
+    ~Hysteresis() {
+        _aligned_free(stack);
+    }
 
-   static Signature filter_signature()
-   {
-      Signature signature = "mt_hysteresis";
+    InputConfiguration &input_configuration() const { return TwoFrame(); }
 
-      signature.add(Parameter(TYPE_CLIP, ""));
-      signature.add(Parameter(TYPE_CLIP, ""));
+    static Signature filter_signature()
+    {
+        Signature signature = "mt_hysteresis";
 
-      return add_defaults( signature );
-   }
+        signature.add(Parameter(TYPE_CLIP, ""));
+        signature.add(Parameter(TYPE_CLIP, ""));
+
+        return add_defaults(signature);
+    }
 };
 
 
