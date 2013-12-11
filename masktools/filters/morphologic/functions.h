@@ -188,12 +188,12 @@ static void xxpand_sse2_vertical(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pS
     UNUSED(nCoordinates); UNUSED(pCoordinates);
     auto max_dev_v = _mm_set1_epi8(Byte(nMaxDeviation));
     int mod16_width = nWidth / 16 * 16;
-    int width_diff = nWidth - mod16_width;
+    bool not_mod16 = nWidth != mod16_width;
    
     process_line_xxpand_vertical<op, limit, mem_mode>(pDst, pSrc, pSrc, pSrcn, max_dev_v, mod16_width);
 
-    if (width_diff) {
-        process_line_xxpand_vertical<op, limit, mem_mode>(pDst + mod16_width, pSrc+mod16_width, pSrc+mod16_width, pSrcn+mod16_width, max_dev_v, width_diff);
+    if (not_mod16) {
+        process_line_xxpand_vertical<op, limit, MemoryMode::SSE2_UNALIGNED>(pDst + nWidth - 16, pSrc+nWidth-16, pSrc+nWidth-16, pSrcn+nWidth-16, max_dev_v, 16);
     }
 
     pDst += nDstPitch;
@@ -205,8 +205,8 @@ static void xxpand_sse2_vertical(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pS
     {
         process_line_xxpand_vertical<op, limit, mem_mode>(pDst, pSrcp, pSrc, pSrcn, max_dev_v, mod16_width);
 
-        if (width_diff) {
-            process_line_xxpand_vertical<op, limit, mem_mode>(pDst + mod16_width, pSrcp+mod16_width, pSrc+mod16_width, pSrcn+mod16_width, max_dev_v, width_diff);
+        if (not_mod16) {
+            process_line_xxpand_vertical<op, limit, MemoryMode::SSE2_UNALIGNED>(pDst + nWidth - 16, pSrcp+nWidth - 16, pSrc+nWidth - 16, pSrcn+nWidth - 16, max_dev_v, 16);
         }
 
         pDst += nDstPitch;
@@ -217,8 +217,8 @@ static void xxpand_sse2_vertical(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pS
     
     process_line_xxpand_vertical<op, limit, mem_mode>(pDst, pSrcp, pSrc, pSrc, max_dev_v, mod16_width);
 
-    if (width_diff) {
-        process_line_xxpand_vertical<op, limit, mem_mode>(pDst + mod16_width, pSrcp+mod16_width, pSrc+mod16_width, pSrc+mod16_width, max_dev_v, width_diff);
+    if (not_mod16) {
+        process_line_xxpand_vertical<op, limit, MemoryMode::SSE2_UNALIGNED>(pDst + nWidth - 16, pSrcp+nWidth - 16, pSrc+nWidth - 16, pSrc+nWidth - 16, max_dev_v, 16);
     }
 }
 
