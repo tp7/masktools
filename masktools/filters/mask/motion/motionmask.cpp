@@ -98,11 +98,11 @@ bool mask_t(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPit
 {
     bool scenechange = nSceneChange >= 2 ? nSceneChange == 3 : sad(pDst, nDstPitch, pSrc, nSrcPitch, nWidth, nHeight) > (unsigned int)(nMotionThreshold * nWidth * nHeight);
 
-    if ( scenechange )
-        Functions::memset_c(pDst, nDstPitch, nWidth, nHeight, static_cast<Byte>(nSceneChangeValue));
-    else
+    if (scenechange) {
+        Functions::memset_plane(pDst, nDstPitch, nWidth, nHeight, static_cast<Byte>(nSceneChangeValue));
+    } else {
         mask(pDst, nDstPitch, pSrc, nSrcPitch, nLowThreshold, nHighThreshold, nWidth, nHeight);
-
+    }
     return scenechange;
 }
 

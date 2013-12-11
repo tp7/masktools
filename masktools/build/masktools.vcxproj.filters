@@ -308,9 +308,6 @@
     <ClCompile Include="..\filters\lut\lutsx\lutsx.cpp">
       <Filter>filters\lut\lutsx</Filter>
     </ClCompile>
-    <ClCompile Include="..\filters\lut\lutspa\lutspa.cpp">
-      <Filter>filters\lut\lutspa</Filter>
-    </ClCompile>
     <ClCompile Include="..\filters\lut\luts\luts.cpp">
       <Filter>filters\lut\luts</Filter>
     </ClCompile>

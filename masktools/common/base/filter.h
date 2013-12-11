@@ -173,16 +173,16 @@ public:
 
         switch (operators[nPlane].getMode())
         {
-        case COPY: Functions::copy_c( output_plane, output_plane.pitch(),
+        case COPY: Functions::copy_plane( output_plane, output_plane.pitch(),
                        frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(),
                        output_plane.width(), output_plane.height() ); break;
-        case COPY_SECOND: Functions::copy_c( output_plane, output_plane.pitch(),
+        case COPY_SECOND: Functions::copy_plane(output_plane, output_plane.pitch(),
                               frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(),
                               output_plane.width(), output_plane.height() ); break;
-        case COPY_THIRD: Functions::copy_c( output_plane, output_plane.pitch(),
+        case COPY_THIRD: Functions::copy_plane(output_plane, output_plane.pitch(),
                              frames[2].plane(nPlane), frames[2].plane(nPlane).pitch(),
                              output_plane.width(), output_plane.height() ); break;
-        case MEMSET: Functions::memset_c( output_plane, output_plane.pitch(), output_plane.width(), output_plane.height(), static_cast<Byte>(operators[nPlane].value()) ); break;
+        case MEMSET: Functions::memset_plane( output_plane, output_plane.pitch(), output_plane.width(), output_plane.height(), static_cast<Byte>(operators[nPlane].value()) ); break;
         case PROCESS: process( n, output_plane, nPlane ); break;
         case NONE: 
         default: break;

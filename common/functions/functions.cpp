@@ -3,7 +3,7 @@
 
 using namespace Filtering;
 
-void Functions::memset_c(Byte *pPlane, ptrdiff_t nPitch, int nWidth, int nHeight, Byte value)
+void Functions::memset_plane(Byte *pPlane, ptrdiff_t nPitch, int nWidth, int nHeight, Byte value)
 {
     if (nPitch == nWidth) {
         memset(pPlane, value, nWidth*nHeight);
@@ -15,7 +15,7 @@ void Functions::memset_c(Byte *pPlane, ptrdiff_t nPitch, int nWidth, int nHeight
     }
 }
 
-void Functions::copy_c(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch,
+void Functions::copy_plane(Byte *pDst, ptrdiff_t nDstPitch, const Byte *pSrc, ptrdiff_t nSrcPitch,
                        int nWidth, int nHeight)
 {
     if (nDstPitch == nWidth && nSrcPitch == nWidth) {

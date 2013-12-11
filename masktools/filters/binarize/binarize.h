@@ -29,14 +29,14 @@ DEFINE_PROCESSOR(255_t);
 
 class Binarize : public MaskTools::Filter
 {
-   Byte nThreshold;
+   Byte threshold;
    ProcessorList<Processor> processors;
 
 protected:
    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
    {
       UNUSED(n);
-      processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), nThreshold, dst.width(), dst.height() );
+      processors.best_processor(constraints[nPlane])(dst, dst.pitch(), threshold, dst.width(), dst.height());
    }
 
    bool isMode(const char *mode) {
@@ -46,12 +46,12 @@ protected:
 public:
    Binarize(const Parameters &parameters) : MaskTools::Filter(parameters, FilterProcessingType::INPLACE)
    {
-      nThreshold = convert<Byte, int>( parameters["threshold"].toInt() );
+       threshold = convert<Byte, int>(parameters["threshold"].toInt());
 
 #define SET_MODE(mode) \
-      processors.push_back( Filtering::Processor<Processor>( binarize_##mode##_c, Constraint( CPU_NONE, 1, 1, 1, 1 ), 0 ) ); \
-      processors.push_back( Filtering::Processor<Processor>( binarize_##mode##_sse2, Constraint( CPU_SSE2 , 1, 1, 1, 1 ), 1 ) ); \
-      processors.push_back( Filtering::Processor<Processor>( binarize_##mode##_asse2, Constraint( CPU_SSE2 , 1, 1, 16, 16 ), 2 ) ); 
+      processors.push_back(Filtering::Processor<Processor>(binarize_##mode##_c, Constraint(CPU_NONE, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 1), 0)); \
+      processors.push_back(Filtering::Processor<Processor>(binarize_##mode##_sse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 1), 1)); \
+      processors.push_back(Filtering::Processor<Processor>(binarize_##mode##_asse2, Constraint(CPU_SSE2, MODULO_NONE, MODULO_NONE, ALIGNMENT_16, 16), 2));
 
       if (isMode("0 x")) { SET_MODE(0_x); }
       else if (isMode("t x")) { SET_MODE(t_x); }

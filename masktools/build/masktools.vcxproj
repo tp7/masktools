@@ -606,7 +606,6 @@
     <ClCompile Include="..\filters\lut\lutf\lutf.cpp" />
     <ClCompile Include="..\filters\lut\lutxyz\lutxyz.cpp" />
     <ClCompile Include="..\filters\lut\lutsx\lutsx.cpp" />
-    <ClCompile Include="..\filters\lut\lutspa\lutspa.cpp" />
     <ClCompile Include="..\filters\merge\merge.cpp" />
     <ClCompile Include="..\filters\logic\logic.cpp" />
     <ClCompile Include="..\filters\convolution\convolution.cpp" />

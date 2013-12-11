@@ -31,87 +31,87 @@ void binarize_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidth, in
 }
 
 /* SSE2 functions */
-static inline __m128i binarize_upper_sse2_op(__m128i x, __m128i t, __m128i) {
+static MT_FORCEINLINE __m128i binarize_upper_sse2_op(__m128i x, __m128i t, __m128i) {
     auto r = _mm_subs_epu8(x, t);
     return _mm_cmpeq_epi8(r, _mm_setzero_si128());
 }
 
-static inline __m128i binarize_lower_sse2_op(__m128i x, __m128i, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_lower_sse2_op(__m128i x, __m128i, __m128i t128) {
     auto r = _mm_add_epi8(x, _mm_set1_epi32(0x80808080));
     return _mm_cmpgt_epi8(r, t128);
 }
 
-static inline __m128i binarize_0_x_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_0_x_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_and_si128(upper, x);
 }
 
-static inline __m128i binarize_t_x_sse2_op(__m128i x, __m128i t, __m128i) {
+static MT_FORCEINLINE __m128i binarize_t_x_sse2_op(__m128i x, __m128i t, __m128i) {
     return _mm_min_epu8(t, x);
 }
 
-static inline __m128i binarize_x_0_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_x_0_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_and_si128(lower, x);
 }
 
-static inline __m128i binarize_x_t_sse2_op(__m128i x, __m128i t, __m128i) {
+static MT_FORCEINLINE __m128i binarize_x_t_sse2_op(__m128i x, __m128i t, __m128i) {
     return _mm_max_epu8(t, x);
 }
 
-static inline __m128i binarize_t_0_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_t_0_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_and_si128(lower, t);
 }
 
-static inline __m128i binarize_0_t_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_0_t_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_and_si128(upper, t);
 }
 
-static inline __m128i binarize_x_255_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_x_255_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_or_si128(upper, x);
 }
 
-static inline __m128i binarize_255_x_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_255_x_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_or_si128(lower, x);
 }
 
-static inline __m128i binarize_t_255_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_t_255_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto upper = binarize_upper_sse2_op(x, t, t128);
     return _mm_or_si128(upper, t);
 }
 
-static inline __m128i binarize_255_t_sse2_op(__m128i x, __m128i t, __m128i t128) {
+static MT_FORCEINLINE __m128i binarize_255_t_sse2_op(__m128i x, __m128i t, __m128i t128) {
     auto lower = binarize_lower_sse2_op(x, t, t128);
     return _mm_or_si128(lower, t);
 }
 
 template<MemoryMode mem_mode, decltype(binarize_upper_sse2_op) op, decltype(binarize_upper) op_c>
-void binarize_sse2_t(Byte *pDst, ptrdiff_t nDstPitch, Byte nThreshold, int nWidth, int nHeight)
+void binarize_sse2_t(Byte *dstp, ptrdiff_t dst_pitch, Byte threshold, int width, int height)
 {
-    auto t = _mm_set1_epi8(Byte(nThreshold));
+    auto t = _mm_set1_epi8(Byte(threshold));
     auto t128 = _mm_add_epi8(t, _mm_set1_epi32(0x80808080));
-    int wMod32 = (nWidth / 32) * 32;
-    auto pDst2 = pDst;
+    int mod32_width = (width / 32) * 32;
+    auto dstp2 = dstp;
 
-    for ( int j = 0; j < nHeight; ++j ) {
-        for ( int i = 0; i < wMod32; i+=32 ) {
-            _mm_prefetch(reinterpret_cast<const char*>(pDst)+i+320, _MM_HINT_T0);
-            auto src = simd_load_si128<mem_mode>(pDst+i);
-            auto src2 = simd_load_si128<mem_mode>(pDst+i+16);
+    for ( int j = 0; j < height; ++j ) {
+        for ( int i = 0; i < mod32_width; i+=32 ) {
+            _mm_prefetch(reinterpret_cast<const char*>(dstp)+i+320, _MM_HINT_T0);
+            auto src = simd_load_si128<mem_mode>(dstp+i);
+            auto src2 = simd_load_si128<mem_mode>(dstp+i+16);
             auto result = op(src, t, t128);
             auto result2 = op(src2, t, t128);
-            simd_store_si128<mem_mode>(pDst+i, result);
-            simd_store_si128<mem_mode>(pDst+i+16, result2);
+            simd_store_si128<mem_mode>(dstp+i, result);
+            simd_store_si128<mem_mode>(dstp+i+16, result2);
         }
-        pDst += nDstPitch;
+        dstp += dst_pitch;
     }
 
-    if (nWidth > wMod32) {
-        binarize_t<op_c>(pDst2 + wMod32, nDstPitch, nThreshold, nWidth - wMod32, nHeight);
+    if (width > mod32_width) {
+        binarize_t<op_c>(dstp2 + mod32_width, dst_pitch, threshold, width - mod32_width, height);
     }
 }
 
