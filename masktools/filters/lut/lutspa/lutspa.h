@@ -18,7 +18,7 @@ protected:
    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
    {
       UNUSED(n);
-      Functions::copy_plane(dst, dst.pitch(), luts[nPlane], dst.width(), dst.width(), dst.height());
+      Functions::copy_plane(dst.data(), dst.pitch(), luts[nPlane], dst.width(), dst.width(), dst.height());
    }
 
 public:

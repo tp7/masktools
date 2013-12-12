@@ -20,17 +20,17 @@ protected:
     virtual void process(int n, const Plane<Byte> &dst, int nPlane)
     {
         UNUSED(n);
-        processors.best_processor(constraints[nPlane])(dst, dst.pitch(), 
-            frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), 
-            frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), 
+        processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(),
+            frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+            frames[1].plane(nPlane).data(), frames[1].plane(nPlane).pitch(),
             dst.width(), dst.height(), overshoot, undershoot);
     }
 
 public:
     Clamp(const Parameters &parameters) : MaskTools::Filter(parameters, FilterProcessingType::INPLACE)
     {
-        undershoot = parameters["undershoot"];
-        overshoot = parameters["overshoot"];
+        undershoot = parameters["undershoot"].toInt();
+        overshoot = parameters["overshoot"].toInt();
 
         /* add the processors */
         processors.push_back(Filtering::Processor<Processor>(&clamp_c, Constraint(CPU_NONE, MODULO_NONE, MODULO_NONE, ALIGNMENT_NONE, 1), 0));

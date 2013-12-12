@@ -45,7 +45,9 @@ protected:
    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
    {
       UNUSED(n);
-      processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), dst.width(), dst.height(), nThresholdDestination, nThresholdSource );
+      processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(), 
+          frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+          dst.width(), dst.height(), nThresholdDestination, nThresholdSource);
    }
 
 public:

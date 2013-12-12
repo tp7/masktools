@@ -20,11 +20,11 @@ public:
    Plane() : pPixel(NULL), nPitch(0), nWidth(0), nHeight(0) {}
    Plane(T *pPixel, ptrdiff_t nPitch, int nWidth, int nHeight) : pPixel(pPixel), nPitch(nPitch), nWidth(nWidth), nHeight(nHeight) { }
 
-   Plane(const Plane<const T> &plane) : pPixel(plane), nPitch(plane.pitch()), nWidth(plane.width()), nHeight(plane.height())
+   Plane(const Plane<const T> &plane) : pPixel(plane.data()), nPitch(plane.pitch()), nWidth(plane.width()), nHeight(plane.height())
    {
    }
 
-   operator T*() const { return pPixel; }
+   T* data() const { return pPixel; }
    ptrdiff_t pitch() const { return nPitch; }
    int width() const { return nWidth; }
    int height() const { return nHeight; }

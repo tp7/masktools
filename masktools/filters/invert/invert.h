@@ -19,7 +19,7 @@ protected:
    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
    {
       UNUSED(n);
-      processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), dst.width(), dst.height() );
+      processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(), dst.width(), dst.height());
    }
 
 public:

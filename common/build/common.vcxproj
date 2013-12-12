@@ -419,7 +419,6 @@
     <ClInclude Include="..\constraints\constraints.h" />
     <ClInclude Include="..\..\avs2x\avisynth-2_5.h" />
     <ClInclude Include="..\..\avs2x\avisynth-2_6.h" />
-    <ClInclude Include="..\..\avs2x\avs2x.h" />
     <ClInclude Include="..\..\avs2x\clip.h" />
     <ClInclude Include="..\..\avs2x\filter.h" />
     <ClInclude Include="..\..\avs2x\params.h" />

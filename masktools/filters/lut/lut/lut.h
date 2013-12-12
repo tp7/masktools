@@ -18,7 +18,7 @@ protected:
    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
    {
       UNUSED(n);
-      lut_c( dst, dst.pitch(), dst.width(), dst.height(), luts[nPlane] );
+      lut_c(dst.data(), dst.pitch(), dst.width(), dst.height(), luts[nPlane]);
    }
 
 public:

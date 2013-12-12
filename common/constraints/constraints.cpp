@@ -50,16 +50,16 @@ Constraint::Constraint(CpuFlags flags, int nWidth, int nHeight, Int64 nAddress, 
 flags(flags), moduloX(toModulo(nWidth)), moduloY(toModulo(nHeight)), alignment(toAlignment(nAddress | nPitch)), nMinimumWidth(nWidth) { }
 
 Constraint::Constraint(CpuFlags flags, const Plane<const Byte> &plane) :
-flags(flags), moduloX(toModulo(plane.width())), moduloY(toModulo(plane.height())), alignment(toAlignment(Int64(static_cast<const Byte*>(plane)) | plane.pitch())), nMinimumWidth(plane.width()) {}
+flags(flags), moduloX(toModulo(plane.width())), moduloY(toModulo(plane.height())), alignment(toAlignment(Int64(static_cast<const Byte*>(plane.data())) | plane.pitch())), nMinimumWidth(plane.width()) {}
 
 Constraint::Constraint(CpuFlags flags, const Plane<Byte> &plane) :
-flags(flags), moduloX(toModulo(plane.width())), moduloY(toModulo(plane.height())), alignment(toAlignment(Int64(static_cast<const Byte*>(plane)) | plane.pitch())), nMinimumWidth(plane.width()) {}
+flags(flags), moduloX(toModulo(plane.width())), moduloY(toModulo(plane.height())), alignment(toAlignment(Int64(static_cast<const Byte*>(plane.data())) | plane.pitch())), nMinimumWidth(plane.width()) {}
 
 Constraint::Constraint(const Constraint &constraint, const Plane<Byte> &plane) :
-flags(constraint.flags), moduloX(constraint.moduloX & toModulo(plane.width())), moduloY(constraint.moduloY & toModulo(plane.height())), alignment(constraint.alignment & toAlignment(Int64(static_cast<const Byte*>(plane)) | plane.pitch())), nMinimumWidth(plane.width()) {}
+flags(constraint.flags), moduloX(constraint.moduloX & toModulo(plane.width())), moduloY(constraint.moduloY & toModulo(plane.height())), alignment(constraint.alignment & toAlignment(Int64(static_cast<const Byte*>(plane.data())) | plane.pitch())), nMinimumWidth(plane.width()) {}
 
 Constraint::Constraint(const Constraint &constraint, const Plane<const Byte> &plane) :
-flags(constraint.flags), moduloX(constraint.moduloX & toModulo(plane.width())), moduloY(constraint.moduloY & toModulo(plane.height())), alignment(constraint.alignment & toAlignment(Int64(static_cast<const Byte*>(plane)) | plane.pitch())), nMinimumWidth(plane.width()) {}
+flags(constraint.flags), moduloX(constraint.moduloX & toModulo(plane.width())), moduloY(constraint.moduloY & toModulo(plane.height())), alignment(constraint.alignment & toAlignment(Int64(static_cast<const Byte*>(plane.data())) | plane.pitch())), nMinimumWidth(plane.width()) {}
 
 bool Constraint::respect(const Constraint &constraint) const
 {

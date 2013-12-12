@@ -27,7 +27,7 @@
 #include "../filters/support/average/average.h"
 #include "../filters/support/clamp/clamp.h"
 
-#include "../../avs2x/avs2x.h"
+#include "../../avs2x/filter.h"
 #include "../helpers/avs2x/helpers_avs2x.h"
 
 using namespace Filtering;

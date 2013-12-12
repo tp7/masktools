@@ -63,9 +63,6 @@
     <ClInclude Include="..\..\avs2x\avisynth-2_6.h">
       <Filter>avs2x</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\avs2x\avs2x.h">
-      <Filter>avs2x</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\avs2x\clip.h">
       <Filter>avs2x</Filter>
     </ClInclude>

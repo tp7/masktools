@@ -18,7 +18,10 @@ protected:
     virtual void process(int n, const Plane<Byte> &dst, int nPlane)
     {
         UNUSED(n);
-        hysteresis_c(dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(), stack, dst.width(), dst.height());
+        hysteresis_c(dst.data(), dst.pitch(),
+            frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+            frames[1].plane(nPlane).data(), frames[1].plane(nPlane).pitch(),
+            stack, dst.width(), dst.height());
     }
 
 public:

@@ -43,13 +43,6 @@ public:
    Value(const Value &v) : type(v.type), defined(v.defined), val_clip(v.val_clip), val_int(v.val_int), 
                             val_string(v.val_string), val_bool(v.val_bool), val_float(v.val_float) { }
 
-   operator int() const { return val_int; }
-   operator double() const { return val_float; }
-   operator float() const { return float(val_float); }
-   operator bool() const { return val_bool; }
-   operator String() const { return val_string; }
-   operator PClip() const { return val_clip; }
-
    Type get_type() const { return type; }
 
    int toInt() const { return val_int; }

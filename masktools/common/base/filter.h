@@ -62,14 +62,14 @@ public:
         parameters(parameters), 
         flags(Functions::get_cpu_flags()),
         inPlace_(processingType == FilterProcessingType::INPLACE),
-        nXOffset( parameters["offx"] ),
-        nYOffset( parameters["offy"] ),
-        nCoreWidth( parameters["w"] ),
-        nCoreHeight( parameters["h"] )
+        nXOffset( parameters["offx"].toInt() ),
+        nYOffset(parameters["offy"].toInt()),
+        nCoreWidth(parameters["w"].toInt()),
+        nCoreHeight(parameters["h"].toInt())
     {
         for(auto &param: parameters) {
             if (param.getType() == TYPE_CLIP) {
-                childs.push_back(param.getValue());
+                childs.push_back(param.getValue().toClip());
             }
         }
 
@@ -79,14 +79,9 @@ public:
         nHeight = childs[0]->height();
         C = childs[0]->colorspace();
 
-        nXOffset = parameters["offx"];
-        nYOffset = parameters["offy"];
-        nCoreWidth = parameters["w"];
-        nCoreHeight = parameters["h"];
-
-        operators[0] = Operator( parameters["Y"] );
-        operators[1] = Operator( parameters["U"] );
-        operators[2] = Operator( parameters["V"] );
+        operators[0] = Operator(parameters["Y"].toInt());
+        operators[1] = Operator(parameters["U"].toInt());
+        operators[2] = Operator(parameters["V"].toInt());
 
         if ( nXOffset < 0 || nXOffset > nWidth  ) nXOffset = 0;
         if ( nYOffset < 0 || nYOffset > nHeight ) nYOffset = 0;
@@ -173,18 +168,30 @@ public:
 
         switch (operators[nPlane].getMode())
         {
-        case COPY: Functions::copy_plane( output_plane, output_plane.pitch(),
-                       frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(),
-                       output_plane.width(), output_plane.height() ); break;
-        case COPY_SECOND: Functions::copy_plane(output_plane, output_plane.pitch(),
-                              frames[1].plane(nPlane), frames[1].plane(nPlane).pitch(),
-                              output_plane.width(), output_plane.height() ); break;
-        case COPY_THIRD: Functions::copy_plane(output_plane, output_plane.pitch(),
-                             frames[2].plane(nPlane), frames[2].plane(nPlane).pitch(),
-                             output_plane.width(), output_plane.height() ); break;
-        case MEMSET: Functions::memset_plane( output_plane, output_plane.pitch(), output_plane.width(), output_plane.height(), static_cast<Byte>(operators[nPlane].value()) ); break;
-        case PROCESS: process( n, output_plane, nPlane ); break;
-        case NONE: 
+        case COPY:
+            Functions::copy_plane(output_plane.data(), output_plane.pitch(),
+                frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+                output_plane.width(), output_plane.height());
+            break;
+        case COPY_SECOND:
+            Functions::copy_plane(output_plane.data(), output_plane.pitch(),
+                frames[1].plane(nPlane).data(), frames[1].plane(nPlane).pitch(),
+                output_plane.width(), output_plane.height());
+            break;
+        case COPY_THIRD:
+            Functions::copy_plane(output_plane.data(), output_plane.pitch(),
+                frames[2].plane(nPlane).data(), frames[2].plane(nPlane).pitch(),
+                output_plane.width(), output_plane.height());
+            break;
+        case MEMSET:
+            Functions::memset_plane(output_plane.data(), output_plane.pitch(), 
+                output_plane.width(), output_plane.height(), 
+                static_cast<Byte>(operators[nPlane].value()));
+            break;
+        case PROCESS:
+            process(n, output_plane, nPlane);
+            break;
+        case NONE:
         default: break;
         }
     }

@@ -28,9 +28,13 @@ protected:
    {
       UNUSED(n);
       if ( nPlane == 0 )
-         nSceneChange = processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), nLowThresholds[nPlane], nHighThresholds[nPlane], nMotionThreshold, 0, nSceneChangeValue, dst.width(), dst.height() ) ? 3 : 2;
+          nSceneChange = processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(), 
+          frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+          nLowThresholds[nPlane], nHighThresholds[nPlane], nMotionThreshold, 0, nSceneChangeValue, dst.width(), dst.height()) ? 3 : 2;
       else
-         processors.best_processor( constraints[nPlane] )( dst, dst.pitch(), frames[0].plane(nPlane), frames[0].plane(nPlane).pitch(), nLowThresholds[nPlane], nHighThresholds[nPlane], nMotionThreshold, nSceneChange, nSceneChangeValue, dst.width(), dst.height() );
+          processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(), 
+          frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+          nLowThresholds[nPlane], nHighThresholds[nPlane], nMotionThreshold, nSceneChange, nSceneChangeValue, dst.width(), dst.height());
    }
 
 public:
