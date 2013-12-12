@@ -23,7 +23,7 @@ class Operator {
 public:
 
    Operator() : mode(NONE), nValue(-1) {}
-   Operator(Mode mode, int nValue) : mode(mode), nValue(mode == MEMSET ? nValue : -1) {}
+   Operator(Mode mode, int nValue = -1) : mode(mode), nValue(mode == MEMSET ? nValue : -1) {}
    Operator(int nValue)
    {
       this->nValue = -1;
