@@ -71,60 +71,63 @@ static const int PlaneOrder[] = { PLANAR_Y, PLANAR_U, PLANAR_V };
 /* clip class, adapted to avs25 */
 class Clip : public Filtering::Clip {
 
-   ::PClip pclip;
-   IScriptEnvironment *env;
+    ::PClip pclip;
+    IScriptEnvironment *env;
 
-   std::vector<PVideoFrame> frames;
+    std::vector<PVideoFrame> frames;
 
 public:
 
-   Clip(const ::PClip &pclip) : pclip(pclip), env(NULL)
-   {
-      VideoInfo vi = pclip->GetVideoInfo();
-      nWidth = vi.width;
-      nHeight = vi.height;
-      nFrames = vi.num_frames;
-      C = AVSColorspaceToColorspace( vi.pixel_type );
-   }
-   virtual ~Clip()
-   {
-   }
+    Clip(const ::PClip &pclip) : pclip(pclip), env(NULL)
+    {
+        VideoInfo vi = pclip->GetVideoInfo();
+        nWidth = vi.width;
+        nHeight = vi.height;
+        nFrames = vi.num_frames;
+        C = AVSColorspaceToColorspace(vi.pixel_type);
+    }
+    
+    virtual ~Clip()
+    {
+    }
 
-   template<typename T> Frame<T> ConvertTo(const PVideoFrame& frame)
-   {
-      Plane<T> planes[3];
+    template<typename T> Frame<T> ConvertTo(const PVideoFrame& frame)
+    {
+        Plane<T> planes[3];
 #if defined(FILTER_AVS_25)
-      if ( C == COLORSPACE_YV16 )
-      {
-         for ( int i = 0; i < plane_counts[C]; i++ )
-            planes[i] = Avisynth2x::ConvertInterleavedTo<T>( frame, i );
-      }
-      else
+        if ( C == COLORSPACE_YV16 )
+        {
+            for ( int i = 0; i < plane_counts[C]; i++ )
+                planes[i] = Avisynth2x::ConvertInterleavedTo<T>( frame, i );
+        }
+        else
 #endif
-      {
-         for ( int i = 0; i < plane_counts[C]; i++ )
-            planes[i] = Avisynth2x::ConvertTo<T>( frame, PlaneOrder[i] ); 
-      }
+        {
+            for (int i = 0; i < plane_counts[C]; i++)
+                planes[i] = Avisynth2x::ConvertTo<T>(frame, PlaneOrder[i]);
+        }
+        return plane_counts[C] == 1 ? Frame<T>(planes[0]) : Frame<T>(planes, C);
+    }
 
-      return plane_counts[C] == 1 ? Frame<T>( planes[0] ) : Frame<T>( planes, C );
-   }
+    virtual Frame<Byte> get_frame(int n)
+    {
+        PVideoFrame frame = pclip->GetFrame(n, env);
+        frames.push_back(frame);
+        return ConvertTo<Byte>(frame);
+    }
 
-   virtual Frame<Byte> get_frame(int n)
-   {
-      PVideoFrame frame = pclip->GetFrame( n ,env );
-      frames.push_back( frame );
-      return ConvertTo<Byte>( frame );
-   }
    virtual Frame<const Byte> get_const_frame(int n)
    {
-      PVideoFrame frame = pclip->GetFrame( clip<int>(n, 0, nFrames - 1), env );
-      frames.push_back( frame );
-      return ConvertTo<const Byte>( frame );
+       PVideoFrame frame = pclip->GetFrame(clip<int>(n, 0, nFrames - 1), env);
+       frames.push_back(frame);
+       return ConvertTo<const Byte>(frame);
    }
+
    virtual void release_frames()
    {
-      frames.clear();
+       frames.clear();
    }
+
    void set_env(IScriptEnvironment *env) { this->env = env; }
 
 };

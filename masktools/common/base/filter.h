@@ -201,8 +201,7 @@ public:
         Frame<Byte> output = output_frame.offset(nXOffset, nYOffset, nCoreWidth, nCoreHeight);
 
         for (int i = 0; i < int(input_configuration().size()); i++) {
-            frames.push_back(
-                childs[input_configuration()[i].index()]->get_const_frame(n + input_configuration()[i].offset())
+            frames.push_back(childs[input_configuration()[i].index()]->get_const_frame(n + input_configuration()[i].offset())
                 .offset(nXOffset, nYOffset, nCoreWidth, nCoreHeight));
         }
 

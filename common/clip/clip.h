@@ -28,7 +28,6 @@ public:
    virtual Frame<Byte> get_frame(int n) = 0;
    virtual Frame<const Byte> get_const_frame(int n) = 0;
    virtual void release_frames() = 0;
-   //Clip *copy() { add_ref(); return this; }
 
 };
 

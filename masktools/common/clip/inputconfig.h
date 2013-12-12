@@ -13,7 +13,7 @@ class Input {
 
 public:
 
-   Input(int nIndex = 0, int nOffset = 0) : nIndex(nIndex), nOffset(nOffset) {}
+   Input(int nIndex, int nOffset) : nIndex(nIndex), nOffset(nOffset) {}
 
    int index() const { return nIndex; }
    int offset() const { return nOffset; }

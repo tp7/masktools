@@ -29,18 +29,21 @@ public:
     {
         PVideoFrame dst = _filter.is_in_place() ? child->GetFrame(n, env) : env->NewVideoFrame(vi);
 
-        if (_filter.is_in_place())
+        if (_filter.is_in_place()) {
             env->MakeWritable(&dst);
+        }
 
-        for (int i = 0; i < int(_filter.get_childs().size()); i++)
+        for (int i = 0; i < int(_filter.get_childs().size()); i++) {
             dynamic_cast<Clip *>((Filtering::Clip *)_filter.get_childs()[i].get())->set_env(env);
+        }
 
         Frame<Byte> destination = dynamic_cast<Clip *>((Filtering::Clip *)_filter.get_childs()[0].get())->ConvertTo<Byte>(dst);
 
         _filter.get_frame(n, destination);
 
-        for (int i = 0; i < int(_filter.get_childs().size()); i++)
+        for (int i = 0; i < int(_filter.get_childs().size()); i++) {
             _filter.get_childs()[i]->release_frames();
+        }
 
         return dst;
     }

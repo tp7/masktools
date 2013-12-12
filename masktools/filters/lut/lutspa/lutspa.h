@@ -48,7 +48,7 @@ public:
           if (operators[i] != PROCESS) {
               continue;
           }
-
+          
           if (parameters[expr_strs[i]].undefinedOrEmptyString() && parameters["expr"].undefinedOrEmptyString()) {
               operators[i] = Operator(MEMSET, 0); //for no real reason
               continue;
