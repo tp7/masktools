@@ -2,10 +2,11 @@
 #define __Common_Clip_H__
 
 #include "../frame/frame.h"
+#include <memory>
 
 namespace Filtering { 
 
-class Clip : public RefCounted {
+class Clip {
 
 protected:
 
@@ -27,11 +28,11 @@ public:
    virtual Frame<Byte> get_frame(int n) = 0;
    virtual Frame<const Byte> get_const_frame(int n) = 0;
    virtual void release_frames() = 0;
-   Clip *copy() { add_ref(); return this; }
+   //Clip *copy() { add_ref(); return this; }
 
 };
 
-typedef SmartPointer<Clip> PClip;
+typedef std::shared_ptr<Clip> PClip;
 typedef std::vector<PClip> ClipArray;
 
 } // namespace Filtering

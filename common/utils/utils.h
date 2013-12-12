@@ -174,63 +174,6 @@ static const int pixel_sizes[3][COLORSPACE_COUNT] =
 
 template<Colorspace C> int pixel_size(int nPlane) { return pixel_sizes[C][nPlane]; }
 
-/* ref counted class */
-class RefCounted {
-
-   int nRefCount;
-
-public:
-
-   RefCounted() : nRefCount(0) {}
-   ~RefCounted() { assert( nRefCount == 0 ); }
-
-   void add_ref() { nRefCount++; }
-   void del_ref() { nRefCount--; }
-   bool is_refed() const { return nRefCount > 0; }
-   int get_ref() const { return nRefCount; }
-   
-};
-
-
-/* smart pointer template */
-template<class T>
-class SmartPointer {
-
-   T *p;
-
-public:
-
-   SmartPointer() : p(NULL) { }
-   SmartPointer(T *p) : p(p ? p->copy() : NULL) { }
-   SmartPointer(const SmartPointer<T> &p) : p(p.p ? p.p->copy() : NULL) { }
-   ~SmartPointer()
-   {
-      if ( !p )
-         return;
-
-      p->del_ref();
-
-      if ( !p->is_refed() )
-         delete p;
-   }
-   SmartPointer &operator =(const SmartPointer<T> &p)
-   {
-      if ( this->p )
-      {
-         this->p->del_ref();
-
-         if ( !this->p->is_refed() )
-            delete this->p;
-      }
-
-      this->p = p.p ? p.p->copy() : NULL;
-
-      return *this;
-   }
-   operator T*() const { return p; }
-   T *operator->() const { assert( p ); return p; }
-};
-
 } // namespace Filtering
 
 #endif
