@@ -59,21 +59,21 @@ protected:
 public:
 
     Filter(const Parameters &parameters, FilterProcessingType processingType) :
-        parameters(parameters), 
+        parameters(parameters),
         flags(Functions::get_cpu_flags()),
         inPlace_(processingType == FilterProcessingType::INPLACE),
-        nXOffset( parameters["offx"].toInt() ),
+        nXOffset(parameters["offx"].toInt()),
         nYOffset(parameters["offy"].toInt()),
         nCoreWidth(parameters["w"].toInt()),
         nCoreHeight(parameters["h"].toInt())
     {
-        for(auto &param: parameters) {
+        for (auto &param: parameters) {
             if (param.getType() == TYPE_CLIP) {
                 childs.push_back(param.getValue().toClip());
             }
         }
 
-        assert( !childs.empty() );
+        assert(!childs.empty());
 
         nWidth = childs[0]->width();
         nHeight = childs[0]->height();
@@ -83,45 +83,45 @@ public:
         operators[1] = Operator(parameters["U"].toInt());
         operators[2] = Operator(parameters["V"].toInt());
 
-        if ( nXOffset < 0 || nXOffset > nWidth  ) nXOffset = 0;
-        if ( nYOffset < 0 || nYOffset > nHeight ) nYOffset = 0;
-        if ( nXOffset + nCoreWidth  > nWidth  || nCoreWidth  < 0 ) nCoreWidth  = nWidth - nXOffset;
-        if ( nYOffset + nCoreHeight > nHeight || nCoreHeight < 0 ) nCoreHeight = nHeight - nYOffset;
+        if (nXOffset < 0 || nXOffset > nWidth) nXOffset = 0;
+        if (nYOffset < 0 || nYOffset > nHeight) nYOffset = 0;
+        if (nXOffset + nCoreWidth  > nWidth  || nCoreWidth  < 0) nCoreWidth = nWidth - nXOffset;
+        if (nYOffset + nCoreHeight > nHeight || nCoreHeight < 0) nCoreHeight = nHeight - nYOffset;
 
-        if ( parameters["chroma"].is_defined() )
+        if (parameters["chroma"].is_defined())
         {
             /* overrides chroma channel operators according to the "chroma" string */
             String chroma = parameters["chroma"].toString();
 
-            if ( chroma == "process" )
+            if (chroma == "process")
                 operators[1] = operators[2] = PROCESS;
-            else if ( chroma == "copy" )
+            else if (chroma == "copy")
                 operators[1] = operators[2] = COPY;
-            else if ( chroma == "copy first" )
+            else if (chroma == "copy first")
                 operators[1] = operators[2] = COPY;
-            else if ( chroma == "copy second" )
+            else if (chroma == "copy second")
                 operators[1] = operators[2] = COPY_SECOND;
-            else if ( chroma == "copy third" )
+            else if (chroma == "copy third")
                 operators[1] = operators[2] = COPY_THIRD;
             else
-                operators[1] = operators[2] = Operator( MEMSET, atoi( chroma.c_str() ) );
+                operators[1] = operators[2] = Operator(MEMSET, atoi(chroma.c_str()));
         }
 
         /* checks the operators */
-        for ( int i = 0; i < 3; i++ )
+        for (int i = 0; i < 3; i++)
         {
-            if ( operators[i] == COPY_THIRD && childs.size() < 3 )
+            if (operators[i] == COPY_THIRD && childs.size() < 3)
                 operators[i] = COPY_SECOND;
-            if ( operators[i] == COPY_SECOND && childs.size() < 2 )
+            if (operators[i] == COPY_SECOND && childs.size() < 2)
                 operators[i] = COPY;
         }
 
-        if ( is_in_place() )
+        if (is_in_place())
         {
             /* in place filters copy differently */
-            for ( int i = 0; i < 3; i++ )
+            for (int i = 0; i < 3; i++)
             {
-                switch ( operators[i].getMode() )
+                switch (operators[i].getMode())
                 {
                 case COPY: operators[i] = NONE; break;
                 case COPY_SECOND: operators[i] = COPY; break;
@@ -131,21 +131,21 @@ public:
         }
 
         /* effective modes */
-        print( LOG_DEBUG, "modes : %i %i %i\n", operators[0].getMode(), operators[1].getMode(), operators[2].getMode() );
+        print(LOG_DEBUG, "modes : %i %i %i\n", operators[0].getMode(), operators[1].getMode(), operators[2].getMode());
 
         /* cpu flags */
-        if ( !parameters["sse2"].toBool() ) flags &= ~CPU_SSE2;
-        if ( !parameters["sse3"].toBool() ) flags &= ~CPU_SSE3;
-        if ( !parameters["ssse3"].toBool() ) flags &= ~CPU_SSSE3;
-        if ( !parameters["sse4"].toBool() ) { 
+        if (!parameters["sse2"].toBool()) flags &= ~CPU_SSE2;
+        if (!parameters["sse3"].toBool()) flags &= ~CPU_SSE3;
+        if (!parameters["ssse3"].toBool()) flags &= ~CPU_SSSE3;
+        if (!parameters["sse4"].toBool()) {
             flags &= ~CPU_SSE4_1;
             flags &= ~CPU_SSE4_2;
         }
 
-        print( LOG_DEBUG, "using cpu flags : 0x%x\n", flags );
+        print(LOG_DEBUG, "using cpu flags : 0x%x\n", flags);
 
         /* chroma offsets and box */
-        if ( C != COLORSPACE_Y8 && C != COLORSPACE_NONE )
+        if (C != COLORSPACE_Y8 && C != COLORSPACE_NONE)
         {
             nXOffsetUV = nXOffset / width_ratios[1][C];
             nYOffsetUV = nYOffset / height_ratios[1][C];
@@ -154,10 +154,10 @@ public:
         }
 
         /* effective offset */
-        print( LOG_DEBUG, "offset : %i %i, width x height : %i x %i\n", nXOffset, nYOffset, nCoreWidth, nCoreHeight );
+        print(LOG_DEBUG, "offset : %i %i, width x height : %i x %i\n", nXOffset, nYOffset, nCoreWidth, nCoreHeight);
 
         /* check the colorspace */
-        if ( C == COLORSPACE_NONE )
+        if (C == COLORSPACE_NONE)
             error = "unsupported colorspace. masktools only support planar YUV colorspaces (YV12, YV16, YV24)";
     }
 
@@ -198,20 +198,27 @@ public:
 
     virtual Frame<Byte> get_frame(int n, const Frame<Byte> &output_frame)
     {
-        Frame<Byte> output = output_frame.offset( nXOffset, nYOffset, nCoreWidth, nCoreHeight );
+        Frame<Byte> output = output_frame.offset(nXOffset, nYOffset, nCoreWidth, nCoreHeight);
 
-        for ( int i = 0; i < int( input_configuration().size() ); i++ )
-            frames.push_back( childs[ input_configuration()[i].index() ]->get_const_frame( n + input_configuration()[i].offset() ).offset( nXOffset, nYOffset, nCoreWidth, nCoreHeight ) );
+        for (int i = 0; i < int(input_configuration().size()); i++) {
+            frames.push_back(
+                childs[input_configuration()[i].index()]->get_const_frame(n + input_configuration()[i].offset())
+                .offset(nXOffset, nYOffset, nCoreWidth, nCoreHeight));
+        }
 
-        for ( int i = 0; i < plane_counts[C]; i++ )
-            constraints[i] = Constraint( flags, output.plane(i) );
+        for (int i = 0; i < plane_counts[C]; i++) {
+            constraints[i] = Constraint(flags, output.plane(i));
+        }
 
-        for ( int i = 0; i < int(frames.size()); i++ )
-            for ( int j = 0; j < plane_counts[frames[i].colorspace()]; j++ )
-                constraints[j] = Constraint( constraints[j], frames[i].plane(j) );
+        for (int i = 0; i < int(frames.size()); i++) {
+            for (int j = 0; j < plane_counts[frames[i].colorspace()]; j++) {
+                constraints[j] = Constraint(constraints[j], frames[i].plane(j));
+            }
+        }
 
-        for ( int i = 0; i < plane_counts[C]; i++ )
-            process_plane( n, output.plane(i), i );
+        for (int i = 0; i < plane_counts[C]; i++) {
+            process_plane(n, output.plane(i), i);
+        }
 
         frames.clear();
 

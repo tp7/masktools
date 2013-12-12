@@ -73,19 +73,19 @@ public:
 template<class P>
 class Processor {
 
-   P           *processor;
-   int         nSpeed;
-   Constraint  constraint;
+    P           *processor;
+    int         nSpeed;
+    Constraint  constraint;
 
 public:
 
-   Processor() : processor(NULL), nSpeed(-1) { }
-   Processor(P *processor) : processor(processor), nSpeed( 0 ), constraint( CPU_NONE, 1, 1, 1, 1 ) { }
-   Processor(P *processor, const Constraint &constraint, int nSpeed) : processor(processor), nSpeed(nSpeed), constraint(constraint) { }
-   bool respect( const Constraint &constraint) const { return this->constraint.respect(constraint); }
-   int speed() const { return nSpeed; }
-   P* getFunction() const { return processor; }
-   void print() const { constraint.print(); }
+    Processor() : processor(NULL), nSpeed(-1) { }
+    Processor(P *processor) : processor(processor), nSpeed(0), constraint(CPU_NONE, 1, 1, 1, 1) { }
+    Processor(P *processor, const Constraint &constraint, int nSpeed) : processor(processor), nSpeed(nSpeed), constraint(constraint) { }
+    bool respect(const Constraint &constraint) const { return this->constraint.respect(constraint); }
+    int speed() const { return nSpeed; }
+    P* getFunction() const { return processor; }
+    void print() const { constraint.print(); }
 
 };
 
@@ -97,12 +97,12 @@ public:
 
    P *best_processor(const Constraint &constraint) const 
    {
-      int nBestSpeed = -1;
+      int best_speed = -1;
       const Processor<P> *best_proc;
 
       for(const auto &processor: *this) {
-          if (processor.speed() > nBestSpeed && processor.respect(constraint)) {
-              nBestSpeed = processor.speed();
+          if (processor.speed() > best_speed && processor.respect(constraint)) {
+              best_speed = processor.speed();
               best_proc = &processor;
           }
       }

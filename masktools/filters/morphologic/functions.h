@@ -253,7 +253,8 @@ static void xxpand_sse2_horizontal(Byte *pDst, ptrdiff_t nDstPitch, const Byte *
     int mod16_width = (nWidth / 16) * 16;
     int sse_loop_limit = nWidth == mod16_width ? mod16_width - 16 : mod16_width;
     
-    __m128i max_dev_v = _mm_set1_epi8(Byte(nMaxDeviation));
+    Byte max_dev = Byte(nMaxDeviation);
+    __m128i max_dev_v = _mm_set1_epi8(max_dev);
     __m128i left_mask = _mm_set_epi32(0, 0, 0, 0xFF);
 #pragma warning(disable: 4309)
     __m128i right_mask = _mm_set_epi8(0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -300,11 +301,11 @@ static void xxpand_sse2_horizontal(Byte *pDst, ptrdiff_t nDstPitch, const Byte *
 
              int x;
              for (x = mod16_width; x < nWidth-1; ++x) {
-                 Byte temp = c_core(l, pSrc[x], pSrc[x+1], nMaxDeviation);
+                 Byte temp = c_core(l, pSrc[x], pSrc[x+1], max_dev);
                  l = pSrc[x];
                  pDst[x] = temp;
              }
-             pDst[x] = c_core(l, pSrc[x], pSrc[x], nMaxDeviation);
+             pDst[x] = c_core(l, pSrc[x], pSrc[x], max_dev);
         }
         pSrc += nSrcPitch;
         pDst += nDstPitch;
