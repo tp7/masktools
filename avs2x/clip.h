@@ -1,7 +1,7 @@
 #ifndef __Common_Avs2x_Clip_H__
 #define __Common_Avs2x_Clip_H__
 
-#include "../common/common.h"
+#include "filter.h"
 #include "../common/utils/utils.h"
 
 #if defined(FILTER_AVS_25)
