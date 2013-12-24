@@ -8,6 +8,3 @@ Current roadmap:
 * High bitdepth support with Avisynth+.
 
 Internal multithreading or support for stacked clips will not be added.
-
-### License ###
-Everything is  [GPL v2](http://www.gnu.org/licenses/gpl-2.0.html). Not because I want it this way or anything.
