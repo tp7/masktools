@@ -15,11 +15,11 @@ class Lutspa : public MaskTools::Filter
    Byte *luts[3];
 
 protected:
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      Functions::copy_plane(dst.data(), dst.pitch(), luts[nPlane], dst.width(), dst.width(), dst.height());
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane, const Filtering::Frame<const Byte> frames[3], const Constraint constraints[3]) override
+    {
+        UNUSED(n); UNUSED(frames); UNUSED(constraints);
+        Functions::copy_plane(dst.data(), dst.pitch(), luts[nPlane], dst.width(), dst.width(), dst.height());
+    }
 
 public:
    Lutspa(const Parameters &parameters) : MaskTools::Filter(parameters, FilterProcessingType::CHILD)

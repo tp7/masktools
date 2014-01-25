@@ -18,7 +18,7 @@ class MakeDiff : public MaskTools::Filter
 
 protected:
 
-    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane, const Filtering::Frame<const Byte> frames[3], const Constraint constraints[3]) override
     {
         UNUSED(n);
         processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(), 

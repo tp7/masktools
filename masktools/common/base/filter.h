@@ -32,10 +32,7 @@ protected:
     int nXOffset, nYOffset, nXOffsetUV, nYOffsetUV;
     int nCoreWidth, nCoreHeight, nCoreWidthUV, nCoreHeightUV;
 
-    std::vector<Frame<const Byte> > frames;
-    Constraint constraints[3];
-
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane) = 0;
+   virtual void process(int n, const Plane<Byte> &dst, int nPlane, const Frame<const Byte> frames[3], const Constraint constraints[3]) = 0;
    virtual InputConfiguration &input_configuration() const = 0;
 
    static Signature &add_defaults(Signature &signature)
@@ -161,11 +158,8 @@ public:
             error = "unsupported colorspace. masktools only support planar YUV colorspaces (YV12, YV16, YV24)";
     }
 
-    void process_plane(int n, const Plane<Byte> &output_plane, int nPlane)
+    void process_plane(int n, const Plane<Byte> &output_plane, int nPlane, const Constraint constraints[3], const Frame<const byte> frames[3])
     {
-        /* need multiple constraints */
-        Constraint constraint = constraints[nPlane];
-
         switch (operators[nPlane].getMode())
         {
         case COPY:
@@ -189,37 +183,39 @@ public:
                 static_cast<Byte>(operators[nPlane].value()));
             break;
         case PROCESS:
-            process(n, output_plane, nPlane);
+            process(n, output_plane, nPlane, frames, constraints);
             break;
         case NONE:
         default: break;
         }
     }
 
-    virtual Frame<Byte> get_frame(int n, const Frame<Byte> &output_frame)
+    virtual Frame<Byte> get_frame(int n, const Frame<Byte> &output_frame, IScriptEnvironment *env)
     {
         Frame<Byte> output = output_frame.offset(nXOffset, nYOffset, nCoreWidth, nCoreHeight);
 
+        Frame<const Byte> frames[3];
+        Constraint constraints[3];
+
         for (int i = 0; i < int(input_configuration().size()); i++) {
-            frames.push_back(childs[input_configuration()[i].index()]->get_const_frame(n + input_configuration()[i].offset())
-                .offset(nXOffset, nYOffset, nCoreWidth, nCoreHeight));
+            
+            frames[i] = childs[input_configuration()[i].index()]->get_const_frame(n + input_configuration()[i].offset(), env)
+                .offset(nXOffset, nYOffset, nCoreWidth, nCoreHeight);
         }
 
         for (int i = 0; i < plane_counts[C]; i++) {
             constraints[i] = Constraint(flags, output.plane(i));
         }
 
-        for (int i = 0; i < int(frames.size()); i++) {
+        for (int i = 0; i < int(input_configuration().size()); i++) {
             for (int j = 0; j < plane_counts[frames[i].colorspace()]; j++) {
                 constraints[j] = Constraint(constraints[j], frames[i].plane(j));
             }
         }
 
         for (int i = 0; i < plane_counts[C]; i++) {
-            process_plane(n, output.plane(i), i);
+            process_plane(n, output.plane(i), i, constraints, frames);
         }
-
-        frames.clear();
 
         return output_frame;
     }

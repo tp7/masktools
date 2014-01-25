@@ -3,6 +3,14 @@
 
 #include "../frame/frame.h"
 #include <memory>
+#if defined(FILTER_AVS_25)
+#include "avisynth-2_5.h"
+#elif defined(FILTER_AVS_26)
+#include <windows.h>
+#include <avisynth.h>
+#else
+#error FILTER_AVS_2x not defined
+#endif
 
 namespace Filtering { 
 
@@ -24,9 +32,8 @@ public:
    int frame_count() const { return nFrames; }
    Colorspace colorspace() const { return C; }
 
-   virtual Frame<Byte> get_frame(int n) = 0;
-   virtual Frame<const Byte> get_const_frame(int n) = 0;
-   virtual void release_frames() = 0;
+   virtual Frame<Byte> get_frame(int n, IScriptEnvironment *env) = 0;
+   virtual Frame<const Byte> get_const_frame(int n, IScriptEnvironment *env) = 0;
 
 };
 

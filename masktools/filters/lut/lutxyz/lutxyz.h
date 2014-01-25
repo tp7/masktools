@@ -34,14 +34,14 @@ class Lutxyz : public MaskTools::Filter
    }
 
 protected:
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      lut_c(dst.data(), dst.pitch(), 
-          frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
-          frames[1].plane(nPlane).data(), frames[1].plane(nPlane).pitch(),
-          dst.width(), dst.height(), luts[nPlane].ptr);
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane, const Filtering::Frame<const Byte> frames[3], const Constraint constraints[3]) override
+    {
+        UNUSED(n);
+        lut_c(dst.data(), dst.pitch(),
+            frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+            frames[1].plane(nPlane).data(), frames[1].plane(nPlane).pitch(),
+            dst.width(), dst.height(), luts[nPlane].ptr);
+    }
 
 public:
    Lutxyz(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )

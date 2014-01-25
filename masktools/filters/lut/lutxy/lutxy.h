@@ -15,11 +15,11 @@ class Lutxy : public MaskTools::Filter
    Byte luts[3][65536];
 
 protected:
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      lut_c(dst.data(), dst.pitch(), frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(), dst.width(), dst.height(), luts[nPlane]);
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane, const ::Filtering::Frame<const Byte> frames[3], const Constraint constraints[3]) override
+    {
+        UNUSED(n);
+        lut_c(dst.data(), dst.pitch(), frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(), dst.width(), dst.height(), luts[nPlane]);
+    }
 
 public:
    Lutxy(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::INPLACE )

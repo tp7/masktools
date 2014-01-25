@@ -8,7 +8,7 @@
 #include "avisynth-2_5.h"
 #elif defined(FILTER_AVS_26)
 #include <windows.h>
-#include "avisynth-2_6.h"
+#include <avisynth.h>
 #else
 #error FILTER_AVS_2x not defined
 #endif
@@ -74,8 +74,6 @@ class Clip : public Filtering::Clip {
     ::PClip pclip;
     IScriptEnvironment *env;
 
-    std::vector<PVideoFrame> frames;
-
 public:
 
     Clip(const ::PClip &pclip) : pclip(pclip), env(NULL)
@@ -109,27 +107,17 @@ public:
         return plane_counts[C] == 1 ? Frame<T>(planes[0]) : Frame<T>(planes, C);
     }
 
-    virtual Frame<Byte> get_frame(int n)
+    virtual Frame<Byte> get_frame(int n, IScriptEnvironment *env)
     {
         PVideoFrame frame = pclip->GetFrame(n, env);
-        frames.push_back(frame);
         return ConvertTo<Byte>(frame);
     }
 
-   virtual Frame<const Byte> get_const_frame(int n)
+   virtual Frame<const Byte> get_const_frame(int n, IScriptEnvironment *env)
    {
        PVideoFrame frame = pclip->GetFrame(clip<int>(n, 0, nFrames - 1), env);
-       frames.push_back(frame);
        return ConvertTo<const Byte>(frame);
    }
-
-   virtual void release_frames()
-   {
-       frames.clear();
-   }
-
-   void set_env(IScriptEnvironment *env) { this->env = env; }
-
 };
 
 } } // namespace Avisynth2x, Common

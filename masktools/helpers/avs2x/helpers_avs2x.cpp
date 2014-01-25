@@ -3,7 +3,7 @@
 #include "../../../avs2x/avisynth-2_5.h"
 #elif defined(FILTER_AVS_26)
 #include <windows.h>
-#include "../../../avs2x/avisynth-2_6.h"
+#include <avisynth.h>
 #endif
 #include "../../../common/utils/utils.h"
 #include "../../helpers/forms/forms.h"

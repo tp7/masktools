@@ -26,7 +26,7 @@ class Merge : public MaskTools::Filter
 
 protected:
 
-    virtual void process(int n, const Plane<Byte> &dst, int nPlane)
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane, const Frame<const Byte> frames[3], const Constraint constraints[3]) override
     {
         UNUSED(n);
         if (use_luma && (nPlane > 0)) {

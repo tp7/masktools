@@ -17,14 +17,14 @@ class MappedBlur : public MaskTools::Filter
 
    ProcessorList<Processor> processors;
 protected:
-   virtual void process(int n, const Plane<Byte> &dst, int nPlane)
-   {
-      UNUSED(n);
-      processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(),
-          frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
-          frames[1].plane(nPlane).data(), frames[1].plane(nPlane).pitch(),
-          matrix, dst.width(), dst.height());
-   }
+    virtual void process(int n, const Plane<Byte> &dst, int nPlane, const Frame<const Byte> frames[3], const Constraint constraints[3]) override
+    {
+        UNUSED(n);
+        processors.best_processor(constraints[nPlane])(dst.data(), dst.pitch(),
+            frames[0].plane(nPlane).data(), frames[0].plane(nPlane).pitch(),
+            frames[1].plane(nPlane).data(), frames[1].plane(nPlane).pitch(),
+            matrix, dst.width(), dst.height());
+    }
 
 public:
    MappedBlur(const Parameters &parameters) : MaskTools::Filter( parameters, FilterProcessingType::CHILD )
